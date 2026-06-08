@@ -1,0 +1,502 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+html {
+  height: 100%;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: white;
+  font-family: roboto, arial;
+  outline: 0;
+}
+
+p {
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.layout {
+  display: flex;
+  flex-grow: 1;
+}
+
+.sidebar {
+  width: 200px;
+  background-color: #0c1117;
+  display: flex;
+  border-radius: 10px;
+  flex-direction: column;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  z-index: 200;
+  height: 100vh;
+  overflow-y: auto;
+  position: fixed;
+}
+
+.sidebar::-webkit-scrollbar {
+  background: transparent;
+  display: none;
+}
+
+.goalIQ-name {
+  height: 30px;
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+  padding: 11px 30px 11px 15px;
+  position: relative;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.sidebar-link svg {
+  height: 32px;
+  width: 32px;
+  stroke-width: 1;
+  stroke: currentColor;
+  fill: #0c1117;
+}
+
+.sidebar-link.active {
+  background: linear-gradient(to right,
+      #081423 0%,
+      #1151a0 40%, transparent 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 120, 0.08);
+  padding-top: 11px;
+  padding-bottom: 11px;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  color: blue;
+}
+
+.sidebar-link.active::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 4px;
+  width: 4px;
+  height: 85%;
+  background-color: #0222d8;
+  border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.sidebar-link:hover {
+  background-color: #1b2b3e;
+
+}
+
+.sidebar-link img {
+  height: 30px;
+}
+
+.sidebar-link Div {
+  color: white;
+  font-family: roboto, arial;
+  font-size: 14px;
+}
+
+.crown-upgradecontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 80px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.icon-text {
+  display: flex;
+  width: 85%;
+  padding: 15px 10px 15px 10px;
+  border: solid #465261 1px;
+  border-radius: 16px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.goalIQ-pro-icon {
+  height: 18px;
+}
+
+.upgrade-text {
+  font-family: roboto, arial;
+  font-size: 11px;
+  line-height: 20px;
+}
+
+.upgrade-button {
+  background-color: #0222d8;
+  padding: 10px 15px 10px 15px;
+  border-radius: 6px;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.profile-premium {
+  display: flex;
+  gap: 35px;
+  align-items: center;
+  position: relative;
+  margin-top: 30px;
+}
+
+.gap-container {
+  display: flex;
+  gap: 10px;
+}
+
+.position-absolute-premium-proflie {
+  background-color: red;
+  border-radius: 50%;
+  font-size: 6px;
+  position: absolute;
+  bottom: 6px;
+  left: 28px;
+  height: 10px;
+  width: 10px;
+}
+
+.dropdownarrow-button {
+  background-color: #0c1117;
+  border: none;
+}
+
+.dropdownarrow {
+  height: 10px;
+}
+
+.text-premuim {
+  color: #009950;
+}
+
+.parent-container {
+  width: calc(100% - 200px);
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  padding: 80px 0 0 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 15px;
+  z-index: 200;
+  position: fixed;
+  background: transparent;
+  backdrop-filter: blur(5px);
+  width: calc(100% - 200px);
+  top: 0;
+}
+
+.header-middle {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 420px;
+  height: 50px;
+  background-color: #0c1117;
+  border-radius: 50px;
+  padding: 0 14px;
+}
+
+.search-box input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 14px;
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
+.notifications-icon {
+  height: 25px;
+  width: 25px;
+  stroke: white;
+}
+
+.position-relative-container {
+  position: relative;
+}
+
+.position-absolute-container {
+  position: absolute;
+  background-color: red;
+  border-radius: 50%;
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  font-size: 10px;
+  top: -8px;
+  right: -6px;
+}
+
+.profile-picture {
+  height: 40px;
+  border-radius: 50%;
+}
+
+.position-absolute-profile {
+  background-color: red;
+  border-radius: 50%;
+  font-size: 6px;
+  position: absolute;
+  bottom: 8px;
+  left: 28px;
+  height: 10px;
+  width: 10px;
+}
+
+.Matches-section {
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 60%;
+}
+
+.date-picker svg {
+  height: 25px;
+  width: 25px;
+  stroke-width: 1;
+  stroke: currentColor;
+  fill: #0c1117;
+}
+
+.ads-img-container {
+  width: 100%;
+  overflow: hidden;
+  height: 100px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  background: #000;
+}
+
+.ads-picture {
+  object-fit: fill;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  image-rendering: crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.father-today-the-rest {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  background-color: #0c1117;
+  padding: 14px 14px 14px 14px;
+}
+
+.today-right-left-arrow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 13px;
+  border-bottom: solid 1px #465261;
+}
+
+.today-side-arrow-button {
+  border: none;
+  border-radius: 50px;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 5px 5px 5px 5px;
+  background-color: #1b2b3e;
+  cursor: pointer;
+}
+
+.date-picker {
+  font-size: 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.live-finished-trending-all-main-container {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  padding-left: 14px;
+  padding-right: 14px;
+  padding-top: 13px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.l-f-t-a-button {
+  color: white;
+  background-color: #1b2b3e;
+  border-radius: 50px;
+  padding: 5px 15px 5px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-transform: capitalize;
+  width: 90px;
+}
+
+.live-button {
+  color: white;
+  background-color: rgb(70, 9, 9);
+  border-radius: 50px;
+  padding: 5px 15px 5px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  text-transform: capitalize;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.livematches-section {
+  width: 100%;
+  border: none;
+  border-radius: 16px;
+  background-color: #0c1117;
+  padding: 14px 14px 0px 14px;
+}
+
+.livematches-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.live-matches-header {
+  display: flex;
+  justify-content: space-between;
+  text-transform: capitalize;
+}
+
+.pulsing-dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+  background: #d41b27;
+  display: flex;
+}
+
+.team-logo {
+  height: 30px;
+}
+
+.matches {
+  display: flex;
+  flex-direction: column;
+}
+
+.each-match {
+  display: flex;
+  justify-content: space-between;
+  place-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid #465261;
+}
+
+.each-match:last-child {
+  border-bottom: none;
+}
+
+.each-match>.time {
+  color: #d41b27;
+  font-size: 1.14em;
+}
+
+.scores {
+  color: #d41b27;
+  font-size: 1.26em;
+}
+
+.teams {
+  display: flex;
+  place-items: center;
+  gap: 54px;
+}
+
+.home-team,
+.away-team {
+  display: flex;
+  place-items: center;
+  gap: 20px;
+  min-width: 140px;
+}
+
+.favourite-svg {
+  cursor: pointer;
+  fill: #0c1117;
+}
+
+.favourite-svg.active {
+  fill: #fff;
+}
+
+.main-container {
+  display: flex;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
