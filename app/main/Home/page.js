@@ -1,8 +1,9 @@
+import HomeBody from "@/app/components/HomeBody"
 
 function Home() {
   return (
-    <div>
-      
+    <div className="parent-container">
+      <HomeBody />
     </div>
   )
 }
