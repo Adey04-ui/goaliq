@@ -546,12 +546,12 @@ body {
 
   .allLeaguesContainer>.searchBar-filter {
     display: flex;
-    gap: 12px;
+    gap: 7px;
   }
 
   .allLeaguesContainer>.searchBar-filter>.searchBar {
     display: flex;
-    width: 82%;
+    width: 78%;
   }
 
   .allLeaguesContainer>.searchBar-filter>.searchBar>input {
@@ -585,12 +585,12 @@ body {
   .allLeaguesList>.eachList {
     display: flex;
     justify-content: space-between;
-    padding: 10px 12px;
+    padding: 12px 12px;
     border-radius: 8px;
     transition: all 0.3s ease;
     cursor: pointer;
-    border: solid;
     font-size: 15px;
+    background: #1b2b3e;
   }
 
   .allLeaguesList>.eachList>.left {
@@ -599,11 +599,48 @@ body {
     align-items: center;
   }
 
+  .allLeaguesList>.eachList>.left>.leagueDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .allLeaguesList>.eachList>.left>.leagueDetails>.countryName {
+    display: flex;
+    gap: 8px;
+    font-size: 13px;
+  }
+
   .allLeaguesList>.eachList>.right {
     display: flex;
     gap: 16px;
     align-items: center;
   }
+  .dropdown-container {
+  width: 130px;
+  display: flex;
+  flex-direction: column;
+  background: #0c1117;
+  padding: 7px 8px;
+  border-radius: 6px;
+  gap: 3px;
+}
+
+.dropdown-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  outline: none;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+}
+
+.dropdown-item:hover {
+  border: none;
+  background: #2b2b2b;
+  border-radius: 5px;
+}
 }
 
 @media (prefers-color-scheme: dark) {
