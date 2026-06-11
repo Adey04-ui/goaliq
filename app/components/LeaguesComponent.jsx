@@ -7,6 +7,7 @@ import useSWR from "swr"
 import Image from "next/image"
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { signIn } from "next-auth/react"
+import { toggleFavourite } from "@/services/favourites"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -47,6 +48,19 @@ function LeaguesComponent() {
   const handleSelect = (season) => {
     setSelected(season)
   }
+
+  const handleFav = async (league) => {
+    const req = await toggleFavourite({
+      itemId: league.id,
+      type: "LEAGUE",
+      name: league.name,
+      logo: league.logo,
+    })
+
+    if(req) {
+      
+    }
+  }
   console.log(leagues)
 
   return (
@@ -75,48 +89,48 @@ function LeaguesComponent() {
             placeholder="Search leagues..."
           />
         </div>
-        <div className="dropdown" style={{width: '21.5%'}}>
+        <div className="dropdown" style={{ width: '21.5%' }}>
           <DropdownMenu.Root modal={false}>
-              <DropdownMenu.Trigger asChild>
-                <button className="button" style={{display: 'flex', width: '100%', background: 'transparent', border: '.5px solid #5c5c5c', padding: '8px 6px', borderRadius: '6px', justifyContent: 'space-between', placeItems: 'center', textTransform: 'capitalize', cursor: 'pointer'}}>
-                  <div style={{ display: 'flex', gap: '6px', fontSize: '13px' }}>
-                    <span className='status'>season</span>
-                    <span className='menu' style={{ color: `${selected.color}` }}>
-                      {selected}
-                    </span>
-                  </div>
-                  <span className="icpon">
-                    <ChevronDown size={16} />
+            <DropdownMenu.Trigger asChild>
+              <button className="button" style={{ display: 'flex', width: '100%', background: 'transparent', border: '.5px solid #5c5c5c', padding: '8px 6px', borderRadius: '6px', justifyContent: 'space-between', placeItems: 'center', textTransform: 'capitalize', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', gap: '6px', fontSize: '13px' }}>
+                  <span className='status'>season</span>
+                  <span className='menu' style={{ color: `${selected.color}` }}>
+                    {selected}
                   </span>
-                </button>
-              </DropdownMenu.Trigger>
+                </div>
+                <span className="icpon">
+                  <ChevronDown size={16} />
+                </span>
+              </button>
+            </DropdownMenu.Trigger>
 
-              <DropdownMenu.Portal>
-                <DropdownMenu.Content
-                  className="dropdown-container"
-                  sideOffset={8}
-                >
-                  {seasons.map((season) => (
-                    <DropdownMenu.Item key={season} onSelect={() => handleSelect(season)} className="dropdown-item" style={{  }}>
-                      {season}
-                      {selected === season && <CheckCircle size={15} />}
-                    </DropdownMenu.Item>
-                  ))}
-                </DropdownMenu.Content>
-              </DropdownMenu.Portal>
-            </DropdownMenu.Root>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content
+                className="dropdown-container"
+                sideOffset={8}
+              >
+                {seasons.map((season) => (
+                  <DropdownMenu.Item key={season} onSelect={() => handleSelect(season)} className="dropdown-item" style={{}}>
+                    {season}
+                    {selected === season && <CheckCircle size={15} />}
+                  </DropdownMenu.Item>
+                ))}
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
         </div>
       </div>
       <button onClick={() => signIn("google")}>
-      Continue with Google
-    </button>
+        Continue with Google
+      </button>
 
       <div className="allLeaguesList">
         {leagues.map((league) => (
           <div className="eachList" key={league.league.id}>
             <div className="left">
               <div className="leagueImage">
-                <Image width={40} height={40} alt="league_logo" src={league.league.logo} style={{objectPosition: 'center', objectFit: 'contain'}} />
+                <Image width={40} height={40} alt="league_logo" src={league.league.logo} style={{ objectPosition: 'center', objectFit: 'contain' }} />
               </div>
               <div className="leagueDetails">
                 <div className="leagueName">
@@ -125,7 +139,7 @@ function LeaguesComponent() {
                 <div className="countryName">
                   {league.country.flag && (
                     <div className="countryImage">
-                      <Image width={15} height={15} alt="country_flag" src={league.country.flag} style={{borderRadius: '4px'}} />
+                      <Image width={15} height={15} alt="country_flag" src={league.country.flag} style={{ borderRadius: '4px' }} />
                     </div>
                   )}
                   {league.country.name}
@@ -133,7 +147,7 @@ function LeaguesComponent() {
               </div>
             </div>
             <div className="right">
-              <div className="favourite-btn">
+              <div className="favourite-btn" onClick={handleFav(league.league)}>
                 <svg style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff', }} viewBox="0 0 24 24"
                   className="favourite-svg">
                   <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
