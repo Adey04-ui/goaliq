@@ -1,7 +1,14 @@
+"use client"
+
 import Image from 'next/image'
 import React from 'react'
+import { useSession } from "next-auth/react"
 
 function Topbar() {
+  const { data: session, status } = useSession()
+
+  console.log("Session data in Topbar:", session)
+
   return (
     <div className="header">
       <div className="header-left"></div>
@@ -26,7 +33,7 @@ function Topbar() {
           <div className="position-absolute-container">3</div>
         </div>
         <div className="position-relative-container active">
-          <Image className="profile-picture" src="/assets/goalIQ1.png" alt="profile" width={30} height={30} />
+          <Image className="profile-picture" src={session?.user?.image} alt="profile" width={30} height={30} />
             <div className="position-absolute-profile"></div>
         </div>
       </div>

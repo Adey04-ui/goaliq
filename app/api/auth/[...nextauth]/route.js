@@ -1,9 +1,9 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import {prisma} from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
 
-const handler = NextAuth({
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -16,6 +16,8 @@ const handler = NextAuth({
   session: {
     strategy: "database",
   },
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }

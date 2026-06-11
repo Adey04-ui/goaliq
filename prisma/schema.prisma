@@ -22,7 +22,7 @@ model User {
   accounts Account[]
   sessions Session[]
 
-  favorites FavoriteLeague[]
+  favorites Favorite[]
 }
 
 model Account {
@@ -61,14 +61,26 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model FavoriteLeague {
-  id       String  @id @default(cuid())
-  leagueId Int
-  name     String
-  logo     String?
+enum FavoriteType {
+  LEAGUE
+  TEAM
+  MATCH
+}
+
+model Favorite {
+  id String @id @default(cuid())
+
+  type   FavoriteType
+  itemId Int
+
+  name String
+  logo String?
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
+
+  @@unique([userId, type, itemId])
+  @@map("FavoriteLeague")
 }

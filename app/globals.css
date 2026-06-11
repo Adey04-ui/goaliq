@@ -295,7 +295,6 @@ body {
   }
 
   .profile-picture {
-    height: 40px;
     border-radius: 50%;
   }
 
@@ -304,8 +303,8 @@ body {
     border-radius: 50%;
     font-size: 6px;
     position: absolute;
-    bottom: 8px;
-    left: 28px;
+    bottom: 3px;
+    left: 24px;
     height: 10px;
     width: 10px;
   }
