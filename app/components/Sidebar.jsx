@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
+import ball from "../assets/goalIQ17.png"
 
 function Sidebar() {
   const pathname = usePathname()
@@ -14,10 +15,11 @@ function Sidebar() {
       <div className="logo-container">
         <Image width={20} height={20} alt="" className="goalIQ-name" src="/assets/goalIQ16.png" />
       </div>
-      <div className={`sidebar-link ${pathname == '/main/home' ? 'active' : ''}`}  onClick={()=> router.push('/main/home')}><Image width={20} height={20} src="/assets/goalIQ17.png" alt="ball" />
+      <div className={`sidebar-link ${pathname == '/main/home' ? 'active' : ''}`} onClick={() => router.push('/main/home')}>
+        <Image width={30} height={30} src={ball} alt="ball" />
         <div>Matches</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/leagues' ? 'active' : ''}`} onClick={()=> router.push('/main/leagues')}>
+      <div className={`sidebar-link ${pathname == '/main/leagues' ? 'active' : ''}`} onClick={() => router.push('/main/leagues')}>
         <svg viewBox="0 0 24 24">
           <path d="M6 4h12v3a6 6 0 0 1-12 0z" />
           <path d="M9 21h6" />
@@ -27,7 +29,7 @@ function Sidebar() {
         </svg>
         <div>Leagues</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/news' ? 'active' : ''}`} onClick={()=> setCurrent('news')}>
+      <div className={`sidebar-link ${pathname == '/main/news' ? 'active' : ''}`} onClick={() => setCurrent('news')}>
         <svg viewBox="0 0 24 24">
           <rect x="3" y="4" width="18" height="16" rx="2" />
           <rect x="6" y="7" width="6" height="4" />
@@ -38,13 +40,13 @@ function Sidebar() {
         </svg>
         <div>News</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/following' ? 'active' : ''}`} onClick={()=> setCurrent('following')}>
+      <div className={`sidebar-link ${pathname == '/main/following' ? 'active' : ''}`} onClick={() => setCurrent('following')}>
         <svg viewBox="0 0 24 24">
           <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
         </svg>
         <div>Following</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/calender' ? 'active' : ''}`}  onClick={()=> setCurrent('calender')}>
+      <div className={`sidebar-link ${pathname == '/main/calender' ? 'active' : ''}`} onClick={() => setCurrent('calender')}>
         <svg viewBox="0 0 24 24">
           <rect x="3" y="5" width="18" height="16" rx="2" />
           <line x1="3" y1="10" x2="21" y2="10" />
@@ -53,7 +55,7 @@ function Sidebar() {
         </svg>
         <div>Calender</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/settings' ? 'active' : ''}`}  onClick={()=> setCurrent('settings')}>
+      <div className={`sidebar-link ${pathname == '/main/settings' ? 'active' : ''}`} onClick={() => setCurrent('settings')}>
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
           <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
