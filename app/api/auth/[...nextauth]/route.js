@@ -16,6 +16,10 @@ export const authOptions = {
   session: {
     strategy: "database",
   },
+
+  pages: {
+    error: "/auth/error",
+  },
 }
 
 const handler = NextAuth(authOptions)

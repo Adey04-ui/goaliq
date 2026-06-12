@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALIQ</title>
+
+  <link rel="stylesheet" href="./goaliq-style/right-side.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      color: white;
+      font-family: roboto, arial;
+      outline: 0;
+    }
+
+    p {
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .layout {
+      display: flex;
+      flex-grow: 1;
+    }
+
+    .sidebar {
+      width: 200px;
+      background-color: #0c1117;
+      display: flex;
+      border-radius: 10px;
+      flex-direction: column;
+      padding-top: 25px;
+      padding-bottom: 25px;
+      z-index: 200;
+      height: 100vh;
+      overflow-y: auto;
+      position: fixed;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      background: transparent;
+      display: none;
+    }
+
+    .goalIQ-name {
+      height: 30px;
+    }
+
+    .logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      gap: 10px;
+      padding: 11px 30px 11px 15px;
+      position: relative;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .sidebar-link svg {
+      height: 32px;
+      width: 32px;
+      stroke-width: 1;
+      stroke: currentColor;
+      fill: #0c1117;
+    }
+
+    .sidebar-link.active {
+      background: linear-gradient(to right,
+          #081423 0%,
+          #1151a0 40%, transparent 100%);
+      box-shadow: 0 0 20px rgba(0, 255, 120, 0.08);
+      padding-top: 11px;
+      padding-bottom: 11px;
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+      color: blue;
+    }
+
+    .sidebar-link.active::before {
+      content: "";
+      position: absolute;
+      left: -2px;
+      top: 4px;
+      width: 4px;
+      height: 85%;
+      background-color: #0222d8;
+      border-bottom-right-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+
+    .sidebar-link:hover {
+      background-color: #1b2b3e;
+
+    }
+
+    .sidebar-link img {
+      height: 30px;
+    }
+
+    .sidebar-link Div {
+      color: white;
+      font-family: roboto, arial;
+      font-size: 14px;
+    }
+
+    .crown-upgradecontainer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 80px;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .icon-text {
+      display: flex;
+      width: 85%;
+      padding: 15px 10px 15px 10px;
+      border: solid #465261 1px;
+      border-radius: 16px;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .goalIQ-pro-icon {
+      height: 18px;
+    }
+
+    .upgrade-text {
+      font-family: roboto, arial;
+      font-size: 11px;
+      line-height: 20px;
+    }
+
+    .upgrade-button {
+      background-color: #0222d8;
+      padding: 10px 15px 10px 15px;
+      border-radius: 6px;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .profile-premium {
+      display: flex;
+      gap: 35px;
+      align-items: center;
+      position: relative;
+      margin-top: 30px;
+    }
+
+    .gap-container {
+      display: flex;
+      gap: 10px;
+    }
+
+    .position-absolute-premium-proflie {
+      background-color: red;
+      border-radius: 50%;
+      font-size: 6px;
+      position: absolute;
+      bottom: 6px;
+      left: 28px;
+      height: 10px;
+      width: 10px;
+    }
+
+    .dropdownarrow-button {
+      background-color: #0c1117;
+      border: none;
+    }
+
+    .dropdownarrow {
+      height: 10px;
+    }
+
+    .text-premuim {
+      color: #009950;
+    }
+
+    .parent-container {
+      width: calc(100% - 200px);
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      padding: 80px 0 0 0;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 15px;
+      z-index: 200;
+      position: fixed;
+      background: transparent;
+      backdrop-filter: blur(5px);
+      width: calc(100% - 200px);
+      top: 0;
+    }
+
+    .header-middle {
+      display: flex;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 420px;
+      height: 50px;
+      background-color: #0c1117;
+      border-radius: 50px;
+      padding: 0 14px;
+    }
+
+    .search-box input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 14px;
+    }
+
+    .search-icon {
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 25px;
+    }
+
+    .notifications-icon {
+      height: 25px;
+      width: 25px;
+      stroke: white;
+    }
+
+    .position-relative-container {
+      position: relative;
+    }
+
+    .position-absolute-container {
+      position: absolute;
+      background-color: red;
+      border-radius: 50%;
+      padding-left: 5px;
+      padding-right: 5px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      font-size: 10px;
+      top: -8px;
+      right: -6px;
+    }
+
+    .profile-picture {
+      height: 40px;
+      border-radius: 50%;
+    }
+
+    .position-absolute-profile {
+      background-color: red;
+      border-radius: 50%;
+      font-size: 6px;
+      position: absolute;
+      bottom: 8px;
+      left: 28px;
+      height: 10px;
+      width: 10px;
+    }
+
+    .Matches-section {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 60%;
+    }
+
+    .date-picker svg {
+      height: 25px;
+      width: 25px;
+      stroke-width: 1;
+      stroke: currentColor;
+      fill: #0c1117;
+    }
+
+    .ads-img-container {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 12px;
+      height: 150px;
+      flex-shrink: 0;
+      background: #000;
+    }
+
+    .ads-picture {
+      object-fit: fit;
+      width: 100%;
+      /* height: 200px; */
+      max-height: 100%;
+      image-rendering: crisp-edges;
+      image-rendering: -webkit-optimize-contrast;
+
+    }
+
+    .father-today-the-rest {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      background-color: #0c1117;
+      padding: 14px 14px 14px 14px;
+    }
+
+    .today-right-left-arrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 13px;
+      border-bottom: solid 1px #465261;
+    }
+
+    .today-side-arrow-button {
+      border: none;
+      border-radius: 50px;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+      padding: 5px 5px 5px 5px;
+      background-color: #1b2b3e;
+      cursor: pointer;
+    }
+
+    .date-picker {
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .live-finished-trending-all-main-container {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      padding-left: 14px;
+      padding-right: 14px;
+      padding-top: 13px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .l-f-t-a-button {
+      color: white;
+      background-color: #1b2b3e;
+      border-radius: 50px;
+      padding: 5px 15px 5px 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-transform: capitalize;
+      width: 90px;
+    }
+
+    .live-button {
+      color: white;
+      background-color: rgb(70, 9, 9);
+      border-radius: 50px;
+      padding: 5px 15px 5px 15px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      text-transform: capitalize;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .livematches-section {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      background-color: #0c1117;
+      padding: 14px 14px 0px 14px;
+    }
+
+    .livematches-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .live-matches-header {
+      display: flex;
+      justify-content: space-between;
+      text-transform: capitalize;
+    }
+
+    .pulsing-dot {
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      background: #d41b27;
+      display: flex;
+    }
+
+    .team-logo {
+      height: 30px;
+    }
+
+    .matches {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .each-match {
+      display: flex;
+      justify-content: space-between;
+      place-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #465261;
+    }
+
+    .each-match:last-child {
+      border-bottom: none;
+    }
+
+    .each-match>.time {
+      color: #d41b27;
+      font-size: 1.14em;
+    }
+
+    .scores {
+      color: #d41b27;
+      font-size: 1.26em;
+    }
+
+    .teams {
+      display: flex;
+      place-items: center;
+      gap: 54px;
+    }
+
+    .home-team,
+    .away-team {
+      display: flex;
+      place-items: center;
+      gap: 20px;
+      min-width: 140px;
+    }
+
+    .favourite-svg {
+      cursor: pointer;
+      fill: #0c1117;
+    }
+
+    .favourite-svg.active {
+      fill: #0222d8;
+    }
+
+    .main-container {
+      display: flex;
+      padding: 10px 20px;
+      gap: 24px;
+    }
+  </style>
+</head>
+
+<body style="background-color: #000000;">
+  <div class="layout">
+    <div class="sidebar">
+      <div class="logo-container">
+        <img class="goalIQ-name" src="goalIQ16.png">
+      </div>
+      <div class="sidebar-link active"><img src="goalIQ17.png" alt="ball">
+        <div>Matches</div>
+      </div>
+      <div class="sidebar-link">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 4h12v3a6 6 0 0 1-12 0z" />
+          <path d="M9 21h6" />
+          <path d="M12 16v5" />
+          <path d="M6 7H4a3 3 0 0 0 3 3" />
+          <path d="M18 7h2a3 3 0 0 1-3 3" />
+        </svg>
+        <div>Leagues</div>
+      </div>
+      <div class="sidebar-link">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="16" rx="2" />
+          <rect x="6" y="7" width="6" height="4" />
+          <line x1="13" y1="8" x2="18" y2="8" />
+          <line x1="13" y1="11" x2="18" y2="11" />
+          <line x1="6" y1="13" x2="18" y2="13" />
+          <line x1="6" y1="16" x2="14" y2="16" />
+        </svg>
+        <div>News</div>
+      </div>
+      <div class="sidebar-link">
+        <svg viewBox="0 0 24 24">
+          <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
+        </svg>
+        <div>Following</div>
+      </div>
+      <div class="sidebar-link">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="5" width="18" height="16" rx="2" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+          <line x1="8" y1="3" x2="8" y2="7" />
+          <line x1="16" y1="3" x2="16" y2="7" />
+        </svg>
+        <div>Calender</div>
+      </div>
+      <div class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="#0c1117" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+          <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M11.2707 2C9.86736 2 8.7297 3.13766 8.7297 4.54104C8.7297 4.74442 8.58945 5.01577 8.25424 5.19782C8.15109 5.25384 8.04936 5.3121 7.94912 5.37253C7.6148 5.57407 7.30096 5.56113 7.1167 5.4557C5.8929 4.75548 4.3334 5.17333 3.62365 6.39163L2.91923 7.60077C2.20812 8.82141 2.62778 10.3877 3.85393 11.0892C4.0317 11.191 4.19885 11.4497 4.19071 11.8346C4.18955 11.8896 4.18896 11.9448 4.18896 12C4.18896 12.0553 4.18955 12.1104 4.19071 12.1654C4.19885 12.5504 4.03171 12.8091 3.85395 12.9108C2.62781 13.6123 2.20815 15.1786 2.91926 16.3992L3.6237 17.6084C4.33345 18.8267 5.89293 19.2445 7.11673 18.5443C7.30099 18.4389 7.61481 18.4259 7.94912 18.6275C8.04936 18.6879 8.15109 18.7462 8.25424 18.8022C8.58945 18.9842 8.7297 19.2556 8.7297 19.459C8.7297 20.8623 9.86736 22 11.2707 22H12.7294C14.1328 22 15.2704 20.8623 15.2704 19.459C15.2704 19.2556 15.4107 18.9842 15.7459 18.8022C15.849 18.7462 15.9508 18.6879 16.051 18.6275C16.3853 18.4259 16.6991 18.4389 16.8834 18.5443C18.1072 19.2445 19.6667 18.8267 20.3764 17.6084L21.0809 16.3992C21.792 15.1786 21.3723 13.6123 20.1462 12.9108C19.9684 12.8091 19.8013 12.5504 19.8094 12.1654C19.8106 12.1104 19.8112 12.0552 19.8112 12C19.8112 11.9448 19.8106 11.8896 19.8094 11.8346C19.8013 11.4496 19.9684 11.1909 20.1462 11.0892C21.3724 10.3877 21.792 8.8214 21.0809 7.60076L20.3765 6.39162C19.6667 5.17332 18.1072 4.75547 16.8834 5.45569C16.6992 5.56113 16.3853 5.57406 16.051 5.37252C15.9508 5.31209 15.8491 5.25384 15.7459 5.19782C15.4107 5.01577 15.2704 4.74442 15.2704 4.54104C15.2704 3.13766 14.1328 2 12.7294 2H11.2707ZM12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9Z"
+              fill="#0c1117"></path>
+          </g>
+        </svg>
+        <div>Settings</div>
+      </div>
+      <div class="crown-upgradecontainer">
+        <div class="icon-text">
+          <img class="goalIQ-pro-icon" src="goalIQ18.png">
+          <div class="upgrade-text">
+            Unlock advanced AI insight, predictions & ad-free expexerience.
+          </div>
+          <button class="upgrade-button">
+            Upgrade Now
+          </button>
+        </div>
+        <div class="profile-premium">
+          <div class="gap-container">
+            <img class="profile-picture" src="goalIQ1.png">
+            <div class="position-absolute-premium-proflie"></div>
+            <div>
+              <p>
+                Evans
+              </p>
+              <p class="text-premuim">
+                Premium
+              </p>
+            </div>
+          </div>
+          <button class="dropdownarrow-button">
+            <img class="dropdownarrow" src="goalIQ21.png">
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="parent-container">
+      <div class="header">
+        <div class="header-left"></div>
+        <div class="header-middle">
+          <div class="search-box">
+            <svg class="search-icon" viewbox="0 0 24 24">
+              <circle cx="11" cy="11" r="7" stroke="white" stroke-width="2" fill="none" />
+              <line x1="16" y1="16" x2="21" y2="21" stroke="white" stroke-width="2" />
+            </svg>
+            <input type="text" placeholder="Search teams, player, news...">
+          </div>
+        </div>
+        <div class="header-right">
+          <div class="position-relative-container">
+            <svg class="notifications-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="22"
+              viewBox="0 0 20 22" fill="none">
+              <!-- Bell body -->
+              <path d="M10 2C10 2 5 4 5 10V15L3 17H17L15 15V10C15 4 10 2 10 2Z" stroke="white" stroke-width="1.5"
+                stroke-linejoin="round" fill="none" />
+              <!-- Clapper / bottom dot -->
+              <path d="M8 17C8 18.1 8.9 19 10 19C11.1 19 12 18.1 12 17" stroke="white" stroke-width="1.5" fill="none" />
+              <!-- Top stem -->
+              <line x1="10" y1="1" x2="10" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            <div class="position-absolute-container">3</div>
+          </div>
+          <div class="position-relative-container active">
+            <img class="profile-picture" src="goalIQ1.png" alt="profile">
+            <div class="position-absolute-profile"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- main container -->
+
+      <div class="main-container">
+        <div class="Matches-section">
+          <div class="ads-img-container">
+            <img class="ads-picture" src="goalIQ22.png" alt="ads">
+          </div>
+          <div class="father-today-the-rest">
+            <div class="today-right-left-arrow">
+              <button class="today-side-arrow-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" stroke="white" fill="none" stroke-width="2">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <div class="date-picker">
+                <svg viewBox="0 0 24 24">
+                  <rect x="3" y="5" width="18" height="16" rx="2" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                  <line x1="8" y1="3" x2="8" y2="7" />
+                  <line x1="16" y1="3" x2="16" y2="7" />
+                </svg>
+                Today
+              </div>
+              <button class="today-side-arrow-button">
+                <svg width="20" height="20" viewBox="0 0 24 24" stroke="white" fill="none" stroke-width="2">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+            </div>
+            <div class="live-finished-trending-all-main-container">
+              <button class="live-button">live</button>
+              <button class="l-f-t-a-button">finished</button>
+              <button class="l-f-t-a-button">trending</button>
+              <button class="l-f-t-a-button">all</button>
+            </div>
+          </div>
+          <div class="livematches-section">
+            <div class="livematches-container">
+              <div class="live-matches-header">
+                <div style="font-weight: 600; display: flex; gap: 10px; align-items: center;">
+                  <span class="pulsing-dot"></span>
+                  live matches
+                </div>
+                <div style="font-size: 13px; display: flex; gap: 10px; place-items: center; cursor: pointer;"
+                  class="see-all-btn">
+                  see all
+                  <div>
+                    <svg class="seeall-svg" clxmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                      viewBox="0 0 16 16" fill="none">
+                      <!-- Square box with open top-right corner -->
+                      <path d="M6 3H3C2.45 3 2 3.45 2 4V13C2 13.55 2.45 14 3 14H12C12.55 14 13 13.55 13 13V10"
+                        stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                      <!-- Arrow line -->
+                      <line x1="8" y1="8" x2="14" y2="2" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" />
+                      <!-- Arrow head -->
+                      <polyline points="10,2 14,2 14,6" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"
+                        stroke-linejoin="round" fill="none" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div class="matches">
+                <div class="each-match">
+                  <div class="time">
+                    63'
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./mancity.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Man City
+                      </span>
+                    </div>
+                    <div class="scores">
+                      2 - 1
+                    </div>
+                    <div class="away-team">
+                      <img src="./tottenham.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Tottenham
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg style="stroke-width: 1; height: 22; width: 22; stroke: #fff; fill:none;" width="20" height="20"
+                      viewBox="0 0 24 24">
+                      <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                </div>
+                <div class="each-match">
+                  <div class="time">
+                    78'
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./leverkusen.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Leverkusen
+                      </span>
+                    </div>
+                    <div class="scores">
+                      1 - 0
+                    </div>
+                    <div class="away-team">
+                      <img src="./stuttgart.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Stuttgart
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg style="stroke-width: 1; height: 22; width: 22; stroke: #fff; fill:none;" width="20" height="20"
+                      viewBox="0 0 24 24">
+                      <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                </div>
+                <div class="each-match">
+                  <div class="time">
+                    21'
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./psg.png" alt="team_logo" class="team-logo">
+                      <span>
+                        PSG
+                      </span>
+                    </div>
+                    <div class="scores">
+                      0 - 0
+                    </div>
+                    <div class="away-team">
+                      <img src="./lyon.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Lyon
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg style="stroke-width: 1; height: 22; width: 22; stroke: white; fill:none;" width="20"
+                      height="20" viewBox="0 0 24 24">
+                      <rect x="3" y="5" width="18" height="12" rx="2"></rect>
+                      <line x1="8" y1="21" x2="16" y2="21"></line>
+                      <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="livematches-section">
+            <div class="livematches-container">
+              <div class="live-matches-header">
+                <div style="font-weight: 600; display: flex; gap: 10px; align-items: center;">
+                  today matches
+                </div>
+                <div>
+                  <div>
+                  </div>
+                </div>
+              </div>
+              <div class="matches">
+                <div class="each-match">
+                  <div class="time-2">
+                    17:30
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./mancity.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Man City
+                      </span>
+                    </div>
+                    <div class="vs">
+                      vs
+                    </div>
+                    <div class="away-team">
+                      <img src="./tottenham.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Tottenham
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22"
+                      class="favourite-svg">
+                      <!-- Bell body -->
+                      <path d="M10 2C10 2 5 4 5 10V15L3 17H17L15 15V10C15 4 10 2 10 2Z" stroke="white"
+                        stroke-width="1.5" stroke-linejoin="round" />
+                      <!-- Clapper / bottom dot -->
+                      <path d="M8 17C8 18.1 8.9 19 10 19C11.1 19 12 18.1 12 17" stroke="white" stroke-width="1.5" />
+                      <!-- Top stem -->
+                      <line x1="10" y1="1" x2="10" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="each-match">
+                  <div class="time-2">
+                    20:00
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./leverkusen.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Leverkusen
+                      </span>
+                    </div>
+                    <div class="vs">
+                      vs
+                    </div>
+                    <div class="away-team">
+                      <img src="./stuttgart.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Stuttgart
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22"
+                      class="favourite-svg">
+                      <!-- Bell body -->
+                      <path d="M10 2C10 2 5 4 5 10V15L3 17H17L15 15V10C15 4 10 2 10 2Z" stroke="white"
+                        stroke-width="1.5" stroke-linejoin="round" />
+                      <!-- Clapper / bottom dot -->
+                      <path d="M8 17C8 18.1 8.9 19 10 19C11.1 19 12 18.1 12 17" stroke="white" stroke-width="1.5" />
+                      <!-- Top stem -->
+                      <line x1="10" y1="1" x2="10" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="each-match">
+                  <div class="time-2">
+                    22:15
+                  </div>
+                  <div class="teams">
+                    <div class="home-team">
+                      <img src="./psg.png" alt="team_logo" class="team-logo">
+                      <span>
+                        PSG
+                      </span>
+                    </div>
+                    <div class="vs">
+                      vs
+                    </div>
+                    <div class="away-team">
+                      <img src="./lyon.PNG.png" alt="team_logo" class="team-logo">
+                      <span>
+                        Lyon
+                      </span>
+                    </div>
+                  </div>
+                  <div class="favourite-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22"
+                      class="favourite-svg">
+                      <!-- Bell body -->
+                      <path d="M10 2C10 2 5 4 5 10V15L3 17H17L15 15V10C15 4 10 2 10 2Z" stroke="white"
+                        stroke-width="1.5" stroke-linejoin="round" />
+                      <!-- Clapper / bottom dot -->
+                      <path d="M8 17C8 18.1 8.9 19 10 19C11.1 19 12 18.1 12 17" stroke="white" stroke-width="1.5" />
+                      <!-- Top stem -->
+                      <line x1="10" y1="1" x2="10" y2="3" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; padding: 14px 14px 0px 14px;">
+            <button
+              style="display: flex; align-items: center; justify-content: center; background-color: #0c1117; border: none;padding: 15px 25px 15px 25px; border-radius: 50px;">
+              See all
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 10l4 4 4-4" />
+              </svg>
+            </button>
+            <button
+              style="display: flex; place-items: center; justify-content: center; background-color: #0c1117; border: none; padding: 15px 25px 15px 25px;border-radius: 50px;">
+              Hide all
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 14l4-4 4 4" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="right-side">
+          <div style="background-color: #0c1117; padding: 15px; border-radius: 16px;">
+            <div style="display: flex; justify-content: space-between; padding-bottom: 20px;">
+              <span style="font-size: 17px; font-weight: 600;">Create Your XI</span>
+              <button style="display: flex; align-items: center; padding: 6px 15px 6px 15px; background-color:#0223d7; border: none; border-radius: 16px; justify-content: center; font-size: 11px; font-weight: 600; cursor: pointer;">NEW</button>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <div>
+                <div style="padding-bottom: 25px;">
+                  <h5 style="line-height: 18px;">Build your Ultimate Starting <br> lineup with AI </h5>
+                </div>
+                <button style="background-color: #025a00; border: none; padding: 10px 25px 10px 25px; border-radius: 5px; font-weight: 600; cursor: pointer;">Create Your XI</button>
+              </div>
+              <div>
+                <img style="height: 90px; width: 100px;" src="LINEUP.png" alt="create xi">
+              </div>
+            </div>
+          </div>
+          <div class="ai-container">
+            <div class="header2">
+              <img class="ball-icon" src="goalIQ17.png" alt="ballicon">
+              <div class="left2">
+                AI Assistant
+              </div>
+              <div class="right">
+
+              </div>
+            </div>
+            <div class="main">
+              <div class="temp-message">
+                Ask anything about sports...
+              </div>
+              <div class="input-container">
+                <input type="text" name="ai-message" id="ai-message" placeholder="Ask GOALIQ AI...">
+                <button
+                  style="display: flex; justify-content: center; align-items: center; background-color: #1b2b3e; border: none; border-radius: 50%; padding: 6px 10px 6px 10px; width: 40px; height: 40px; cursor: pointer;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 2L11 13" />
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="latest-news">
+            <div class="news-top">
+              <h4>Latest News</h4>
+              <a href="" id="">See All</a>
+            </div>
+            <div class="news">
+              <div class="news-body">
+                <div style="display: flex; gap: 12px; place-items: center;">
+                  <div class="image-container">
+                    <img src="mbappe.PNG" alt="" id="news-image">
+                  </div>
+                  <div class="new-headline">
+                    <h5>Mbappe inspires Real<br> Madrid to crucial wins</h5>
+                  </div>
+                </div>
+                <div class="time">
+                  <h5><span>2h.</span> ago</h5>
+                </div>
+              </div>
+              <div class="news-body">
+                <div style="display: flex; gap: 12px; place-items: center;">
+                  <div class="image-container">
+                    <img src="salah.PNG" alt="" id="news-image">
+                  </div>
+                  <div class="new-headline">
+                    <h5>liverpool come from <br> behind to beat fulham</h5>
+                  </div>
+                </div>
+                <div class="time">
+                  <h5><span>5h.</span> ago</h5>
+                </div>
+              </div>
+              <div class="news-body">
+                <div style="display: flex; gap: 12px; place-items: center;">
+                  <div class="image-container">
+                    <img src="champions league cup.PNG" alt="" id="news-image">
+                  </div>
+                  <div class="new-headline">
+                    <h5>UEFA confirms changes <br> to champions league</h5>
+                  </div>
+                </div>
+                <div class="time">
+                  <h5><span>8h.</span> ago</h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  document.querySelectorAll('.favourite-svg').forEach(i => {
+    i.addEventListener('click', () => {
+      i.classList.toggle('active')
+    });
+  });
+
+</script>
+
+</html>

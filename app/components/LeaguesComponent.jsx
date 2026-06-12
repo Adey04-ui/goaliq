@@ -6,8 +6,11 @@ import { motion } from "framer-motion"
 import useSWR from "swr"
 import Image from "next/image"
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { toggleFavourite } from "@/services/favourites"
+import LeaguesList from "./LeaguesList"
+import Standings from "./Standings"
+import { AnimatePresence } from "framer-motion"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -20,6 +23,7 @@ function LeaguesComponent() {
     '2024'
   ])
   const [selected, setSelected] = useState(seasons[0])
+  const [selectedLeague, setSelectedLeague] = useState(null)
 
   const filterItems = [
     "favourites",
@@ -49,18 +53,7 @@ function LeaguesComponent() {
     setSelected(season)
   }
 
-  const handleFav = async (league) => {
-    const req = await toggleFavourite({
-      itemId: league.id,
-      type: "LEAGUE",
-      name: league.name,
-      logo: league.logo,
-    })
 
-    if(req) {
-      
-    }
-  }
   console.log(leagues)
 
   return (
@@ -121,45 +114,41 @@ function LeaguesComponent() {
           </DropdownMenu.Root>
         </div>
       </div>
-      <button onClick={() => signIn("google")}>
-        Continue with Google
+      {/* just for testing */}
+      <button onClick={() => signOut()}>
+        Sign Out
       </button>
 
-      <div className="allLeaguesList">
-        {leagues.map((league) => (
-          <div className="eachList" key={league.league.id}>
-            <div className="left">
-              <div className="leagueImage">
-                <Image width={40} height={40} alt="league_logo" src={league.league.logo} style={{ objectPosition: 'center', objectFit: 'contain' }} />
-              </div>
-              <div className="leagueDetails">
-                <div className="leagueName">
-                  {league.league.name}
-                </div>
-                <div className="countryName">
-                  {league.country.flag && (
-                    <div className="countryImage">
-                      <Image width={15} height={15} alt="country_flag" src={league.country.flag} style={{ borderRadius: '4px' }} />
-                    </div>
-                  )}
-                  {league.country.name}
-                </div>
-              </div>
+      <AnimatePresence mode="wait">
+        {!selectedLeague ? (
+          <motion.div
+            key="league-list"
+            initial={{ x: 0 }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.3 }}
+          >
+
+            <div className="allLeaguesList">
+              <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
             </div>
-            <div className="right">
-              <div className="favourite-btn" onClick={handleFav(league.league)}>
-                <svg style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff', }} viewBox="0 0 24 24"
-                  className="favourite-svg">
-                  <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
-                </svg>
-              </div>
-              <div className="navigation-btn">
-                <ChevronRight size={20} color="#5c5c5c" />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="standings"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ duration: 0.3 }}
+          >
+            <Standings
+              league={selectedLeague}
+              onBack={() => setSelectedLeague(null)}
+              season={selected}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isLoading && <p>Loading...</p>}
     </div>
