@@ -2,12 +2,12 @@
 
 import Image from 'next/image'
 import React from 'react'
-import { useSession } from "next-auth/react"
 import { useSignIn } from '@/context/signInContext'
+import { useUser } from '@/context/userContext'
 
 function Topbar() {
-  const { data: session, status } = useSession()
   const { showSignIn, setShowSignIn } = useSignIn()
+  const { session, status } = useUser()
   console.log(showSignIn)
 
   console.log("Session data in Topbar:", session)

@@ -1,7 +1,7 @@
 "use client"
 
 import { CheckCircle, ChevronDown, ChevronRight, Search } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import useSWR from "swr"
 import Image from "next/image"
@@ -12,7 +12,16 @@ import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
 import { AnimatePresence } from "framer-motion"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
+const fetcher = async (url) => {
+  const res = await fetch(url)
+  const result = await res.json()
+
+  if (!res.ok) {
+    throw new Error(result.message)
+  }
+
+  return result.data
+}
 
 function LeaguesComponent() {
   const [filter, setFilter] = useState("topLeagues")
@@ -49,12 +58,17 @@ function LeaguesComponent() {
     }
   )
 
+  
+
+
+
   const handleSelect = (season) => {
     setSelected(season)
   }
 
 
   console.log(leagues)
+  console.log(selected)
 
   return (
     <div className="allLeaguesContainer">
@@ -119,36 +133,31 @@ function LeaguesComponent() {
         Sign Out
       </button>
 
-      <AnimatePresence mode="wait">
-        {!selectedLeague ? (
-          <motion.div
-            key="league-list"
-            initial={{ x: 0 }}
-            animate={{ x: 0 }}
-            exit={{ x: "-100%" }}
-            transition={{ duration: 0.3 }}
-          >
+      <div className="allLeaguesList">
+        <div className="list-layer">
+          <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
+        </div>
 
-            <div className="allLeaguesList">
-              <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="standings"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.3 }}
-          >
-            <Standings
-              league={selectedLeague}
-              onBack={() => setSelectedLeague(null)}
-              season={selected}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence mode="wait">
+          {selectedLeague && (
+            <motion.div
+              key="standingsPanel"
+              className="standingsPanel"
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ duration: 0.3 }}
+            >
+              <Standings
+                league={selectedLeague}
+                onBack={() => setSelectedLeague(null)}
+                season={selected}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </div>
 
       {isLoading && <p>Loading...</p>}
     </div>

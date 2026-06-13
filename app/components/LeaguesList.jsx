@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { ChevronRight } from "lucide-react"
+import { toggleFavourite } from "@/services/favourites"
 
 function LeaguesList({ leagues, onSelectLeague }) {
   const handleFav = async (league) => {

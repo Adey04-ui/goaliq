@@ -5,11 +5,16 @@ import { useState } from "react"
 import { usePathname } from "next/navigation"
 import { useRouter } from "next/navigation"
 import ball from "../assets/goalIQ17.png"
+import { useUser } from '@/context/userContext'
+import { useSignIn } from '@/context/signInContext'
+import { ChevronDown } from "lucide-react"
 
 function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [current, setCurrent] = useState('matches')
+    const { session, status } = useUser()
+      const { showSignIn, setShowSignIn } = useSignIn()
   return (
     <div className="sidebar">
       <div className="logo-container">
@@ -78,21 +83,30 @@ function Sidebar() {
           </button>
         </div>
         <div className="profile-premium">
+          {status == "authenticated" ? (
+            <>
           <div className="gap-container">
-            <Image width={20} height={20} alt="" className="profile-picture" src="/assets/goalIQ1.png" />
+            <Image width={35} height={35} alt="" className="profile-picture" src={session?.user?.image} />
             <div className="position-absolute-premium-proflie"></div>
             <div>
               <p>
-                Evans
+                {session?.user?.name}
               </p>
               <p className="text-premuim">
                 Premium
               </p>
             </div>
           </div>
-          <button className="dropdownarrow-button">
-            <Image width={20} height={20} alt="" className="dropdownarrow" src="/assests/goalIQ21.png" />
-          </button>
+          <ChevronDown className="dropdownarrow" />
+          </>
+        ) : (
+          <div style={{padding: '0px 40px'}}>
+            <button className="sign-in-btn" onClick={() => setShowSignIn(true)}>
+              Sign In
+            </button>
+          </div>
+        )
+}
         </div>
       </div>
     </div>

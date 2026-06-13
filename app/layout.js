@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import { SignInProvider } from "@/context/signInContext";
+import { UserProvider } from "@/context/userContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({ children }) {
       <body>
         <Providers>
           <SignInProvider>
-            {children}
+            <UserProvider>
+              {children}
+            </UserProvider>
           </SignInProvider>
         </Providers>
       </body>
