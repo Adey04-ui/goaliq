@@ -1,19 +1,10 @@
-"use client"
+import { Suspense } from "react"
+import AuthErrorClient from "./AuthErrorClient"
 
-import { useSearchParams } from "next/navigation"
-
-export default function AuthErrorPage() {
-  const params = useSearchParams()
-  const error = params.get("error")
-
+export default function Page() {
   return (
-    <div style={{ padding: "40px" }}>
-      <h1>Login Error</h1>
-      <p>Something went wrong during login.</p>
-
-      <p style={{ color: "red" }}>
-        Error: {error}
-      </p>
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <AuthErrorClient />
+    </Suspense>
   )
 }
