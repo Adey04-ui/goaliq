@@ -8,7 +8,7 @@ export default function AuthErrorClient() {
 
   return (
     <div style={{ padding: "40px" }}>
-      <h1>Login Error</h1>
+      <h1>Sign In Error</h1>
       <p>Something went wrong during login.</p>
 
       <p style={{ color: "red" }}>

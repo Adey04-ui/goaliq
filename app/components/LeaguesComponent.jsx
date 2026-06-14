@@ -11,6 +11,7 @@ import { toggleFavourite } from "@/services/favourites"
 import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
 import { AnimatePresence } from "framer-motion"
+import Loader from "./Loader"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -58,7 +59,7 @@ function LeaguesComponent() {
     }
   )
 
-  
+
 
 
 
@@ -129,13 +130,19 @@ function LeaguesComponent() {
         </div>
       </div>
       {/* just for testing */}
-      <button onClick={() => signOut()}>
+      {/* <button onClick={() => signOut()}>
         Sign Out
-      </button>
+      </button> */}
 
       <div className="allLeaguesList">
         <div className="list-layer">
-          <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
+          {isLoading ? (
+            <div style={{height: '100%', width: '100%', justifyContent: 'center', placeItems: 'center', display: 'flex'}}>
+              <Loader />
+            </div>
+          ) : (
+            <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
+          )}
         </div>
 
         <AnimatePresence mode="wait">
@@ -158,8 +165,6 @@ function LeaguesComponent() {
         </AnimatePresence>
 
       </div>
-
-      {isLoading && <p>Loading...</p>}
     </div>
   )
 }

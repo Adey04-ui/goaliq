@@ -17,7 +17,7 @@ function LeaguesList({ leagues, onSelectLeague }) {
   }
   return (
     leagues.map((league) => (
-      <div className="eachList" key={league.league.id} onClick={()=> onSelectLeague(league.league)}>
+      <div className="eachList" key={league.league.id} onClick={()=> onSelectLeague(league)}>
         <div className="left">
           <div className="leagueImage">
             <Image width={40} height={40} alt="league_logo" src={league.league.logo} style={{ objectPosition: 'center', objectFit: 'contain' }} />
