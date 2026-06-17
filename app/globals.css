@@ -828,9 +828,6 @@ body {
     border-radius: 4px;
   }
 
-  .standingsContainer>.standingsTabs {
-    display: flex;
-  }
 
   .standingsTabs {
     display: flex;
@@ -862,80 +859,86 @@ body {
     border-radius: 10px;
   }
 
-  .standingsContainer>.tableHeader {
+  .standingsContainer>.panel>.standingsL {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .standingsContainer>.panel>.standingsL>.tableHeader {
     display: flex;
     font-weight: bold;
     gap: 8px;
     font-size: 15px;
   }
 
-  .standingsContainer>.tableHeader>span {
+  .standingsContainer>.panel>.standingsL>.tableHeader>span {
     width: 7%;
     text-align: right;
   }
 
-  .standingsContainer>.tableHeader>span:first-child,
-  .standingsContainer>.tableHeader>span.teamColumn {
+  .standingsContainer>.panel>.standingsL>.tableHeader>span:first-child,
+  .standingsContainer>.panel>.standingsL>.tableHeader>span.teamColumn {
     text-align: left;
   }
 
-  .standingsContainer>.tableHeader>span:first-child {
+  .standingsContainer>.panel>.standingsL>.tableHeader>span:first-child {
     margin-left: 12px;
   }
 
-  .standingsContainer>.tableHeader>span.teamColumn {
+  .standingsContainer>.panel>.standingsL>.tableHeader>span.teamColumn {
     width: 45%;
   }
 
-  .standingsContainer>.standingsRows {
+  .standingsContainer>.panel>.standingsL>.standingsRows {
     display: flex;
     flex-direction: column;
   }
 
-  .standingsContainer>.standingsRows>.standingRow {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow {
     display: flex;
     gap: 8px;
     padding: 10px 0;
     border-bottom: 1px solid #5c5c5c;
   }
 
-  .standingsContainer>.standingsRows>.standingRow:last-child {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow:last-child {
     border-bottom: none;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>span {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>span {
     width: 7%;
     text-align: right;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>span.teamRank {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>span.teamRank {
     text-align: left;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>.teamColumn {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn {
     width: 45%;
     display: flex;
     place-items: center;
     gap: 10px;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>.teamColumn>img {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn>img {
     object-fit: contain;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>.qualificationMarker.ucl {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.ucl {
     width: 4px;
     background: #1151a0;
     border-radius: 4px;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>.qualificationMarker.uel {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.uel {
     width: 4px;
     background: #FF9B00;
     border-radius: 4px;
   }
 
-  .standingsContainer>.standingsRows>.standingRow>.qualificationMarker.relegation {
+  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.relegation {
     width: 4px;
     background: red;
     border-radius: 4px;
