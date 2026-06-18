@@ -4,8 +4,8 @@ import { ArrowLeft } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import StandingsTable from "./StandingsTable"
-
-const tabs = ["Standings", "Fixtures", "Top Scorers", "Stats"]
+import Fixtures from "./Fixtures"
+import Results from "./Results"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -20,6 +20,8 @@ const fetcher = async (url) => {
 
 export default function Standings({ league, onBack, season }) {
   const [active, setActive] = useState("Standings")
+  const tabs = ["Standings", "Results", "Fixtures", "Top Scorers", "Stats"]
+  const activeIndex = tabs.indexOf(active)
   const [selectedGroup, setSelectedGroup] = useState(0)
   const {
     data,
@@ -105,15 +107,38 @@ export default function Standings({ league, onBack, season }) {
           </button>
         ))}
       </div>
- 
-      <div className="panel">
-        <StandingsTable 
-          hasGroups={hasGroups}
-          standingsGroups={standingsGroups}
-          selectedGroup={selectedGroup}
-          setSelectedGroup={setSelectedGroup}
-          displayedStandings={displayedStandings}
-        />
+
+      <div className="contentViewport">
+        <motion.div
+          className="contentSlider"
+          animate={{
+            x: `-${activeIndex * 100}%`,
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 250,
+            damping: 30,
+          }}
+        >
+
+          <div className="panel">
+            <StandingsTable
+              hasGroups={hasGroups}
+              standingsGroups={standingsGroups}
+              selectedGroup={selectedGroup}
+              setSelectedGroup={setSelectedGroup}
+              displayedStandings={displayedStandings}
+            />
+          </div>
+
+          <div className="panel">
+            <Results />
+          </div>
+
+          <div className="panel">
+            <Fixtures />
+          </div>
+        </motion.div>
       </div>
 
     </div>

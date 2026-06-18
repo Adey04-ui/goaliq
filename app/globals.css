@@ -541,7 +541,7 @@ body {
 
   .allLeaguesContainer>.filters>.each.active {
     border-radius: 18px;
-    background: #1b2b3e;
+    background: #1151a0;
   }
 
   .allLeaguesContainer>.searchBar-filter {
@@ -859,86 +859,86 @@ body {
     border-radius: 10px;
   }
 
-  .standingsContainer>.panel>.standingsL {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  .standingsContainer>.panel>.standingsL>.tableHeader {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader {
     display: flex;
     font-weight: bold;
     gap: 8px;
     font-size: 15px;
   }
 
-  .standingsContainer>.panel>.standingsL>.tableHeader>span {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span {
     width: 7%;
     text-align: right;
   }
 
-  .standingsContainer>.panel>.standingsL>.tableHeader>span:first-child,
-  .standingsContainer>.panel>.standingsL>.tableHeader>span.teamColumn {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span:first-child,
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span.teamColumn {
     text-align: left;
   }
 
-  .standingsContainer>.panel>.standingsL>.tableHeader>span:first-child {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span:first-child {
     margin-left: 12px;
   }
 
-  .standingsContainer>.panel>.standingsL>.tableHeader>span.teamColumn {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span.teamColumn {
     width: 45%;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows {
     display: flex;
     flex-direction: column;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow {
     display: flex;
     gap: 8px;
     padding: 10px 0;
     border-bottom: 1px solid #5c5c5c;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow:last-child {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow:last-child {
     border-bottom: none;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>span {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>span {
     width: 7%;
     text-align: right;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>span.teamRank {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>span.teamRank {
     text-align: left;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn {
     width: 45%;
     display: flex;
     place-items: center;
     gap: 10px;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn>img {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn>img {
     object-fit: contain;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.ucl {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.ucl {
     width: 4px;
     background: #1151a0;
     border-radius: 4px;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.uel {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.uel {
     width: 4px;
     background: #FF9B00;
     border-radius: 4px;
   }
 
-  .standingsContainer>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.relegation {
+  .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.qualificationMarker.relegation {
     width: 4px;
     background: red;
     border-radius: 4px;
@@ -1054,6 +1054,22 @@ body {
     height: 3px;
     border-radius: 999px;
     background: #2f7bff;
+  }
+
+  .contentViewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .contentSlider {
+    display: flex;
+    width: 100%;
+    gap: 5px;
+  }
+
+  .panel {
+    width: 100%;
+    flex-shrink: 0;
   }
 }
 

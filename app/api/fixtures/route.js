@@ -11,9 +11,7 @@ export async function GET(request) {
           success: false,
           message: "League and season are required",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       )
     }
 
@@ -28,9 +26,36 @@ export async function GET(request) {
 
     const data = await res.json()
 
+    const fixtures = data.response.filter(
+      (match) => match.fixture.status.short === "NS"
+    )
+
+    const results = data.response.filter(
+      (match) =>
+        ["FT", "AET", "PEN"].includes(
+          match.fixture.status.short
+        )
+    )
+
+    const live = data.response.filter(
+      match =>
+        [
+          "1H",
+          "HT",
+          "2H",
+          "ET",
+          "BT",
+          "LIVE"
+        ].includes(match.fixture.status.short)
+    )
+
     return Response.json({
       success: true,
-      data: data.response,
+      data: {
+        fixtures,
+        results,
+        live,
+      },
     })
   } catch (error) {
     return Response.json(
@@ -38,9 +63,7 @@ export async function GET(request) {
         success: false,
         message: error.message,
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     )
   }
 }
