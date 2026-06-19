@@ -606,7 +606,13 @@ body {
     border-radius: 6px;
   }
 
-  .allLeaguesList>.list-layer>.eachList {
+  .allLeaguesList>.list-layer>div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .allLeaguesList>.list-layer>div>.eachList {
     display: flex;
     justify-content: space-between;
     padding: 12px 12px;
@@ -619,25 +625,25 @@ body {
         #1151a0 10%, transparent 100%);
   }
 
-  .allLeaguesList>.list-layer>.eachList>.left {
+  .allLeaguesList>.list-layer>div>.eachList>.left {
     display: flex;
     gap: 32px;
     align-items: center;
   }
 
-  .allLeaguesList>.list-layer>.eachList>.left>.leagueDetails {
+  .allLeaguesList>.list-layer>div>.eachList>.left>.leagueDetails {
     display: flex;
     flex-direction: column;
     gap: 9px;
   }
 
-  .allLeaguesList>.list-layer>.eachList>.left>.leagueDetails>.countryName {
+  .allLeaguesList>.list-layer>div>.eachList>.left>.leagueDetails>.countryName {
     display: flex;
     gap: 8px;
     font-size: 13px;
   }
 
-  .allLeaguesList>.list-layer>.eachList>.right {
+  .allLeaguesList>.list-layer>div>.eachList>.right {
     display: flex;
     gap: 16px;
     align-items: center;
