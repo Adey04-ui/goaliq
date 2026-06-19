@@ -25,7 +25,6 @@ const fetcher = async (url) => {
 }
 
 function LeaguesComponent() {
-  const [filter, setFilter] = useState("topLeagues")
   const [search, setSearch] = useState("")
   const [seasons, setSeasons] = useState([
     '2022',
@@ -36,14 +35,16 @@ function LeaguesComponent() {
   const [selectedLeague, setSelectedLeague] = useState(null)
 
   const filterItems = [
-    "favourites",
-    "topLeagues",
-    "allLeagues",
+    "favorites",
+    "top_leagues",
+    "all_leagues",
     "europe",
     "africa",
     "asia",
     "america",
   ]
+  
+  const [filter, setFilter] = useState(filterItems[1])
 
   const sortedFilters = [
     filter,
@@ -82,7 +83,7 @@ function LeaguesComponent() {
             onClick={() => setFilter(item)}
             transition={{ duration: 0.3 }}
           >
-            <span>{item}</span>
+            <span>{item.replaceAll('_', ' ')}</span>
           </motion.div>
         ))}
       </div>

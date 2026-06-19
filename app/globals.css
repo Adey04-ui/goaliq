@@ -491,7 +491,7 @@ body {
     fill: #0c1117;
   }
 
-  .favourite-svg.active {
+  .favourite-svg.filled {
     fill: #fff;
   }
 

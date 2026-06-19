@@ -3,6 +3,10 @@ import "./globals.css";
 import Providers from "./providers";
 import { SignInProvider } from "@/context/signInContext";
 import { UserProvider } from "@/context/userContext";
+import { FavoritesProvider } from "@/context/favoriteContext";
+import { ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+import GetFavourites from "./components/GetFavourites";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -28,7 +32,15 @@ export default function RootLayout({ children }) {
         <Providers>
           <SignInProvider>
             <UserProvider>
-              {children}
+              <FavoritesProvider>
+                {children}
+                <ToastContainer
+                  position="top-right"
+                  autoClose={3000}
+                  theme="dark"
+                />
+                <GetFavourites />
+              </FavoritesProvider>
             </UserProvider>
           </SignInProvider>
         </Providers>

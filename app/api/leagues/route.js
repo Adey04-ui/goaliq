@@ -1,4 +1,7 @@
 import { CONTINENTS } from "../continents"
+import { prisma } from "@/lib/prisma"
+import { getServerSession } from "next-auth"
+import { authOptions } from "../auth/[...nextauth]/route"
 
 const topLeagues = [39, 140, 78, 135, 61, 2, 3, 4, 5, 6]
 
@@ -48,7 +51,7 @@ export async function GET(request) {
     let filteredLeagues = leagues
 
     switch (filter) {
-      case "topLeagues":
+      case "top_leagues":
         filteredLeagues = leagues.filter((l) =>
           topLeagues.includes(l.league.id)
         )
@@ -89,6 +92,43 @@ export async function GET(request) {
           CONTINENTS.oceania.includes(l.country.name)
         )
         break
+
+      case "favorites": {
+        const session = await getServerSession(authOptions)
+
+        if (!session?.user?.email) {
+          return Response.json(
+            { success: false, message: "Not authenticated" },
+            { status: 401 }
+          )
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: session.user.email },
+        })
+
+        if (!user) {
+          return Response.json(
+            { success: false, message: "User not found" },
+            { status: 404 }
+          )
+        }
+
+        const favorites = await prisma.favorite.findMany({
+          where: {
+            userId: user.id,
+            type: "LEAGUE",
+          },
+        })
+
+        const favIds = new Set(favorites.map((f) => f.itemId))
+
+        filteredLeagues = leagues.filter((l) =>
+          favIds.has(l.league.id)
+        )
+
+        break
+      }
     }
 
     return Response.json({
