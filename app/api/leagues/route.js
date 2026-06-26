@@ -2,6 +2,7 @@ import { CONTINENTS } from "../continents"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { getLeagues } from "@/services/leaguesCache"
 
 const topLeagues = [39, 140, 78, 135, 61, 2, 3, 4, 5, 6]
 
@@ -11,42 +12,11 @@ export async function GET(request) {
 
     const filter = searchParams.get("filter")
 
-    const res = await fetch(
-      "https://v3.football.api-sports.io/leagues",
-      {
-        headers: {
-          "x-apisports-key": process.env.API_FOOTBALL_KEY,
-        },
-      }
-    )
+    console.time("getLeagues")
 
-    if (!res.ok) {
-      return Response.json(
-        {
-          success: false,
-          message: "Failed to fetch leagues from API Football",
-        },
-        {
-          status: res.status,
-        }
-      )
-    }
+    const leagues = await getLeagues()
 
-    const data = await res.json()
-
-    if (!data.response) {
-      return Response.json(
-        {
-          success: false,
-          message: "No league data returned",
-        },
-        {
-          status: 404,
-        }
-      )
-    }
-
-    const leagues = data.response
+    console.timeEnd("getLeagues")
 
     let filteredLeagues = leagues
 
@@ -104,7 +74,9 @@ export async function GET(request) {
         }
 
         const user = await prisma.user.findUnique({
-          where: { email: session.user.email },
+          where: {
+            email: session.user.email,
+          },
         })
 
         if (!user) {
@@ -121,7 +93,9 @@ export async function GET(request) {
           },
         })
 
-        const favIds = new Set(favorites.map((f) => f.itemId))
+        const favIds = new Set(
+          favorites.map((f) => Number(f.itemId))
+        )
 
         filteredLeagues = leagues.filter((l) =>
           favIds.has(l.league.id)
@@ -136,12 +110,10 @@ export async function GET(request) {
       data: filteredLeagues,
     })
   } catch (error) {
-    console.error("Leagues API Error:", error)
-
     return Response.json(
       {
         success: false,
-        message: error.message || "Something went wrong",
+        message: error.message,
       },
       {
         status: 500,

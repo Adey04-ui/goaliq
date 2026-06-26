@@ -1,7 +1,8 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
+import StandingsSkeleton from "./StandingsSkeleton"
 
-function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings }) {
+function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading }) {
   return (
     <div className="standingsL">
       {
@@ -46,7 +47,7 @@ function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelected
       </div>
 
       <div className="standingsRows">
-        {displayedStandings?.map((team) => (
+        {!isLoading ? displayedStandings?.map((team) => (
           <div
             className="standingRow"
             key={team.team.id}
@@ -89,7 +90,11 @@ function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelected
               {team.points}
             </span>
           </div>
-        ))}
+        )) : (
+          Array.from({ length: 7 }).map((_, i) => (
+            <StandingsSkeleton key={i} />
+          ))
+        )}
       </div>
     </div>
   )

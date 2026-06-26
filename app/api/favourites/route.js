@@ -1,6 +1,10 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import {
+  getFavoritesCache,
+  setFavoritesCache,
+} from "@/services/favoritesCache"
 
 export async function POST(req) {
   try {
@@ -11,7 +15,6 @@ export async function POST(req) {
         { message: "Not authenticated" },
         { status: 401 }
       )
-      throw new Error ("Not authenticated")
     }
 
     const body = await req.json()
@@ -48,7 +51,24 @@ export async function POST(req) {
         },
       })
 
-      return Response.json({ removed: true })
+      const updatedFavorites = await prisma.favorite.findMany({
+        where: {
+          userId: user.id,
+        },
+      })
+
+      const formatted = {
+        league: updatedFavorites.filter((f) => f.type === "LEAGUE"),
+        team: updatedFavorites.filter((f) => f.type === "TEAM"),
+        match: updatedFavorites.filter((f) => f.type === "MATCH"),
+      }
+
+      await setFavoritesCache(user.id, formatted)
+
+      return Response.json({
+        success: true,
+        removed: true,
+      })
     }
 
     const favorite = await prisma.favorite.create({
@@ -61,7 +81,24 @@ export async function POST(req) {
       },
     })
 
-    return Response.json(favorite)
+    const updatedFavorites = await prisma.favorite.findMany({
+      where: {
+        userId: user.id,
+      },
+    })
+
+    const formatted = {
+      league: updatedFavorites.filter((f) => f.type === "LEAGUE"),
+      team: updatedFavorites.filter((f) => f.type === "TEAM"),
+      match: updatedFavorites.filter((f) => f.type === "MATCH"),
+    }
+
+    await setFavoritesCache(user.id, formatted)
+
+    return Response.json({
+      success: true,
+      favorite,
+    })
   } catch (error) {
     return Response.json(
       { message: error.message },
@@ -97,20 +134,38 @@ export async function GET(req) {
       );
     }
 
+    const cached = await getFavoritesCache(user.id)
+
+    if (cached) {
+      return Response.json({
+        success: true,
+        favorites: cached,
+        source: "cache",
+      })
+    }
+
     const favorites = await prisma.favorite.findMany({
       where: {
         userId: user.id,
-        ...(type && { type }),
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
+    const formatted = {
+      league: favorites.filter((f) => f.type === "LEAGUE"),
+      team: favorites.filter((f) => f.type === "TEAM"),
+      match: favorites.filter((f) => f.type === "MATCH"),
+    }
+
+    await setFavoritesCache(user.id, formatted)
+
     return Response.json({
       success: true,
-      favorites,
-    });
+      favorites: formatted,
+      source: "database",
+    })
   } catch (error) {
     return Response.json(
       { message: error.message },

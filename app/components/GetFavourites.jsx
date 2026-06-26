@@ -8,23 +8,16 @@ import { useFavorites } from "@/context/favoriteContext"
 function GetFavourites() {
   const { favorites, setFavorites } = useFavorites()
   useEffect(() => {
-    getFavourites("TEAM").then((res) => {
+    getFavourites().then((res) => {
       if (res.success) {
-        setFavorites((prev) => ({ ...prev, team: res?.data?.favorites }))
-      } else {
-        toast.error("Error fetching favourites:", res.message)
-      }
-    })
-
-    getFavourites("LEAGUE").then((res) => {
-      if (res.success) {
-        setFavorites((prev) => ({ ...prev, league: res?.data?.favorites }))
+        setFavorites( res?.data?.favorites)
       } else {
         toast.error("Error fetching favourites:", res.message)
       }
     })
   }, [])
     console.log("Favorites updated:", favorites) 
+    return null
 }
 
 export default GetFavourites

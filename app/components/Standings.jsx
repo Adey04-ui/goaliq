@@ -27,7 +27,7 @@ export default function Standings({ league, onBack, season }) {
     data,
     isLoading,
   } = useSWR(
-    league
+    active == "Standings" && league
       ? `/api/standings?league=${league.league.id}&season=${season}`
       : null,
     fetcher,
@@ -48,10 +48,6 @@ export default function Standings({ league, onBack, season }) {
   const displayedStandings = hasGroups
     ? standingsGroups[selectedGroup]
     : standingsGroups[0] || []
-
-  console.log(league)
-  console.log("selected from standings", season)
-  console.log(data)
 
   if (!league) return null
   return (
@@ -128,11 +124,13 @@ export default function Standings({ league, onBack, season }) {
               selectedGroup={selectedGroup}
               setSelectedGroup={setSelectedGroup}
               displayedStandings={displayedStandings}
+              active={active}
+              isLoading={isLoading}
             />
           </div>
 
           <div className="panel">
-            <Results />
+            <Results season={season} league={league} active={active} />
           </div>
 
           <div className="panel">

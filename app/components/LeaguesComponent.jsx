@@ -1,37 +1,33 @@
 "use client"
 
 import { CheckCircle, ChevronDown, ChevronRight, Search } from "lucide-react"
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
+import { useEffect, useState, useDeferredValue } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import useSWR from "swr"
 import Image from "next/image"
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { signIn, signOut } from "next-auth/react"
 import { toggleFavourite } from "@/services/favourites"
 import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
-import { AnimatePresence } from "framer-motion"
 import Loader from "./Loader"
+import LeagueSkeleton from "./LeagueSkeleton"
+
+const PAGE_SIZE = 20
 
 const fetcher = async (url) => {
   const res = await fetch(url)
   const result = await res.json()
-
-  if (!res.ok) {
-    throw new Error(result.message)
-  }
-
+  if (!res.ok) throw new Error(result.message)
   return result.data
 }
 
 function LeaguesComponent() {
   const [search, setSearch] = useState("")
-  const [seasons, setSeasons] = useState([
-    '2022',
-    '2023',
-    '2024'
-  ])
-  const [selected, setSelected] = useState(seasons[0])
+  const deferredSearch = useDeferredValue(search) // doesn't block typing
+
+  const [page, setPage] = useState(1)
+  const [seasons] = useState(['2022', '2023', '2024'])
+  const [selected, setSelected] = useState('2022')
   const [selectedLeague, setSelectedLeague] = useState(null)
 
   const filterItems = [
@@ -43,7 +39,7 @@ function LeaguesComponent() {
     "asia",
     "america",
   ]
-  
+
   const [filter, setFilter] = useState(filterItems[1])
 
   const sortedFilters = [
@@ -60,17 +56,18 @@ function LeaguesComponent() {
     }
   )
 
+  useEffect(() => {
+    setPage(1)
+  }, [filter, deferredSearch])
 
+  const filtered = leagues.filter((l) =>
+    l.league.name.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+    l.country.name.toLowerCase().includes(deferredSearch.toLowerCase())
+  )
 
-
-
-  const handleSelect = (season) => {
-    setSelected(season)
-  }
-
-
-  console.log(leagues)
-  console.log(selected)
+  // Slice for current page
+  const paginated = filtered.slice(0, page * PAGE_SIZE)
+  const hasMore = paginated.length < filtered.length
 
   return (
     <div className="allLeaguesContainer">
@@ -104,23 +101,19 @@ function LeaguesComponent() {
               <button className="button" style={{ display: 'flex', width: '100%', background: 'transparent', border: '.5px solid #5c5c5c', padding: '8px 6px', borderRadius: '6px', justifyContent: 'space-between', placeItems: 'center', textTransform: 'capitalize', cursor: 'pointer' }}>
                 <div style={{ display: 'flex', gap: '6px', fontSize: '13px' }}>
                   <span className='status'>season</span>
-                  <span className='menu' style={{ color: `${selected.color}` }}>
-                    {selected}
-                  </span>
+                  <span className='menu'>{selected}</span>
                 </div>
-                <span className="icpon">
-                  <ChevronDown size={16} />
-                </span>
+                <ChevronDown size={16} />
               </button>
             </DropdownMenu.Trigger>
-
             <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                className="dropdown-container"
-                sideOffset={8}
-              >
+              <DropdownMenu.Content className="dropdown-container" sideOffset={8}>
                 {seasons.map((season) => (
-                  <DropdownMenu.Item key={season} onSelect={() => handleSelect(season)} className="dropdown-item" style={{}}>
+                  <DropdownMenu.Item
+                    key={season}
+                    onSelect={() => setSelected(season)}
+                    className="dropdown-item"
+                  >
                     {season}
                     {selected === season && <CheckCircle size={15} />}
                   </DropdownMenu.Item>
@@ -130,19 +123,22 @@ function LeaguesComponent() {
           </DropdownMenu.Root>
         </div>
       </div>
-      {/* just for testing */}
-      {/* <button onClick={() => signOut()}>
-        Sign Out
-      </button> */}
 
       <div className="allLeaguesList">
         <div className="list-layer">
-          {isLoading ? (
-            <div style={{height: '100%', width: '100%', justifyContent: 'center', placeItems: 'center', display: 'flex'}}>
-              <Loader />
-            </div>
-          ) : (
-            <LeaguesList leagues={leagues} onSelectLeague={setSelectedLeague} />
+          <LeaguesList
+            leagues={paginated}
+            onSelectLeague={setSelectedLeague}
+            isLoading={isLoading}
+          />
+
+          {!isLoading && hasMore && (
+            <button
+              className="load-more-btn"
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Show more ({filtered.length - paginated.length} remaining)
+            </button>
           )}
         </div>
 
@@ -164,7 +160,6 @@ function LeaguesComponent() {
             </motion.div>
           )}
         </AnimatePresence>
-
       </div>
     </div>
   )

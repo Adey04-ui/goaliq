@@ -31,9 +31,9 @@ export async function toggleFavourite(data) {
   }
 }
 
-export async function getFavourites(type) {
+export async function getFavourites() {
   try {
-    const res = await fetch(`/api/favourites?type=${type}`)
+    const res = await fetch(`/api/favourites`)
     const result = await res.json()
 
     if (!res.ok) {

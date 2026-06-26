@@ -1077,6 +1077,89 @@ body {
     width: 100%;
     flex-shrink: 0;
   }
+
+  .resultContainer>div>.eachMatch {
+    display: flex;
+    padding: 0 12px;
+    gap: 20px;
+    background: #081423;
+  }
+
+  .resultContainer>div>.eachMatch>.timestamp {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 13px 18px;
+    font-size: 16px;
+    border-right: 2px solid #888;
+  }
+
+  .resultContainer>div>.eachMatch>.teams {
+    display: flex;
+    padding: 13px 0;
+    gap: 35px;
+  }
+
+  .resultContainer>div>.eachMatch>.teams>.home,
+  .resultContainer>div>.eachMatch>.teams>.away {
+    display: flex;
+    min-width: 250px;
+    gap: 25px;
+  }
+
+  .resultContainer>div>.eachMatch>.teams>.scoreline {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 6px 40px;
+    gap: 8px;
+  }
+
+  /* Skeleton.css - Pure CSS, Dark Mode Friendly */
+
+  .skeleton {
+    background: #2a2a2a;
+    position: relative;
+    overflow: hidden;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      background-color: #2a2a2a;
+    }
+
+    50% {
+      background-color: #3a3a3a;
+    }
+  }
+
+  /* Beautiful moving shimmer effect */
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.08),
+        transparent);
+    animation: shimmer 1.7s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% {
+      left: -100%;
+    }
+
+    100% {
+      left: 200%;
+    }
+  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1084,3 +1167,49 @@ body {
     color-scheme: dark;
   }
 }
+
+/* Skeleton.css - Pure CSS, Light Mode Friendly */
+
+/* .skeleton {
+  background: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    background-color: #e5e7eb;
+  }
+
+  50% {
+    background-color: #d1d5db;
+  }
+}
+
+/* Beautiful moving shimmer effect */
+/* .skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.75),
+      transparent);
+  animation: shimmer 1.7s infinite linear;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
+}  */
