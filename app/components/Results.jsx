@@ -108,7 +108,12 @@ function Results({ season, league, active }) {
     return (
       <div className="resultsContainer">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="matchSkeleton" />
+          <div key={i} className="resultsContainer__dateGroup">
+            <div className="resultsContainer__skeletonLabel" />
+            {Array.from({ length: 3 }).map((_, j) => (
+              <div key={j} className="resultsContainer__skeletonMatch" />
+            ))}
+          </div>
         ))}
       </div>
     )

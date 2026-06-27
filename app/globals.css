@@ -1056,7 +1056,7 @@ body {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -6px;
+    bottom: -0px;
     height: 3px;
     border-radius: 999px;
     background: #2f7bff;
@@ -1070,7 +1070,6 @@ body {
   .contentSlider {
     display: flex;
     width: 100%;
-    gap: 5px;
   }
 
   .panel {
@@ -1107,8 +1106,7 @@ body {
 
   /* Each match row */
   .resultsContainer>div>.eachMatch {
-    display: grid;
-    grid-template-columns: 52px 1fr 80px 1fr 32px;
+    display: flex;
     align-items: center;
     padding: 10px 14px;
     gap: 8px;
@@ -1116,7 +1114,8 @@ body {
     background: #1a2026;
     transition: background 0.15s;
     border-radius: 13px;
-    max-width: 99%;
+    max-width: 99.5%;
+    justify-content: space-between;
   }
 
   .resultsContainer>div>.eachMatch:hover {
@@ -1128,7 +1127,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    gap: 5px;
   }
 
   .resultsContainer>div>.eachMatch>.timestamp>.time {
@@ -1248,6 +1247,35 @@ body {
     color: #fff;
   }
 
+  .resultsContainer>.resultsContainer__dateGroup>.resultsContainer__skeletonLabel {
+    height: 14px;
+    width: 140px;
+    border-radius: 4px;
+    margin: 10px 14px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: resultsShimmer 1.4s infinite;
+  }
+
+  .resultsContainer>.resultsContainer__dateGroup>.resultsContainer__skeletonMatch {
+    height: 52px;
+    margin: 2px 14px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: resultsShimmer 1.4s infinite;
+  }
+
+  @keyframes resultsShimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
   /* Skeleton.css - Pure CSS, Dark Mode Friendly */
 
   .skeleton {
@@ -1291,6 +1319,305 @@ body {
 
     100% {
       left: 200%;
+    }
+  }
+
+  /* Container */
+  .topScorersContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* Header row */
+  .topScorersContainer>.topScorers__header {
+    display: grid;
+    grid-template-columns: 36px 1fr 210px 80px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  .topScorersContainer>.topScorers__header>span {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a7a7a;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .topScorersContainer>.topScorers__header>span:last-child {
+    text-align: right;
+  }
+
+  /* Each row */
+  .topScorersContainer>.topScorers__row {
+    display: grid;
+    grid-template-columns: 36px 1fr 210px 80px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid #313131;
+    transition: background 0.15s;
+    cursor: pointer;
+    background: #1a2026;
+  }
+
+  /* Rank */
+  .topScorersContainer>.topScorers__row>.topScorers__rank {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* Player cell */
+  .topScorersContainer>.topScorers__row>.topScorers__player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__player>.topScorers__player-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1e1e1e;
+    flex-shrink: 0;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__player>.topScorers__player-photo>img {
+    border-radius: 50%;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__player>.topScorers__player-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__player>.topScorers__player-info>.topScorers__player-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__player>.topScorers__player-info>.topScorers__player-sub {
+    font-size: 12px;
+    color: #9b9b9b;
+  }
+
+  /* Team cell */
+  .topScorersContainer>.topScorers__row>.topScorers__team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__team>img {
+    height: 28px;
+    width: 28px;
+    object-fit: contain;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__team>span {
+    font-size: 14px;
+    color: #ccc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Goals cell */
+  .topScorersContainer>.topScorers__row>.topScorers__goals {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__goals>.topScorers__goals-total {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .topScorersContainer>.topScorers__row>.topScorers__goals>.topScorers__goals-penalties {
+    font-size: 12px;
+    color: #9b9b9b;
+  }
+
+  /* Skeleton */
+  .topScorersContainer>.topScorers__skeleton {
+    height: 58px;
+    margin: 4px 14px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .knockoutContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 8px 0;
+  }
+
+  .knockoutContainer>.knockout__empty {
+    text-align: center;
+    padding: 40px 0;
+    font-size: 13px;
+    color: #555;
+  }
+
+  /* Each round block */
+  .knockoutContainer>.knockout__round {
+    margin-bottom: 20px;
+  }
+
+  /* Round label */
+  .knockoutContainer>.knockout__round>.knockout__roundLabel {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 0 14px 8px;
+    border-bottom: 1px solid #1e1e1e;
+    margin-bottom: 8px;
+  }
+
+  /* Match grid — 2 columns */
+  .knockoutContainer>.knockout__round>.knockout__matches {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+  /* Single match card */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Each team row inside the match */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #1a1a1a;
+    transition: background 0.15s;
+  }
+
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team:last-child {
+    border-bottom: none;
+  }
+
+  /* Team name */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team>.knockout__teamName {
+    flex: 1;
+    font-size: 12px;
+    color: #e0e0e0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Score */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team>.knockout__score {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    min-width: 16px;
+    text-align: right;
+  }
+
+  /* Winner row */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.winner>.knockout__teamName {
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.winner>.knockout__score {
+    color: #4a9eff;
+  }
+
+  /* Loser row */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.loser>.knockout__teamName {
+    color: #444;
+  }
+
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.loser>.knockout__score {
+    color: #333;
+  }
+
+  /* Upcoming match — no result yet */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.upcoming>.knockout__teamName {
+    color: #666;
+  }
+
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team.upcoming>.knockout__score {
+    color: #444;
+  }
+
+  /* TBD team placeholder logo */
+  .knockoutContainer>.knockout__round>.knockout__matches>.knockout__match>.knockout__team>.knockout__teamPlaceholder {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #1e1e1e;
+    flex-shrink: 0;
+  }
+
+  /* Skeletons */
+  .knockoutContainer>.knockout__roundSkeleton {
+    margin-bottom: 20px;
+    padding: 0 8px;
+  }
+
+  .knockoutContainer>.knockout__roundSkeleton>.knockout__labelSkeleton {
+    height: 12px;
+    width: 100px;
+    border-radius: 4px;
+    background: #1a1a1a;
+    margin-bottom: 12px;
+  }
+
+  .knockoutContainer>.knockout__roundSkeleton>.knockout__matchesSkeleton {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .knockoutContainer>.knockout__roundSkeleton>.knockout__matchesSkeleton>.knockout__matchSkeleton {
+    height: 72px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
     }
   }
 }
