@@ -60,6 +60,8 @@ export default function Standings({ league, onBack, season }) {
     ? standingsGroups[selectedGroup]
     : standingsGroups[0] || []
 
+    console.log("standing groups",standingsGroups)
+
   if (!league) return null
 
   return (

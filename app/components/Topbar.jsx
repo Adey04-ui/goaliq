@@ -8,14 +8,11 @@ import { useUser } from '@/context/userContext'
 function Topbar() {
   const { showSignIn, setShowSignIn } = useSignIn()
   const { session, status } = useUser()
-  console.log(showSignIn)
-
-  console.log("Session data in Topbar:", session)
-  console.log("Session status in Topbar:", status)
 
   return (
     <div className="header">
       <div className="header-left"></div>
+
       <div className="header-middle">
         <div className="search-box">
           <svg className="search-icon" viewBox="0 0 24 24">
@@ -25,8 +22,14 @@ function Topbar() {
           <input type="text" placeholder="Search teams, player, news..." />
         </div>
       </div>
+
       <div className="header-right">
-        {status == "authenticated" ? (
+        {status === "loading" && (
+          // Placeholder so layout doesn't jump while session loads
+          <div className="topbar__authPlaceholder" />
+        )}
+
+        {status === "authenticated" && (
           <>
             <div className="position-relative-container">
               <svg className="notifications-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="22"
@@ -39,12 +42,20 @@ function Topbar() {
               <div className="position-absolute-container">3</div>
             </div>
             <div className="position-relative-container active">
-              <Image className="profile-picture" src={session?.user?.image} alt="profile" width={30} height={30} />
+              <Image
+                className="profile-picture"
+                src={session?.user?.image}
+                alt="profile"
+                width={30}
+                height={30}
+              />
               <div className="position-absolute-profile"></div>
             </div>
           </>
-        ) : (
-          <div style={{padding: '0px 40px'}}>
+        )}
+
+        {status === "unauthenticated" && (
+          <div style={{ padding: '0px 40px' }}>
             <button className="sign-in-btn" onClick={() => setShowSignIn(true)}>
               Sign In
             </button>
