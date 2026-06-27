@@ -1,31 +1,27 @@
 "use client"
 
-import { CheckCircle, ChevronDown, ChevronRight, Search } from "lucide-react"
+import { CheckCircle, ChevronDown, Search } from "lucide-react"
 import { useEffect, useState, useDeferredValue } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import useSWR from "swr"
-import Image from "next/image"
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { toggleFavourite } from "@/services/favourites"
 import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
-import Loader from "./Loader"
-import LeagueSkeleton from "./LeagueSkeleton"
-
-const PAGE_SIZE = 20
 
 const fetcher = async (url) => {
   const res = await fetch(url)
   const result = await res.json()
   if (!res.ok) throw new Error(result.message)
-  return result.data
+  return result
 }
 
 function LeaguesComponent() {
   const [search, setSearch] = useState("")
-  const deferredSearch = useDeferredValue(search) // doesn't block typing
+  const deferredSearch = useDeferredValue(search)
 
-  const [page, setPage] = useState(1)
+  const [allLeaguesPage, setAllLeaguesPage] = useState(0)
+  const [accumulatedLeagues, setAccumulatedLeagues] = useState([])
+
   const [seasons] = useState(['2022', '2023', '2024'])
   const [selected, setSelected] = useState('2022')
   const [selectedLeague, setSelectedLeague] = useState(null)
@@ -47,8 +43,11 @@ function LeaguesComponent() {
     ...filterItems.filter((item) => item !== filter),
   ]
 
-  const { data: leagues = [], isLoading } = useSWR(
-    `/api/leagues?filter=${filter}`,
+  // Main fetch — paginated for all_leagues, single fetch for everything else
+  const { data, isLoading } = useSWR(
+    filter === "all_leagues"
+      ? `/api/leagues?filter=all_leagues&page=${allLeaguesPage}`
+      : `/api/leagues?filter=${filter}`,
     fetcher,
     {
       dedupingInterval: 60000,
@@ -56,18 +55,64 @@ function LeaguesComponent() {
     }
   )
 
-  useEffect(() => {
-    setPage(1)
-  }, [filter, deferredSearch])
-
-  const filtered = leagues.filter((l) =>
-    l.league.name.toLowerCase().includes(deferredSearch.toLowerCase()) ||
-    l.country.name.toLowerCase().includes(deferredSearch.toLowerCase())
+  // Search — only fires for all_leagues with 2+ chars typed
+  const { data: searchData, isLoading: isSearchLoading } = useSWR(
+    filter === "all_leagues" && deferredSearch.length >= 2
+      ? `/api/leagues/search?q=${encodeURIComponent(deferredSearch)}`
+      : null,
+    fetcher,
+    {
+      dedupingInterval: 5000,
+      revalidateOnFocus: false,
+    }
   )
 
-  // Slice for current page
-  const paginated = filtered.slice(0, page * PAGE_SIZE)
-  const hasMore = paginated.length < filtered.length
+  // Accumulate pages for all_leagues infinite scroll
+  useEffect(() => {
+    if (filter !== "all_leagues" || !data?.data) return
+    setAccumulatedLeagues(prev =>
+      allLeaguesPage === 0 ? data.data : [...prev, ...data.data]
+    )
+  }, [data, allLeaguesPage])
+
+  // Reset everything when filter changes
+  useEffect(() => {
+    setAllLeaguesPage(0)
+    setAccumulatedLeagues([])
+  }, [filter])
+
+  // Decide what leagues to show
+  const rawLeagues = data?.data ?? []
+  const total = data?.total ?? 0
+
+  const displayLeagues = (() => {
+    if (filter === "all_leagues") {
+      // Searching — use search endpoint results
+      if (deferredSearch.length >= 2) {
+        return searchData?.data ?? []
+      }
+      // Not searching — use accumulated paginated results
+      // search index items have flat shape {id, name, logo, country, flag}
+      // so we need to reshape them to match what LeaguesList expects
+      return accumulatedLeagues
+    }
+
+    // Small filters — search locally, already have full data
+    if (deferredSearch.length >= 2) {
+      return rawLeagues.filter(l =>
+        l.league.name.toLowerCase().includes(deferredSearch.toLowerCase()) ||
+        l.country.name.toLowerCase().includes(deferredSearch.toLowerCase())
+      )
+    }
+
+    return rawLeagues
+  })()
+
+  const hasMore = filter === "all_leagues" &&
+    deferredSearch.length < 2 &&
+    accumulatedLeagues.length < total
+
+  const showLoading = isLoading || (filter === "all_leagues" && deferredSearch.length >= 2 && isSearchLoading)
 
   return (
     <div className="allLeaguesContainer">
@@ -127,17 +172,18 @@ function LeaguesComponent() {
       <div className="allLeaguesList">
         <div className="list-layer">
           <LeaguesList
-            leagues={paginated}
+            leagues={displayLeagues}
             onSelectLeague={setSelectedLeague}
-            isLoading={isLoading}
+            isLoading={showLoading}
+            isSearchResult={filter === "all_leagues" && deferredSearch.length >= 2}
           />
 
-          {!isLoading && hasMore && (
+          {!showLoading && hasMore && (
             <button
               className="load-more-btn"
-              onClick={() => setPage((p) => p + 1)}
+              onClick={() => setAllLeaguesPage(p => p + 1)}
             >
-              Show more ({filtered.length - paginated.length} remaining)
+              Load more leagues ({total - accumulatedLeagues.length} remaining)
             </button>
           )}
         </div>

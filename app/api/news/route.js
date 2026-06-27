@@ -1,28 +1,25 @@
+import { redis } from "@/lib/redis"
 
-
-const NEWS_CACHE_MS = 1000 * 60 * 60 * 2 // 2 hours
-
-const newsCache = new Map()
+const NEWS_CACHE_SECONDS = 60 * 60 * 2 // 2 hours — news goes stale fast
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url)
     const query = searchParams.get("q") || "football"
-    const max = searchParams.get("max") || "3"
+    const max = searchParams.get("max") || "10"
 
-    const cacheKey = `${query}_${max}`
-    const now = Date.now()
-    const cached = newsCache.get(cacheKey)
+    const cacheKey = `news:${query}:${max}`
+    const cached = await redis.get(cacheKey)
 
-    if (cached && now < cached.expiry) {
-      console.log(`[news] Cache hit — ${cacheKey}`)
-      return Response.json({ success: true, data: cached.data })
+    if (cached) {
+      console.log(`[news] Redis hit — ${cacheKey}`)
+      return Response.json({ success: true, data: cached })
     }
 
-    console.log(`[news] Cache miss — fetching "${query}"`)
+    console.log(`[news] Redis miss — fetching "${query}"`)
 
     const res = await fetch(
-      `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=${max}&apikey=${process.env.GNEWS_API_KEY}`,
+      `https://gnews.io/api/v4/search?q=${encodeURIComponent(query)}&lang=en&max=${max}&apikey=${process.env.GNEWS_API_KEY}`
     )
 
     if (!res.ok) {
@@ -33,13 +30,11 @@ export async function GET(request) {
     }
 
     const data = await res.json()
+    const articles = data.articles
 
-    newsCache.set(cacheKey, {
-      data: data.articles,
-      expiry: now + NEWS_CACHE_MS,
-    })
+    await redis.set(cacheKey, articles, { ex: NEWS_CACHE_SECONDS })
 
-    return Response.json({ success: true, data: data.articles })
+    return Response.json({ success: true, data: articles })
 
   } catch (error) {
     return Response.json(

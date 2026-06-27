@@ -1,10 +1,8 @@
-// app/api/topScorers/route.js
+import { redis } from "@/lib/redis"
 
 const CURRENT_SEASON = new Date().getFullYear().toString()
-const PAST_CACHE_MS = 1000 * 60 * 60 * 24 * 30  // 30 days
-const CURRENT_CACHE_MS = 1000 * 60 * 60 * 3      // 3 hours
-
-const topScorersCache = new Map()
+const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
+const CURRENT_CACHE_SECONDS = 60 * 60 * 3
 
 export async function GET(request) {
   try {
@@ -19,17 +17,15 @@ export async function GET(request) {
       )
     }
 
-    const cacheKey = `${league}_${season}`
-    const now = Date.now()
-    const cached = topScorersCache.get(cacheKey)
-    const cacheDuration = season === CURRENT_SEASON ? CURRENT_CACHE_MS : PAST_CACHE_MS
+    const cacheKey = `topscorers:${league}:${season}`
+    const cached = await redis.get(cacheKey)
 
-    if (cached && now < cached.expiry) {
-      console.log(`[topScorers] Cache hit — ${cacheKey}`)
-      return Response.json({ success: true, data: cached.data })
+    if (cached) {
+      console.log(`[topscorers] Redis hit — ${cacheKey}`)
+      return Response.json({ success: true, data: cached })
     }
 
-    console.log(`[topScorers] Cache miss — fetching ${cacheKey}`)
+    console.log(`[topscorers] Redis miss — fetching ${cacheKey}`)
 
     const res = await fetch(
       `https://v3.football.api-sports.io/players/topscorers?league=${league}&season=${season}`,
@@ -50,10 +46,11 @@ export async function GET(request) {
     const data = await res.json()
     const scorers = data.response
 
-    topScorersCache.set(cacheKey, {
-      data: scorers,
-      expiry: now + cacheDuration,
-    })
+    const ttl = season === CURRENT_SEASON
+      ? CURRENT_CACHE_SECONDS
+      : PAST_CACHE_SECONDS
+
+    await redis.set(cacheKey, scorers, { ex: ttl })
 
     return Response.json({ success: true, data: scorers })
 

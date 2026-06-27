@@ -1,24 +1,19 @@
 import Image from "next/image"
 import { ChevronRight } from "lucide-react"
 import { toggleFavourite } from "@/services/favourites"
-import { toast } from "react-toastify"
 import { useFavorites } from "@/context/favoriteContext"
 import { motion, AnimatePresence } from "framer-motion"
 import LeagueSkeleton from "./LeagueSkeleton"
-
 
 let flushTimer = null
 const favQueue = new Map()
 
 const scheduleFlush = () => {
   if (flushTimer) return
-
   flushTimer = setTimeout(async () => {
     const items = [...favQueue.values()]
-
     favQueue.clear()
     flushTimer = null
-
     for (const item of items) {
       try {
         await toggleFavourite({
@@ -34,40 +29,64 @@ const scheduleFlush = () => {
   }, 800)
 }
 
-function LeaguesList({ leagues, onSelectLeague, isLoading }) {
+// Normalize both shapes into one consistent shape
+function normalizeLeague(league) {
+  // Search index shape — flat
+  if (league.id !== undefined) {
+    return {
+      id: league.id,
+      name: league.name,
+      logo: league.logo,
+      type: league.type,
+      countryName: league.country,
+      countryFlag: league.flag,
+      // raw for passing to Standings which expects nested shape
+      raw: null,
+    }
+  }
+
+  // Normal API shape — nested
+  return {
+    id: league.league.id,
+    name: league.league.name,
+    logo: league.league.logo,
+    type: league.league.type,
+    countryName: league.country.name,
+    countryFlag: league.country.flag,
+    // raw for passing to Standings
+    raw: league,
+  }
+}
+
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.08 },
+  },
+}
+
+const itemVariants = {
+  hidden: { x: -40, opacity: 0 },
+  show: {
+    x: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 120, damping: 18 },
+  },
+}
+
+function LeaguesList({ leagues, onSelectLeague, isLoading, isSearchResult }) {
   const { favorites, setFavorites } = useFavorites()
 
   const handleFav = (league) => {
     const key = league.id
+    const exists = favorites?.league?.some(fav => fav.itemId === key)
 
-    const exists = favorites?.league?.some(
-      (fav) => fav.itemId === key
-    )
-
-    // 1. optimistic UI update
     setFavorites((prev) => {
       const list = prev.league || []
-
-      let updated
-
-      if (exists) {
-        updated = list.filter(f => f.itemId !== key)
-      } else {
-        updated = [
-          ...list,
-          {
-            itemId: key,
-            name: league.name,
-            logo: league.logo,
-            type: "LEAGUE",
-          },
-        ]
-      }
-
-      return {
-        ...prev,
-        league: updated,
-      }
+      const updated = exists
+        ? list.filter(f => f.itemId !== key)
+        : [...list, { itemId: key, name: league.name, logo: league.logo, type: "LEAGUE" }]
+      return { ...prev, league: updated }
     })
 
     favQueue.set(key, {
@@ -80,70 +99,94 @@ function LeaguesList({ leagues, onSelectLeague, isLoading }) {
 
     scheduleFlush()
   }
+
   const favouriteLeagueIds = new Set(
-    favorites?.league?.map((fav) => fav.itemId) || []
+    favorites?.league?.map(fav => fav.itemId) || []
   )
-  const containerVariants = {
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: 0.08,
-      },
-    },
+
+  if (isLoading) {
+    return (
+      <div>
+        {Array.from({ length: 7 }).map((_, i) => (
+          <LeagueSkeleton key={i} />
+        ))}
+      </div>
+    )
   }
 
-  const itemVariants = {
-    hidden: {
-      x: -40,
-      opacity: 0,
-    },
-    show: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 120,
-        damping: 18,
-      },
-    },
+  if (!leagues.length) {
+    return (
+      <div style={{ padding: '20px 14px', color: '#555', fontSize: '13px' }}>
+        No leagues found
+      </div>
+    )
   }
-  console.log(leagues)
+
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-    >
+    <motion.div variants={containerVariants} initial="hidden" animate="show">
       <AnimatePresence>
-        {!isLoading ? leagues.map((league) => {
-          const isFavourite = favouriteLeagueIds.has(league.league.id)
+        {leagues.map((rawLeague) => {
+          const league = normalizeLeague(rawLeague)
+          const isFavourite = favouriteLeagueIds.has(league.id)
+
           return (
-            <motion.div variants={itemVariants} className="eachList" key={league.league.id} onClick={() => onSelectLeague(league)}>
+            <motion.div
+              variants={itemVariants}
+              className="eachList"
+              key={league.id}
+              onClick={() => {
+                if (league.raw) {
+                  onSelectLeague(league.raw)
+                } else {
+                  onSelectLeague({
+                    league: { id: league.id, name: league.name, logo: league.logo, type: league.type },
+                    country: { name: league.countryName, flag: league.countryFlag },
+                  })
+                }
+              }}
+            >
               <div className="left">
                 <div className="leagueImage">
-                  <Image width={40} height={40} alt="league_logo" src={league.league.logo} style={{ objectPosition: 'center', objectFit: 'contain' }} />
+                  <Image
+                    width={40}
+                    height={40}
+                    alt="league_logo"
+                    src={league.logo}
+                    style={{ objectPosition: 'center', objectFit: 'contain' }}
+                  />
                 </div>
                 <div className="leagueDetails">
-                  <div className="leagueName">
-                    {league.league.name}
-                  </div>
+                  <div className="leagueName">{league.name}</div>
                   <div className="countryName">
-                    {league.country.flag && (
+                    {league.countryFlag && (
                       <div className="countryImage">
-                        <Image width={15} height={15} alt="country_flag" src={league.country.flag} style={{ borderRadius: '4px' }} />
+                        <Image
+                          width={15}
+                          height={15}
+                          alt="country_flag"
+                          src={league.countryFlag}
+                          style={{ borderRadius: '4px' }}
+                        />
                       </div>
                     )}
-                    {league.country.name}
+                    {league.countryName}
                   </div>
                 </div>
               </div>
+
               <div className="right">
-                <div className="favourite-btn" onClick={(e) => {
-                  e.stopPropagation()
-                  handleFav(league.league)
-                }}>
-                  <svg style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff', }} viewBox="0 0 24 24"
-                    className={`favourite-svg ${isFavourite ? 'filled' : ''}`}>
+                <div
+                  className="favourite-btn"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    handleFav(league)
+                  }}
+                >
+                  <svg
+                    style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff' }}
+                    viewBox="0 0 24 24"
+                    className={`favourite-svg ${isFavourite ? 'filled' : ''}`}
+                  >
                     <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
                   </svg>
                 </div>
@@ -153,14 +196,9 @@ function LeaguesList({ leagues, onSelectLeague, isLoading }) {
               </div>
             </motion.div>
           )
-        }) : (
-          Array.from({ length: 7 }).map((_, i) => (
-            <LeagueSkeleton key={i} />
-          ))
-        )}
+        })}
       </AnimatePresence>
     </motion.div>
-
   )
 }
 
