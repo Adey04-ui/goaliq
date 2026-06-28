@@ -16,6 +16,7 @@ model User {
   accounts      Account[]
   favorites     Favorite[]
   sessions      Session[]
+  userXI        UserXI?
 }
 
 model Account {
@@ -70,4 +71,14 @@ enum FavoriteType {
   LEAGUE
   TEAM
   MATCH
+}
+
+model UserXI {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  formation String   @default("4-3-3")
+  players   Json // array of 11 player objects or nulls
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

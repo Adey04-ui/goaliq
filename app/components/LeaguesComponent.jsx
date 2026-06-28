@@ -18,6 +18,7 @@ const fetcher = async (url) => {
 function LeaguesComponent() {
   const [search, setSearch] = useState("")
   const deferredSearch = useDeferredValue(search)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
 
   const [allLeaguesPage, setAllLeaguesPage] = useState(0)
   const [accumulatedLeagues, setAccumulatedLeagues] = useState([])
@@ -73,12 +74,14 @@ function LeaguesComponent() {
     setAccumulatedLeagues(prev =>
       allLeaguesPage === 0 ? data.data : [...prev, ...data.data]
     )
+    setIsLoadingMore(false)
   }, [data, allLeaguesPage])
 
   // Reset everything when filter changes
   useEffect(() => {
     setAllLeaguesPage(0)
     setAccumulatedLeagues([])
+    setIsLoadingMore(false)
   }, [filter])
 
   // Decide what leagues to show
@@ -112,7 +115,10 @@ function LeaguesComponent() {
     deferredSearch.length < 2 &&
     accumulatedLeagues.length < total
 
-  const showLoading = isLoading || (filter === "all_leagues" && deferredSearch.length >= 2 && isSearchLoading)
+  const showLoading = !isLoadingMore && (isLoading ||
+    (filter === "all_leagues" && deferredSearch.length >= 2 && isSearchLoading))
+
+    const loadingMore = isLoadingMore
 
   return (
     <div className="allLeaguesContainer">
@@ -175,17 +181,15 @@ function LeaguesComponent() {
             leagues={displayLeagues}
             onSelectLeague={setSelectedLeague}
             isLoading={showLoading}
+            loadingMore={loadingMore}
+            setIsLoadingMore={setIsLoadingMore}
+            setAllLeaguesPage={setAllLeaguesPage}
+            showLoading={showLoading}
+            hasMore={hasMore}
+            total={total}
+            accumulatedLeagues={accumulatedLeagues}
             isSearchResult={filter === "all_leagues" && deferredSearch.length >= 2}
           />
-
-          {!showLoading && hasMore && (
-            <button
-              className="load-more-btn"
-              onClick={() => setAllLeaguesPage(p => p + 1)}
-            >
-              Load more leagues ({total - accumulatedLeagues.length} remaining)
-            </button>
-          )}
         </div>
 
         <AnimatePresence mode="wait">

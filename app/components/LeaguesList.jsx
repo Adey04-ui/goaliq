@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { ChevronRight } from "lucide-react"
+import { ChevronDown, ChevronRight } from "lucide-react"
 import { toggleFavourite } from "@/services/favourites"
 import { useFavorites } from "@/context/favoriteContext"
 import { motion, AnimatePresence } from "framer-motion"
@@ -74,7 +74,19 @@ const itemVariants = {
   },
 }
 
-function LeaguesList({ leagues, onSelectLeague, isLoading, isSearchResult }) {
+function LeaguesList({
+  leagues,
+  onSelectLeague,
+  isLoading,
+  isSearchResult,
+  loadingMore,
+  setIsLoadingMore,
+  setAllLeaguesPage,
+  showLoading,
+  hasMore,
+  total,
+  accumulatedLeagues,
+}) {
   const { favorites, setFavorites } = useFavorites()
 
   const handleFav = (league) => {
@@ -123,82 +135,108 @@ function LeaguesList({ leagues, onSelectLeague, isLoading, isSearchResult }) {
   }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show">
-      <AnimatePresence>
-        {leagues.map((rawLeague) => {
-          const league = normalizeLeague(rawLeague)
-          const isFavourite = favouriteLeagueIds.has(league.id)
+    <>
+      <motion.div variants={containerVariants} initial="hidden" animate="show">
+        <AnimatePresence>
+          {leagues.map((rawLeague) => {
+            const league = normalizeLeague(rawLeague)
+            const isFavourite = favouriteLeagueIds.has(league.id)
 
-          return (
-            <motion.div
-              variants={itemVariants}
-              className="eachList"
-              key={league.id}
-              onClick={() => {
-                if (league.raw) {
-                  onSelectLeague(league.raw)
-                } else {
-                  onSelectLeague({
-                    league: { id: league.id, name: league.name, logo: league.logo, type: league.type },
-                    country: { name: league.countryName, flag: league.countryFlag },
-                  })
-                }
-              }}
-            >
-              <div className="left">
-                <div className="leagueImage">
-                  <Image
-                    width={40}
-                    height={40}
-                    alt="league_logo"
-                    src={league.logo}
-                    style={{ objectPosition: 'center', objectFit: 'contain' }}
-                  />
-                </div>
-                <div className="leagueDetails">
-                  <div className="leagueName">{league.name}</div>
-                  <div className="countryName">
-                    {league.countryFlag && (
-                      <div className="countryImage">
-                        <Image
-                          width={15}
-                          height={15}
-                          alt="country_flag"
-                          src={league.countryFlag}
-                          style={{ borderRadius: '4px' }}
-                        />
-                      </div>
-                    )}
-                    {league.countryName}
+            return (
+              <motion.div
+                variants={itemVariants}
+                className="eachList"
+                key={league.id}
+                onClick={() => {
+                  if (league.raw) {
+                    onSelectLeague(league.raw)
+                  } else {
+                    onSelectLeague({
+                      league: { id: league.id, name: league.name, logo: league.logo, type: league.type },
+                      country: { name: league.countryName, flag: league.countryFlag },
+                    })
+                  }
+                }}
+              >
+                <div className="left">
+                  <div className="leagueImage">
+                    <Image
+                      width={40}
+                      height={40}
+                      alt="league_logo"
+                      src={league.logo}
+                      style={{ objectPosition: 'center', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div className="leagueDetails">
+                    <div className="leagueName">{league.name}</div>
+                    <div className="countryName">
+                      {league.countryFlag && (
+                        <div className="countryImage">
+                          <Image
+                            width={15}
+                            height={15}
+                            alt="country_flag"
+                            src={league.countryFlag}
+                            style={{ borderRadius: '4px' }}
+                          />
+                        </div>
+                      )}
+                      {league.countryName}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="right">
-                <div
-                  className="favourite-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleFav(league)
-                  }}
-                >
-                  <svg
-                    style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff' }}
-                    viewBox="0 0 24 24"
-                    className={`favourite-svg ${isFavourite ? 'filled' : ''}`}
+                <div className="right">
+                  <div
+                    className="favourite-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFav(league)
+                    }}
                   >
-                    <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
-                  </svg>
+                    <svg
+                      style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff' }}
+                      viewBox="0 0 24 24"
+                      className={`favourite-svg ${isFavourite ? 'filled' : ''}`}
+                    >
+                      <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
+                    </svg>
+                  </div>
+                  <div className="navigation-btn">
+                    <ChevronRight size={20} color="#5c5c5c" />
+                  </div>
                 </div>
-                <div className="navigation-btn">
-                  <ChevronRight size={20} color="#5c5c5c" />
-                </div>
-              </div>
-            </motion.div>
-          )
-        })}
-      </AnimatePresence>
-    </motion.div>
+              </motion.div>
+            )
+          })}
+        </AnimatePresence>
+
+      </motion.div>
+      
+        {loadingMore && (
+          <div>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <LeagueSkeleton key={i} />
+            ))}
+          </div>
+        )}
+
+        {!showLoading && hasMore && (
+          <div className="load-more-wrapper">
+            <button
+              className="load-more-btn"
+              onClick={() => {
+                setIsLoadingMore(true)
+                setAllLeaguesPage(p => p + 1)
+              }}
+            >
+              See more ({total - accumulatedLeagues.length} remaining)
+              <ChevronDown size={18} />
+            </button>
+          </div>
+        )}
+    </>
   )
 }
 

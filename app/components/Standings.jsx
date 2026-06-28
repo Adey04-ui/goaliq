@@ -31,7 +31,7 @@ export default function Standings({ league, onBack, season }) {
     }
   )
 
-  const standingsGroups = data?.[0]?.league?.standings || []
+  const standingsGroups = data?.data?.[0]?.league?.standings || []
   const competitionType = league?.league?.type
   const hasGroups = standingsGroups.length > 1
   const hasStandings = standingsGroups.length > 0 // new check

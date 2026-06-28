@@ -3,6 +3,7 @@ import Image from "next/image"
 import StandingsSkeleton from "./StandingsSkeleton"
 
 function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading }) {
+  console.log("standings group", standingsGroups)
   return (
     <div className="standingsL">
       {
