@@ -2,26 +2,8 @@
 
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-
-// 4-3-3 formation positions as percentages of the pitch dimensions
-// x = left%, y = top%
-const FORMATION_433 = [
-  // Attack
-  { label: "LW", x: 18, y: 12 },
-  { label: "ST", x: 50, y: 8 },
-  { label: "RW", x: 82, y: 12 },
-  // Midfield
-  { label: "CM", x: 22, y: 38 },
-  { label: "CM", x: 50, y: 33 },
-  { label: "CM", x: 78, y: 38 },
-  // Defense
-  { label: "LB", x: 10, y: 62 },
-  { label: "CB", x: 34, y: 65 },
-  { label: "CB", x: 66, y: 65 },
-  { label: "RB", x: 90, y: 62 },
-  // Goalkeeper
-  { label: "GK", x: 50, y: 88 },
-]
+import { useXI } from "@/context/xiContext"
+import { FORMATIONS } from "@/app/main/xi/page"
 
 function PlayerSlot({ position, player, small }) {
   const size = small ? 36 : 44
@@ -155,8 +137,10 @@ export function PitchSVG() {
   )
 }
 
-export default function BuildYourXI({ players = [] }) {
+export default function BuildYourXI() {
   const router = useRouter()
+  const { formation, players, isLoading } = useXI()
+  const positions = FORMATIONS[formation] ?? FORMATIONS["4-3-3"]
 
   // players is an array of 11 items matching FORMATION_433 order
   // empty slots are null
@@ -179,14 +163,21 @@ export default function BuildYourXI({ players = [] }) {
         <PitchSVG />
 
         {/* Player slots */}
-        {FORMATION_433.map((position, index) => (
-          <PlayerSlot
-            key={`${position.label}-${index}`}
-            position={position}
-            player={players[index] ?? null}
-            small
-          />
-        ))}
+        {isLoading ? (
+          <div className="buildXI__loading">
+            {Array.from({ length: 11 }).map((_, i) => (
+              <div key={i} className="buildXI__slotSkeleton" />
+            ))}
+          </div>
+        ) : (
+          positions.map((position, index) => (
+            <PlayerSlot
+              key={`${position.label}-${index}`}
+              position={position}
+              player={players[index] ?? null}
+              small
+            />
+          )))}
       </div>
     </div>
   )

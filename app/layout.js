@@ -7,6 +7,7 @@ import { FavoritesProvider } from "@/context/favoriteContext";
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import GetFavourites from "./components/GetFavourites";
+import { XIProvider } from "@/context/xiContext";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -33,13 +34,15 @@ export default function RootLayout({ children }) {
           <SignInProvider>
             <UserProvider>
               <FavoritesProvider>
-                {children}
-                <ToastContainer
-                  position="top-right"
-                  autoClose={3000}
-                  theme="dark"
-                />
-                <GetFavourites />
+                <XIProvider>
+                  {children}
+                  <ToastContainer
+                    position="top-right"
+                    autoClose={3000}
+                    theme="dark"
+                  />
+                  <GetFavourites />
+                </XIProvider>
               </FavoritesProvider>
             </UserProvider>
           </SignInProvider>

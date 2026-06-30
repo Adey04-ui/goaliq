@@ -5,6 +5,7 @@ import Image from "next/image"
 import useSWR from "swr"
 import { Search, X, ChevronDown, Check, Loader } from "lucide-react"
 import { PitchSVG } from "@/app/components/BuildYourXI"
+import { useXI } from "@/context/xiContext"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -13,8 +14,10 @@ const fetcher = async (url) => {
   return result
 }
 
+const season = "2024"
+
 // All formations
-const FORMATIONS = {
+export const FORMATIONS = {
   "4-3-3": [
     // Attack — moved down from y:12 and y:8
     { label: "LW", x: 18, y: 28 },
@@ -33,43 +36,43 @@ const FORMATIONS = {
     { label: "GK", x: 50, y: 82 },
   ],
   "4-4-2": [
-    { label: "ST",  x: 35, y: 24 },
-    { label: "ST",  x: 65, y: 24 },
-    { label: "LM",  x: 10, y: 46 },
-    { label: "CM",  x: 35, y: 44 },
-    { label: "CM",  x: 65, y: 44 },
-    { label: "RM",  x: 90, y: 46 },
-    { label: "LB",  x: 10, y: 64 },
-    { label: "CB",  x: 34, y: 67 },
-    { label: "CB",  x: 66, y: 67 },
-    { label: "RB",  x: 90, y: 64 },
-    { label: "GK",  x: 50, y: 82 },
+    { label: "ST", x: 35, y: 24 },
+    { label: "ST", x: 65, y: 24 },
+    { label: "LM", x: 10, y: 46 },
+    { label: "CM", x: 35, y: 44 },
+    { label: "CM", x: 65, y: 44 },
+    { label: "RM", x: 90, y: 46 },
+    { label: "LB", x: 10, y: 64 },
+    { label: "CB", x: 34, y: 67 },
+    { label: "CB", x: 66, y: 67 },
+    { label: "RB", x: 90, y: 64 },
+    { label: "GK", x: 50, y: 82 },
   ],
   "4-2-3-1": [
-    { label: "ST",  x: 50, y: 24 },
+    { label: "ST", x: 50, y: 24 },
     { label: "LAM", x: 18, y: 40 },
     { label: "CAM", x: 50, y: 37 },
     { label: "RAM", x: 82, y: 40 },
     { label: "CDM", x: 35, y: 54 },
     { label: "CDM", x: 65, y: 54 },
-    { label: "LB",  x: 10, y: 67 },
-    { label: "CB",  x: 34, y: 69 },
-    { label: "CB",  x: 66, y: 69 },
-    { label: "RB",  x: 90, y: 67 },
-    { label: "GK",  x: 50, y: 82 },
+    { label: "LB", x: 10, y: 67 },
+    { label: "CB", x: 34, y: 69 },
+    { label: "CB", x: 66, y: 69 },
+    { label: "RB", x: 90, y: 67 },
+    { label: "GK", x: 50, y: 82 },
   ],
   "3-5-2": [
-    { label: "ST",  x: 35, y: 25 },
-    { label: "ST",  x: 65, y: 25 },
-    { label: "LWB", x: 14,  y: 49 },
-    { label: "CM",  x: 30, y: 43 },
-    { label: "CM",  x: 50, y: 40 },
-    { label: "CM",  x: 70, y: 43 },
+    { label: "ST", x: 35, y: 25 },
+    { label: "ST", x: 65, y: 25 },
+    { label: "LWB", x: 14, y: 49 },
+    { label: "CM", x: 30, y: 43 },
+    { label: "CM", x: 50, y: 40 },
+    { label: "CM", x: 70, y: 43 },
     { label: "RWB", x: 86, y: 49 },
-    { label: "CB",  x: 25, y: 66 },
-    { label: "CB",  x: 50, y: 69 },
-    { label: "CB",  x: 75, y: 66 },
-    { label: "GK",  x: 50, y: 82 },
+    { label: "CB", x: 25, y: 66 },
+    { label: "CB", x: 50, y: 69 },
+    { label: "CB", x: 75, y: 66 },
+    { label: "GK", x: 50, y: 82 },
   ],
 }
 
@@ -83,7 +86,6 @@ function PlayerPicker({ position, onSelect, onClose }) {
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [debouncedTeam, setDebouncedTeam] = useState("")
 
-  const season = "2022"
 
   // Debounce search
   useEffect(() => {
@@ -355,6 +357,7 @@ function EditableSlot({ position, player, isSelected, onClick }) {
 }
 
 export default function XIPage() {
+  const { formation: savedFormation, players: savedPlayers, mutate } = useXI()
   const [formation, setFormation] = useState("4-3-3")
   const [players, setPlayers] = useState(Array(11).fill(null))
   const [selectedSlot, setSelectedSlot] = useState(null)
@@ -362,15 +365,11 @@ export default function XIPage() {
   const [saved, setSaved] = useState(false)
   const [showFormationPicker, setShowFormationPicker] = useState(false)
 
-  // Load saved XI on mount
-  const { data: xiData } = useSWR("/api/xi", fetcher)
 
   useEffect(() => {
-    if (xiData?.data) {
-      setFormation(xiData.data.formation)
-      setPlayers(xiData.data.players ?? Array(11).fill(null))
-    }
-  }, [xiData])
+    if (savedFormation) setFormation(savedFormation)
+    if (savedPlayers) setPlayers(savedPlayers)
+  }, [savedFormation, savedPlayers])
 
   const positions = FORMATIONS[formation]
 
@@ -414,7 +413,10 @@ export default function XIPage() {
         body: JSON.stringify({ formation, players }),
       })
       const result = await res.json()
-      if (result.success) setSaved(true)
+      if (result.success) {
+        setSaved(true)
+        mutate() 
+      }
     } catch (err) {
       console.error("Save failed", err)
     } finally {
@@ -560,6 +562,7 @@ export default function XIPage() {
             position={positions[selectedSlot]}
             onSelect={handlePlayerSelect}
             onClose={() => setSelectedSlot(null)}
+            season={season}
           />
         )}
       </div>

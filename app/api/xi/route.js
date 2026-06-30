@@ -15,17 +15,17 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      include: { xi: true },
+      include: { userXI: true },
     })
 
-    if (!user?.xi) {
+    if (!user?.userXI) {
       return Response.json({
         success: true,
         data: { formation: "4-3-3", players: Array(11).fill(null) },
       })
     }
 
-    return Response.json({ success: true, data: user.xi })
+    return Response.json({ success: true, data: user.userXI })
 
   } catch (error) {
     return Response.json(
