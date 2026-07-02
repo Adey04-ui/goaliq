@@ -71,6 +71,7 @@ enum FavoriteType {
   LEAGUE
   TEAM
   MATCH
+  PLAYER
 }
 
 model UserXI {
@@ -81,4 +82,21 @@ model UserXI {
   players   Json // array of 11 player objects or nulls
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PlayerIndex {
+  id          Int      @id
+  name        String
+  photo       String?
+  nationality String?
+  position    String?
+  teamId      Int?
+  teamName    String?
+  teamLogo    String?
+  leagueId    Int?
+  season      Int
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([teamId])
 }

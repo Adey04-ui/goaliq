@@ -45,7 +45,7 @@ function Sidebar() {
         </svg>
         <div>News</div>
       </div>
-      <div className={`sidebar-link ${pathname == '/main/following' ? 'active' : ''}`} onClick={() => setCurrent('following')}>
+      <div className={`sidebar-link ${pathname == '/main/following' ? 'active' : ''}`} onClick={() => router.push('/main/following')}>
         <svg viewBox="0 0 24 24">
           <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
         </svg>

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion"
 import Image from "next/image"
 import StandingsSkeleton from "./StandingsSkeleton"
+import Link from "next/link"
 
 function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading }) {
   console.log("standings group", standingsGroups)
@@ -69,18 +70,20 @@ function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelected
               {team.rank}
             </span>
 
-            <div className="teamColumn">
-              <Image
-                src={team.team.logo}
-                alt={team.team.name}
-                width={24}
-                height={24}
-              />
+            <Link href={`/main/team/${team.team.id}`}>
+              <div className="teamColumn">
+                <Image
+                  src={team.team.logo}
+                  alt={team.team.name}
+                  width={24}
+                  height={24}
+                />
 
-              <span>
-                {team.team.name}
-              </span>
-            </div>
+                <span>
+                  {team.team.name}
+                </span>
+              </div>
+            </Link>
 
             <span>{team.all.played}</span>
             <span>{team.all.win}</span>
