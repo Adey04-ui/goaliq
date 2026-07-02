@@ -915,6 +915,7 @@ body {
 
   .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.tableHeader>span.teamColumn {
     width: 45%;
+    cursor: pointer;
   }
 
   .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows {
@@ -947,6 +948,7 @@ body {
     display: flex;
     place-items: center;
     gap: 10px;
+    cursor: pointer;
   }
 
   .standingsContainer>.contentViewport>.contentSlider>.panel>.standingsL>.standingsRows>.standingRow>.teamColumn>img {
