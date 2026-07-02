@@ -1,6 +1,6 @@
 import { redis } from "@/lib/redis"
 
-const CURRENT_SEASON = new Date().getFullYear().toString()
+const CURRENT_SEASON = "2024"
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
 const CURRENT_CACHE_SECONDS = 60 * 60 * 3
 
@@ -42,6 +42,8 @@ export async function GET(request, { params }) {
 
     const ttl = season === CURRENT_SEASON ? CURRENT_CACHE_SECONDS : PAST_CACHE_SECONDS
     await redis.set(cacheKey, payload, { ex: ttl })
+
+    console.log(payload)
 
     return Response.json({ success: true, data: payload })
 

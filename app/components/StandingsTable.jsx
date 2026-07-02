@@ -2,9 +2,10 @@ import { motion } from "framer-motion"
 import Image from "next/image"
 import StandingsSkeleton from "./StandingsSkeleton"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading }) {
-  console.log("standings group", standingsGroups)
+function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading, league }) {
+  const router = useRouter()
   return (
     <div className="standingsL">
       {
@@ -70,20 +71,18 @@ function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelected
               {team.rank}
             </span>
 
-            <Link href={`/main/team/${team.team.id}`}>
-              <div className="teamColumn">
-                <Image
-                  src={team.team.logo}
-                  alt={team.team.name}
-                  width={24}
-                  height={24}
-                />
+            <div className="teamColumn" onClick={() => router.push(`/main/team/${team?.team?.id}?leagueId=${league?.league?.id}`)}>
+              <Image
+                src={team.team.logo}
+                alt={team.team.name}
+                width={24}
+                height={24}
+              />
 
-                <span>
-                  {team.team.name}
-                </span>
-              </div>
-            </Link>
+              <span>
+                {team.team.name}
+              </span>
+            </div>
 
             <span>{team.all.played}</span>
             <span>{team.all.win}</span>

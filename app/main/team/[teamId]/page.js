@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import useSWR from "swr"
 import Image from "next/image"
 import { motion } from "framer-motion"
@@ -24,7 +25,9 @@ const fetcher = async (url) => {
 const TABS = ["Overview", "Squad", "Fixtures", "Results", "Stats"]
 
 export default function TeamPage() {
+  const searchParams = useSearchParams()
   const { teamId } = useParams()
+  const leagueId = searchParams.get("leagueId")
   const [active, setActive] = useState("Overview")
   const { favorites, setFavorites } = useFavorites()
 
@@ -63,13 +66,16 @@ export default function TeamPage() {
 
   if (teamLoading || !team) {
     return (
-      <div className="teamPage">
-        <div className="teamPage__headerSkeleton" />
-        <div className="teamPage__tabsSkeleton" />
-        <div className="teamPage__bodySkeleton" />
+      <div className="parent-container">
+        <div className="teamPage">
+          <div className="teamPage__headerSkeleton" />
+          <div className="teamPage__tabsSkeleton" />
+          <div className="teamPage__bodySkeleton" />
+        </div>
       </div>
     )
   }
+
 
   return (
     <div className="parent-container">
@@ -95,7 +101,7 @@ export default function TeamPage() {
             className={`teamPage__favBtn ${isFavourite ? "active" : ""}`}
             onClick={handleFav}
           >
-            <Star size={18} fill={isFavourite ? "#f5a623" : "none"} />
+            <Star size={18} fill={isFavourite ? "#f5a623" : "none"} color={isFavourite ? "#f5a623" : "none"} />
             {isFavourite ? "Following" : "Follow"}
           </button>
         </div>
@@ -128,7 +134,7 @@ export default function TeamPage() {
             transition={{ type: "spring", stiffness: 250, damping: 30 }}
           >
             <div className="teamPage__panel">
-              <TeamOverview team={team} active={active} teamId={teamId} />
+              <TeamOverview team={team} active={active} teamId={teamId} leagueId={leagueId} />
             </div>
             <div className="teamPage__panel">
               <TeamSquad teamId={teamId} active={active} />
@@ -140,7 +146,7 @@ export default function TeamPage() {
               <TeamResults teamId={teamId} active={active} />
             </div>
             <div className="teamPage__panel">
-              <TeamStats teamId={teamId} team={team} active={active} />
+              <TeamStats teamId={teamId} team={team} active={active} leagueId={leagueId} />
             </div>
           </motion.div>
         </div>

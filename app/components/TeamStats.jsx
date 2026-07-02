@@ -8,15 +8,13 @@ const fetcher = async (url) => {
   return result
 }
 
-export default function TeamStats({ teamId, team, active }) {
-  // We need a league ID to fetch stats — pull from the team's venue/info
-  // API-Sports requires both team + league + season for statistics
-  // We'll use the first league the team plays in from their info
-  const leagueId = team?.league?.id
+const season = "2024"
+
+export default function TeamStats({ teamId, team, active, leagueId }) {
 
   const { data, isLoading } = useSWR(
     active === "Stats" && leagueId
-      ? `/api/teams/${teamId}/stats?league=${leagueId}&season=${new Date().getFullYear()}`
+      ? `/api/teams/${teamId}/stats?league=${leagueId}&season=${season}`
       : null,
     fetcher,
     { dedupingInterval: 60000, revalidateOnFocus: false }

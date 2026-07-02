@@ -13,6 +13,8 @@ const fetcher = async (url) => {
   return result
 }
 
+const season = "2024"
+
 let flushTimer = null
 const favQueue = new Map()
 
@@ -57,7 +59,7 @@ function groupByDate(matches) {
   return groups
 }
 
-function TeamResults({ season, league, active, teamId }) {
+function TeamResults({ league, active, teamId }) {
 
   const { favorites, setFavorites } = useFavorites()
   const [visibleDates, setVisibleDates] = useState(DATES_PER_PAGE)
@@ -94,8 +96,10 @@ function TeamResults({ season, league, active, teamId }) {
     scheduleFlush()
   }
 
+  console.log(active)
+
   const { data, isLoading } = useSWR(
-    active === "Results" && league
+    active === "Results"
       ? `/api/teams/${teamId}/fixtures?season=${season}`
       : null,
     fetcher,
@@ -119,6 +123,8 @@ function TeamResults({ season, league, active, teamId }) {
       </div>
     )
   }
+
+  console.log(data)
 
   const results = data?.data?.results || []
   const grouped = groupByDate(results)
