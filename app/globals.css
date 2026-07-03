@@ -311,7 +311,14 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    width: 60%;
+    width: 64.5%;
+  }
+
+  .right-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 34.5%;
   }
 
   .date-picker svg {
@@ -504,6 +511,8 @@ body {
     font-size: 23px;
     text-transform: capitalize;
   }
+
+  
 
   .league-group-header {
     display: flex;

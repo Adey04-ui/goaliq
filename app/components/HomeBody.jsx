@@ -5,6 +5,8 @@ import Image from "next/image"
 import useSWR from "swr"
 import LeagueGroup from "./LeagueGroup"
 import { toggleFavourite } from "@/services/favourites"
+import NewsPreview from "./NewsPreview"
+import BuildYourXI from "./BuildYourXI"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -216,7 +218,10 @@ function HomeBody() {
         </div>
       </div>
 
-      <div className="right-side"></div>
+      <div className="right-side">
+        <BuildYourXI />
+        <NewsPreview />
+      </div>
     </div>
   )
 }
