@@ -483,7 +483,7 @@ body {
     display: flex;
     place-items: center;
     gap: 20px;
-    min-width: 140px;
+    width: 140px;
   }
 
   .favourite-svg {
@@ -503,6 +503,27 @@ body {
   .mainHeader {
     font-size: 23px;
     text-transform: capitalize;
+  }
+
+  .league-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a0aec0;
+    text-transform: uppercase;
+    padding-bottom: 8px;
+  }
+
+  .league-logo {
+    height: 16px;
+    width: 16px;
+  }
+
+  .l-f-t-a-button.active {
+    background-color: #2a3d52;
+    color: #fff;
   }
 
   .leaguesLeftSide {
