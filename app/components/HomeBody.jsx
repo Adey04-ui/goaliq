@@ -1,19 +1,20 @@
 "use client"
 
-import React, { useState, useMemo } from "react"
+import React, { useState, useMemo, useEffect } from "react"
 import Image from "next/image"
 import useSWR from "swr"
 import LeagueGroup from "./LeagueGroup"
-import { toggleFavourite } from "@/services/favourites"
-import NewsPreview from "./NewsPreview"
-import BuildYourXI from "./BuildYourXI"
+import { getUserTimeZone } from "@/lib/matchTime"
+import { toggleFavourite } from "@/services/favourites" // adjust path if this actually lives in app/api/favourites/route.js exports
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 function formatDate(offsetDays) {
   const d = new Date()
   d.setDate(d.getDate() + offsetDays)
-  return d.toISOString().slice(0, 10)
+  // en-CA locale formats as YYYY-MM-DD, and critically stays in LOCAL time
+  // (toISOString() would convert to UTC first, shifting the date near midnight)
+  return d.toLocaleDateString("en-CA")
 }
 
 function formatDateLabel(offsetDays) {
@@ -42,29 +43,58 @@ function HomeBody() {
   const [offsetDays, setOffsetDays] = useState(0)
   const [tab, setTab] = useState("all")
   const [favouriteIds, setFavouriteIds] = useState(new Set())
+  const [page, setPage] = useState(1)
+  const [accumulatedLeagues, setAccumulatedLeagues] = useState([])
 
   const date = formatDate(offsetDays)
+  const tz = getUserTimeZone()
 
+  // status param only applies to the second (tab-driven) section — live highlights always pull status=live separately
   const statusParam = tab === "live" ? "live" : tab === "finished" ? "finished" : "all"
   const leagueFilterParam = tab === "trending" ? "trending" : "all"
 
   const { data: liveData } = useSWR(
-    offsetDays === 0 ? `/api/matches?date=${date}&status=live` : null,
+    offsetDays === 0 ? `/api/matches?date=${date}&status=live&tz=${encodeURIComponent(tz)}` : null,
     fetcher,
     { refreshInterval: 30000, revalidateOnFocus: false }
   )
 
   const { data: mainData, isLoading } = useSWR(
-    `/api/matches?date=${date}&status=${statusParam}&filter=${leagueFilterParam}`,
+    `/api/matches?date=${date}&status=${statusParam}&filter=${leagueFilterParam}&tz=${encodeURIComponent(tz)}&page=${page}`,
     fetcher,
-    { revalidateOnFocus: false, refreshInterval: offsetDays === 0 ? 60000 : 0 }
+    { revalidateOnFocus: false, refreshInterval: offsetDays === 0 && page === 1 ? 60000 : 0 }
   )
 
+  // reset to page 1 whenever the date or active filter changes
+  useEffect(() => {
+    setPage(1)
+    setAccumulatedLeagues([])
+  }, [date, statusParam, leagueFilterParam])
+
+  // accumulate leagues as more pages load; page 1 replaces, later pages append
+  useEffect(() => {
+    if (!mainData?.data) return
+    setAccumulatedLeagues((prev) => (page === 1 ? mainData.data.leagues : [...prev, ...mainData.data.leagues]))
+  }, [mainData, page])
+
   const liveLeagues = liveData?.data?.leagues || []
-  const mainLeagues = mainData?.data?.leagues || []
+  const mainLeagues = accumulatedLeagues
+  const totalPages = mainData?.data?.totalPages || 1
+  const hasMorePages = page < totalPages
 
-  const hasLiveMatches = liveLeagues?.matches?.filter((match) => match.status === "LIVE").length > 0
+  // live section: grouped by league, but each league only keeps its live matches
+  const liveLeagueGroups = useMemo(
+    () =>
+      liveLeagues
+        .map((g) => ({
+          ...g,
+          matches: g.matches.filter((m) => m.status === "LIVE").sort((a, b) => a.timestamp - b.timestamp),
+        }))
+        .filter((g) => g.matches.length > 0),
+    [liveLeagues]
+  )
 
+  const hasLiveMatches = liveLeagueGroups.length > 0
 
   async function handleToggleFavourite(match) {
     const id = String(match.id)
@@ -163,7 +193,7 @@ function HomeBody() {
                   </svg>
                 </div>
               </div>
-              {liveLeagues.map((group) => (
+              {liveLeagueGroups.map((group) => (
                 <LeagueGroup
                   key={group.league.id}
                   group={group}
@@ -175,7 +205,7 @@ function HomeBody() {
           </div>
         )}
 
-        <div className="livematches-section">
+        {tab !== "live" && (<div className="livematches-section">
           <div className="livematches-container">
             <div className="live-matches-header">
               <div style={{ fontWeight: 600, display: "flex", gap: "10px", alignItems: "center" }}>
@@ -214,14 +244,22 @@ function HomeBody() {
                 onToggleFavourite={handleToggleFavourite}
               />
             ))}
+
+            {hasMorePages && (
+              <button
+                className="l-f-t-a-button"
+                style={{ width: "100%", margin: "14px 0", padding: "10px" }}
+                onClick={() => setPage((p) => p + 1)}
+                disabled={isLoading}
+              >
+                {isLoading ? "Loading..." : "Load more leagues"}
+              </button>
+            )}
           </div>
-        </div>
+        </div>)}
       </div>
 
-      <div className="right-side">
-        <BuildYourXI />
-        <NewsPreview />
-      </div>
+      <div className="right-side"></div>
     </div>
   )
 }

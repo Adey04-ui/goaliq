@@ -5,7 +5,7 @@ const TODAY_CACHE_SECONDS = 45
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
 const FUTURE_CACHE_SECONDS = 60 * 60
 const TRENDING_CACHE_SECONDS = 60 * 60
-const LEAGUES_PER_PAGE = 6
+const LEAGUES_PER_PAGE = 8
 
 const STATUS_MAP = {
   TBD: "UPCOMING",
@@ -54,33 +54,22 @@ function normalizeFixture(m) {
     elapsed: m.fixture.status.elapsed,
     venue: m.fixture.venue?.name || null,
     league: {
-      id: m.league.id,
+      id: String(m.league.id),
       name: m.league.name,
       country: m.league.country,
       logo: m.league.logo,
       round: m.league.round,
     },
     teams: {
-      home: {
-        id: m.teams.home.id,
-        name: m.teams.home.name,
-        logo: m.teams.home.logo,
-        winner: m.teams.home.winner,
-      },
-      away: {
-        id: m.teams.away.id,
-        name: m.teams.away.name,
-        logo: m.teams.away.logo,
-        winner: m.teams.away.winner,
-      },
+      home: { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo, winner: m.teams.home.winner },
+      away: { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo, winner: m.teams.away.winner },
     },
-    goals: {
-      home: m.goals.home,
-      away: m.goals.away,
-    },
+    goals: { home: m.goals.home, away: m.goals.away },
   }
 }
 
+// { [leagueId]: { league, matches: [] } } — all statuses included here,
+// status filtering happens after this so trending sort/pagination sees the full picture
 function groupByLeague(fixtures) {
   const groups = {}
   for (const f of fixtures) {
@@ -99,24 +88,50 @@ async function fetchDayFixtures(date) {
   const cached = await redis.get(cacheKey)
   if (cached) return cached
 
-  const res = await fetch(
-    `https://v3.football.api-sports.io/fixtures?date=${date}`,
-    { headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY } }
-  )
+  const res = await fetch(`https://v3.football.api-sports.io/fixtures?date=${date}`, {
+    headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
+  })
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch fixtures from API-Football")
-  }
+  if (!res.ok) throw new Error("Failed to fetch fixtures from API-Football")
 
   const data = await res.json()
   const normalized = data.response.map(normalizeFixture)
   const grouped = groupByLeague(normalized)
 
   const payload = { date, leagues: grouped }
-
   await redis.set(cacheKey, payload, { ex: getCacheTTL(date) })
 
   return payload
+}
+
+function shiftDateString(dateStr, deltaDays) {
+  const [y, m, d] = dateStr.split("-").map(Number)
+  const dt = new Date(Date.UTC(y, m - 1, d))
+  dt.setUTCDate(dt.getUTCDate() + deltaDays)
+  return dt.toISOString().slice(0, 10)
+}
+
+async function fetchLocalDayFixtures(localDate, timeZone) {
+  const candidateDates = [
+    shiftDateString(localDate, -1),
+    localDate,
+    shiftDateString(localDate, 1),
+  ]
+
+  const dayPayloads = await Promise.all(candidateDates.map(fetchDayFixtures))
+
+  const allFixtures = dayPayloads.flatMap((payload) =>
+    Object.values(payload.leagues).flatMap((group) => group.matches)
+  )
+
+  const matchingLocalDay = allFixtures.filter((f) => {
+    const localFixtureDate = new Date(f.timestamp * 1000).toLocaleDateString("en-CA", {
+      timeZone,
+    })
+    return localFixtureDate === localDate
+  })
+
+  return groupByLeague(matchingLocalDay)
 }
 
 async function getTrendingLeagueIds() {
@@ -133,9 +148,6 @@ async function getTrendingLeagueIds() {
   })
 
   const ids = grouped.map((g) => g.itemId)
-
-  console.log("trending league ids:", ids)
-
   await redis.set(cacheKey, ids, { ex: TRENDING_CACHE_SECONDS })
 
   return ids
@@ -146,36 +158,40 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url)
     const date = searchParams.get("date") || todayString()
     const page = parseInt(searchParams.get("page") || "1", 10)
-    const filter = searchParams.get("filter") || "all"
+    const leagueFilter = searchParams.get("filter") || "all" 
+    const status = searchParams.get("status") || "all" 
+    const timeZone = searchParams.get("tz") || "UTC"
 
-    const { leagues } = await fetchDayFixtures(date)
+    const leagues = await fetchLocalDayFixtures(date, timeZone)
     const trendingIds = await getTrendingLeagueIds()
 
-    let leagueIds = Object.keys(leagues)
-
-    if (filter === "trending") {
-      leagueIds = leagueIds.filter((id) => trendingIds.includes(Number(id)))
+    const filteredLeagues = {}
+    for (const id of Object.keys(leagues)) {
+      const group = leagues[id]
+      const matches =
+        status === "all"
+          ? group.matches
+          : group.matches.filter((m) => m.status.toLowerCase() === status)
+      if (matches.length > 0) {
+        filteredLeagues[id] = { league: group.league, matches }
+      }
     }
 
-    leagueIds.forEach((id) => {
-      console.log({
-        id,
-        idType: typeof id,
-        trending: trendingIds.includes(Number(id)),
-        trendingNumber: trendingIds.includes(Number(id)),
-        name: leagues[id].league.name,
-      });
-    });
+    let leagueIds = Object.keys(filteredLeagues)
+
+    if (leagueFilter === "trending") {
+      leagueIds = leagueIds.filter((id) => trendingIds.includes(Number(id)))
+    }
 
     leagueIds.sort((a, b) => {
       const aTrending = trendingIds.includes(Number(a))
       const bTrending = trendingIds.includes(Number(b))
       if (aTrending !== bTrending) return aTrending ? -1 : 1
-      return leagues[a].league.name.localeCompare(leagues[b].league.name)
+      return filteredLeagues[a].league.name.localeCompare(filteredLeagues[b].league.name)
     })
 
     const totalLeagues = leagueIds.length
-    const totalPages = Math.ceil(totalLeagues / LEAGUES_PER_PAGE)
+    const totalPages = Math.max(1, Math.ceil(totalLeagues / LEAGUES_PER_PAGE))
     const start = (page - 1) * LEAGUES_PER_PAGE
     const pageIds = leagueIds.slice(start, start + LEAGUES_PER_PAGE)
 
@@ -186,13 +202,11 @@ export async function GET(request) {
         page,
         totalPages,
         totalLeagues,
-        leagues: pageIds.map((id) => leagues[id]),
+        trendingLeagueIds: trendingIds,
+        leagues: pageIds.map((id) => filteredLeagues[id]),
       },
     })
   } catch (error) {
-    return Response.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    )
+    return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
