@@ -3,6 +3,7 @@ import Image from "next/image"
 import { useFavorites } from "@/context/favoriteContext"
 import { toggleFavourite } from "@/services/favourites"
 import { useState } from "react"
+import Link from "next/link"
 
 const DATES_PER_PAGE = 3 // how many date groups to show at a time
 
@@ -139,72 +140,74 @@ function Results({ season, league, active }) {
             )
 
             return (
-              <div className="eachMatch" key={match.fixture.id}>
+              <Link href={`/main/matches/${match.fixture.id}`} key={match.fixture.id} className="matchRow" style={{ textDecoration: 'none' }}>
+                <div className="eachMatch">
 
-                {/* Time column */}
-                <div className="timestamp">
-                  <span className="time">
-                    {new Date(match.fixture.date).toLocaleTimeString("en-US", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      hour12: false,
-                      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    })}
-                  </span>
-                  <span className="timezone">
-                    {/* e.g. GMT+1 */}
-                    {`${new Date().toLocaleString("en-US", { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")}`}
-                  </span>
-                </div>
+                  {/* Time column */}
+                  <div className="timestamp">
+                    <span className="time">
+                      {new Date(match.fixture.date).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                      })}
+                    </span>
+                    <span className="timezone">
+                      {/* e.g. GMT+1 */}
+                      {`${new Date().toLocaleString("en-US", { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")}`}
+                    </span>
+                  </div>
 
-                {/* Home team */}
-                <div className="home">
-                  <Image
-                    src={match.teams.home.logo}
-                    alt={match.teams.home.name}
-                    width={28}
-                    height={28}
-                  />
-                  <span>{match.teams.home.name}</span>
-                </div>
+                  {/* Home team */}
+                  <div className="home">
+                    <Image
+                      src={match.teams.home.logo}
+                      alt={match.teams.home.name}
+                      width={28}
+                      height={28}
+                    />
+                    <span>{match.teams.home.name}</span>
+                  </div>
 
-                {/* Scoreline */}
-                <div className="scoreline">
-                  <span className="score">
-                    {match.goals.home} - {match.goals.away}
-                  </span>
-                  <span className="status">{match.fixture.status.short}</span>
-                </div>
+                  {/* Scoreline */}
+                  <div className="scoreline">
+                    <span className="score">
+                      {match.goals.home} - {match.goals.away}
+                    </span>
+                    <span className="status">{match.fixture.status.short}</span>
+                  </div>
 
-                {/* Away team */}
-                <div className="away">
-                  <Image
-                    src={match.teams.away.logo}
-                    alt={match.teams.away.name}
-                    width={28}
-                    height={28}
-                  />
-                  <span>{match.teams.away.name}</span>
-                </div>
+                  {/* Away team */}
+                  <div className="away">
+                    <Image
+                      src={match.teams.away.logo}
+                      alt={match.teams.away.name}
+                      width={28}
+                      height={28}
+                    />
+                    <span>{match.teams.away.name}</span>
+                  </div>
 
-                {/* Favourite */}
-                <div
-                  className="favourite-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleFav(match)
-                  }}
-                >
-                  <svg
-                    style={{ strokeWidth: 1, height: 20, width: 20, stroke: "#888" }}
-                    viewBox="0 0 24 24"
-                    className={`favourite-svg ${isFav ? "filled" : ""}`}
+                  {/* Favourite */}
+                  <div
+                    className="favourite-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleFav(match)
+                    }}
                   >
-                    <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
-                  </svg>
-                </div>
+                    <svg
+                      style={{ strokeWidth: 1, height: 20, width: 20, stroke: "#888" }}
+                      viewBox="0 0 24 24"
+                      className={`favourite-svg ${isFav ? "filled" : ""}`}
+                    >
+                      <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
+                    </svg>
+                  </div>
 
-              </div>
+                </div>
+              </Link>
             )
           })}
         </div>

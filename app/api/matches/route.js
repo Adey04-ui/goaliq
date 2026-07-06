@@ -1,7 +1,7 @@
 import { redis } from "@/lib/redis"
 import { prisma } from "@/lib/prisma"
 
-const TODAY_CACHE_SECONDS = 45
+const TODAY_CACHE_SECONDS = 60 * 60
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
 const FUTURE_CACHE_SECONDS = 60 * 60
 const TRENDING_CACHE_SECONDS = 60 * 60

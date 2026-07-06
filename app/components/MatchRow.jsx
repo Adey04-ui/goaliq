@@ -1,5 +1,6 @@
 import Image from "next/image"
 import { formatMatchTime } from "@/lib/matchTime"
+import Link from "next/link"
 
 function MatchRow({ match, isFavourite, onToggleFavourite }) {
 
@@ -8,6 +9,7 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
   console.log("match: ", match)
 
   return (
+    <Link href={`/main/matches/${match.id}`} className="matchRow" style={{textDecoration: 'none'}}>
     <div className="eachMatch" key={match.id}>
 
       <div className="timestamp">
@@ -33,7 +35,7 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
           width={28}
           height={28}
         />
-        <span>{match.teams.home.name.slice(0, 14)}</span>
+        <span>{match.teams.home.name.length > 14 ? match.teams.home.name.slice(0, 14) + "..." : match.teams.home.name}</span>
       </div>
 
       {/* Scoreline */}
@@ -41,7 +43,7 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
         <span className="score">
           {match.goals.home} - {match.goals.away}
         </span>
-        <span className="status">
+        <span className={`status ${match.status === "LIVE" ? "live" : ""}`}>
           {isScheduled
           ? formatMatchTime(match.date)
           : match.status === "LIVE"
@@ -65,6 +67,7 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
       <div
         className="favourite-btn"
         onClick={(e) => {
+          e.preventDefault()
           e.stopPropagation()
           onToggleFavourite(match)
         }}
@@ -79,6 +82,7 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
       </div>
 
     </div>
+    </Link>
   )
 }
 

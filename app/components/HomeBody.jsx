@@ -230,7 +230,18 @@ function HomeBody() {
               </div>
             </div>
 
-            {isLoading && <div style={{ padding: "20px", opacity: 0.6 }}>Loading matches...</div>}
+            {isLoading && (
+              <div className="resultsContainer">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="resultsContainer__dateGroup">
+                    <div className="resultsContainer__skeletonLabel" style={{height: '50px', width: '240px'}} />
+                    {Array.from({ length: 3 }).map((_, j) => (
+                      <div key={j} className="resultsContainer__skeletonMatch" />
+                    ))}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {!isLoading && mainLeagues.length === 0 && (
               <div style={{ padding: "20px", opacity: 0.6 }}>No matches found.</div>
