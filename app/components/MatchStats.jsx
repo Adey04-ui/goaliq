@@ -47,7 +47,7 @@ function StatBar({ label, homeValue, awayValue, homeColor, awayColor }) {
   )
 }
 
-export default function MatchStats({ match, matchId }) {
+export default function MatchStats({ match, matchId, active }) {
   const { data, isLoading } = useSWR(`/api/matches/${matchId}/stats?status=${match.status}`, fetcher, {
     refreshInterval: match.status === "LIVE" ? 30000 : 0,
   })

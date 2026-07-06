@@ -1,5 +1,5 @@
 import { redis } from "@/lib/redis"
-import Jimp from "jimp"
+import { Jimp } from "jimp"
 import { MANUAL_TEAM_COLORS } from "@/lib/teamColors"
 
 export async function GET(request, { params }) {
