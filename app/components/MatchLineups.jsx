@@ -185,10 +185,11 @@ function TeamSubsList({ side }) {
   )
 }
 
-export default function MatchLineups({ match, matchId }) {
-  const { data, isLoading } = useSWR(`/api/matches/${matchId}/lineups?status=${match.status}`, fetcher)
+export default function MatchLineups({ match, matchId, active }) {
+  const isActive = active === "Lineups"
+  const { data, isLoading } = useSWR(isActive ? `/api/matches/${matchId}/lineups?status=${match.status}` : null, fetcher)
   const { data: eventsData } = useSWR(
-    match.status !== "UPCOMING" ? `/api/matches/${matchId}/events?status=${match.status}` : null,
+    isActive && match.status !== "UPCOMING" ? `/api/matches/${matchId}/events?status=${match.status}` : null,
     fetcher,
     { refreshInterval: match.status === "LIVE" ? 30000 : 0 }
   )

@@ -3,9 +3,9 @@ import Image from "next/image"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-export default function MatchH2H({ match, matchId }) {
+export default function MatchH2H({ match, matchId, active }) {
   const { data, isLoading } = useSWR(
-    `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}`,
+    active === "H2H" ? `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
     fetcher
   )
 

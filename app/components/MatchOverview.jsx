@@ -1,23 +1,30 @@
 import useSWR from "swr"
 import Image from "next/image"
+import { GoalIcon, OwnGoalIcon, MissedPenaltyIcon, SubstitutionIcon, YellowCardIcon, RedCardIcon } from "./EventIcons"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
 function EventIcon({ type, detail }) {
-  if (type === "Goal") return <span>⚽</span>
-  if (type === "Card" && detail === "Yellow Card") return <span style={{ color: "#f5c518" }}>▮</span>
-  if (type === "Card" && detail === "Red Card") return <span style={{ color: "#d41b27" }}>▮</span>
-  if (type === "subst") return <span>⇄</span>
+  if (type === "Goal" && detail === "Own Goal") return <OwnGoalIcon size={16} />
+  if (type === "Goal" && detail === "Missed Penalty") return <MissedPenaltyIcon size={16} />
+  if (type === "Goal") return <GoalIcon size={16} /> // covers "Normal Goal" and "Penalty"
+  if (type === "Card" && detail === "Yellow Card") return <YellowCardIcon size={16} />
+  if (type === "Card" && detail === "Second Yellow card") return <YellowCardIcon size={16} />
+  if (type === "Card" && detail === "Red Card") return <RedCardIcon size={16} />
+  if (type === "subst") return <SubstitutionIcon size={16} />
   return <span>•</span>
 }
 
-function LiveOrFinishedOverview({ match, matchId }) {
+function LiveOrFinishedOverview({ match, matchId, isActive }) {
   const { data: eventsData } = useSWR(
-    `/api/matches/${matchId}/events?status=${match.status}`,
+    isActive ? `/api/matches/${matchId}/events?status=${match.status}` : null,
     fetcher,
     { refreshInterval: match.status === "LIVE" ? 30000 : 0 }
   )
-  const { data: statsData } = useSWR(`/api/matches/${matchId}/stats?status=${match.status}`, fetcher)
+  const { data: statsData } = useSWR(
+    isActive ? `/api/matches/${matchId}/stats?status=${match.status}` : null,
+    fetcher
+  )
 
   const events = eventsData?.data || []
   const stats = statsData?.data
@@ -70,16 +77,16 @@ function FormBadges({ form }) {
   )
 }
 
-function UpcomingOverview({ match, matchId }) {
+function UpcomingOverview({ match, matchId, isActive }) {
   const { data: h2hData } = useSWR(
-    `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}`,
+    isActive ? `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
     fetcher
   )
   const { data: formData } = useSWR(
-    `/api/matches/${matchId}/form?home=${match.teams.home.id}&away=${match.teams.away.id}`,
+    isActive ? `/api/matches/${matchId}/form?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
     fetcher
   )
-  const { data: oddsData } = useSWR(`/api/matches/${matchId}/odds`, fetcher)
+  const { data: oddsData } = useSWR(isActive ? `/api/matches/${matchId}/odds` : null, fetcher)
 
   const h2h = h2hData?.data
   const form = formData?.data
@@ -144,9 +151,11 @@ function UpcomingOverview({ match, matchId }) {
   )
 }
 
-export default function MatchOverview({ match, matchId }) {
+export default function MatchOverview({ match, active, matchId }) {
+  const isActive = active === "Overview"
+
   if (match.status === "UPCOMING") {
-    return <UpcomingOverview match={match} matchId={matchId} />
+    return <UpcomingOverview match={match} matchId={matchId} isActive={isActive} />
   }
-  return <LiveOrFinishedOverview match={match} matchId={matchId} />
+  return <LiveOrFinishedOverview match={match} matchId={matchId} isActive={isActive} />
 }

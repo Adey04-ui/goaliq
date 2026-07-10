@@ -1,6 +1,21 @@
 import { redis } from "@/lib/redis"
-import { Jimp } from "jimp"
+import { Jimp, intToRGBA } from "jimp"
 import { MANUAL_TEAM_COLORS } from "@/lib/teamColors"
+
+// defensive: falls back to raw buffer indexing if getPixelColor isn't where expected —
+// we've been burned twice already by this package's API shifting across versions
+function getPixelRGBA(image, x, y) {
+  if (typeof image.getPixelColor === "function" && typeof intToRGBA === "function") {
+    return intToRGBA(image.getPixelColor(x, y))
+  }
+  const idx = (image.bitmap.width * y + x) * 4
+  return {
+    r: image.bitmap.data[idx],
+    g: image.bitmap.data[idx + 1],
+    b: image.bitmap.data[idx + 2],
+    a: image.bitmap.data[idx + 3],
+  }
+}
 
 export async function GET(request, { params }) {
   try {
@@ -16,49 +31,45 @@ export async function GET(request, { params }) {
 
     const logoUrl = `https://media.api-sports.io/football/teams/${teamId}.png`
     const image = await Jimp.read(logoUrl)
-    image.resize(32, 32)
+
+    const { width, height } = image.bitmap
 
     let r = 0,
       g = 0,
       b = 0,
       count = 0
 
-    image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
-      const alpha = this.bitmap.data[idx + 3]
-      if (alpha < 128) return // skip transparent background
+    // sample every 4th pixel instead of resizing first — avoids depending on
+    // .resize()'s exact signature, which has changed across Jimp major versions
+    for (let y = 0; y < height; y += 4) {
+      for (let x = 0; x < width; x += 4) {
+        const { r: red, g: green, b: blue, a: alpha } = getPixelRGBA(image, x, y)
 
-      const red = this.bitmap.data[idx]
-      const green = this.bitmap.data[idx + 1]
-      const blue = this.bitmap.data[idx + 2]
+        if (alpha < 128) continue
+        const isNearWhite = red > 235 && green > 235 && blue > 235
+        const isNearBlack = red < 20 && green < 20 && blue < 20
+        if (isNearWhite || isNearBlack) continue
 
-      // skip near-white and near-black — usually background fill or crest outline,
-      // not the team's actual brand color. This is a filtered AVERAGE, not true
-      // dominant-cluster extraction (no k-means/median-cut) — good enough for a
-      // single accent color, but a logo with two strong contrasting colors
-      // (e.g. red + blue) can average toward a muddy purple. Flag this if a
-      // team's extracted color looks visibly wrong — that's the mechanism why.
-      const isNearWhite = red > 235 && green > 235 && blue > 235
-      const isNearBlack = red < 20 && green < 20 && blue < 20
-      if (isNearWhite || isNearBlack) return
-
-      r += red
-      g += green
-      b += blue
-      count++
-    })
+        r += red
+        g += green
+        b += blue
+        count++
+      }
+    }
 
     const color =
       count === 0
-        ? "#465261" // whole logo got filtered out (pure black/white crest) — neutral fallback
+        ? "#465261"
         : `#${[r, g, b].map((v) => Math.round(v / count).toString(16).padStart(2, "0")).join("")}`
 
-    const payload = { color, source: "extracted" }
+    const payload = { color, source: "extracted", sampledPixels: count }
 
-    // logos never change — cache long-term
     await redis.set(cacheKey, payload, { ex: 60 * 60 * 24 * 90 })
 
     return Response.json({ success: true, data: payload })
   } catch (error) {
-    return Response.json({ success: false, message: error.message }, { status: 500 })
+    // TEMPORARY: exposing message+stack so we can see the exact failure instead of guessing.
+    // Remove `stack` once this is confirmed working.
+    return Response.json({ success: false, message: error.message, stack: error.stack }, { status: 500 })
   }
 }

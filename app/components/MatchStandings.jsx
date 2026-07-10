@@ -3,9 +3,9 @@ import Image from "next/image"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
  
-export default function MatchStandings({ match, matchId }) {
+export default function MatchStandings({ match, matchId, active }) {
   const { data, isLoading } = useSWR(
-    `/api/matches/${matchId}/standings?league=${match.league.id}&season=${match.league.season}`,
+    active === "Standings" ? `/api/matches/${matchId}/standings?league=${match.league.id}&season=${match.league.season}` : null,
     fetcher
   )
 
