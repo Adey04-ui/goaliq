@@ -52,10 +52,10 @@ export function MissedPenaltyIcon({ size = 16 }) {
 export function SubstitutionIcon({ size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24">
-      <path d="M4 16 Q4 6 14 6" fill="none" stroke="#1a7a3c" strokeWidth="2.2" strokeLinecap="round" />
-      <polygon points="14,3.2 17,6 14,8.8" fill="#1a7a3c" />
-      <path d="M20 8 Q20 18 10 18" fill="none" stroke="#d41b27" strokeWidth="2.2" strokeLinecap="round" />
-      <polygon points="10,20.8 7,18 10,15.2" fill="#d41b27" />
+      <path d="M4 16 Q4 6 14 6" fill="none" stroke="#d41b27" strokeWidth="2.2" strokeLinecap="round" />
+      <polygon points="14,3.2 17,6 14,8.8" fill="#d41b27" />
+      <path d="M20 8 Q20 18 10 18" fill="none" stroke="#1a7a3c" strokeWidth="2.2" strokeLinecap="round" />
+      <polygon points="10,20.8 7,18 10,15.2" fill="#1a7a3c" />
     </svg>
   )
 }

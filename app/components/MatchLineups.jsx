@@ -100,7 +100,7 @@ function PlayerDot({ player, x, y, labelBelow, color }) {
         <g transform="translate(-5.4, -4.7)">
           <rect width="4.2" height="2.6" rx="0.4" fill={ratingColor(player.rating)} />
           <text x="1.9" y="1.9" textAnchor="middle" fontSize="1.9" fill="#fff" fontWeight="700">
-            {player.rating.toFixed(1)}
+            {player.rating?.toFixed(1)}
           </text>
         </g>
       )}
@@ -174,7 +174,7 @@ function TeamSubsList({ side }) {
             {p.subOnMinute && <span className="matchLineups__subBadge on"><ArrowLeft size={19} />{p.subOnMinute}&apos;</span>}
             {p.rating !== null && (
               <span className="matchLineups__ratingBadge" style={{ backgroundColor: ratingColor(p.rating) }}>
-                {p.rating.toFixed(1)}
+                {p.rating?.toFixed(1)}
               </span>
             )}
           </div>

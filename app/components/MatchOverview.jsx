@@ -31,6 +31,25 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
 
   return (
     <div className="matchOverview">
+      <div className="matchOverview__timeline">
+        {events.length === 0 && <div className="matchOverview__empty">No events yet</div>}
+        {events.map((e, i) => (
+          <div key={i} className={`matchOverview__event ${e.team.id === match.teams.home.id ? "home" : "away"}`}>
+            <span className="matchOverview__eventTime">{e.time}{e.extraTime ? `+${e.extraTime}` : ""}&apos;</span>
+            {e.type !== "subst" && (
+              <EventIcon type={e.type} detail={e.detail} />
+            )}
+            <span style={{ display: "flex", placeItems: 'center', gap: '0.5rem', color: '#cfcfcf' }}>
+              {e.player}{e.type === "subst" && e.assist ?
+                (
+                  <span style={{ display: "flex", placeItems: 'center', gap: '0.5rem' }}>{" "}<EventIcon type={e.type} detail={e.detail} /> {" "} {e.assist}</span>
+                ) :
+                ""}
+            </span>
+          </div>
+        ))}
+      </div>
+
       {stats && (
         <div className="matchOverview__statsHighlight">
           <div className="matchOverview__statRow">
@@ -50,17 +69,6 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
           </div>
         </div>
       )}
-
-      <div className="matchOverview__timeline">
-        {events.length === 0 && <div className="matchOverview__empty">No events yet</div>}
-        {events.map((e, i) => (
-          <div key={i} className={`matchOverview__event ${e.team.id === match.teams.home.id ? "home" : "away"}`}>
-            <span className="matchOverview__eventTime">{e.time}{e.extraTime ? `+${e.extraTime}` : ""}&apos;</span>
-            <EventIcon type={e.type} detail={e.detail} />
-            <span>{e.player}{e.type === "subst" && e.assist ? ` ⇄ ${e.assist}` : ""}</span>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
