@@ -8,15 +8,32 @@ datasource db {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
+  id                String    @id @default(cuid())
+  name              String?
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime? @updatedAt
+  country           String?
+  language          String?   @default("en")
+  timezone          String?
+  defaultMatchView  String?   @default("live")
+  dataSaver         Boolean   @default(false)
+  autoPlayVideos    Boolean   @default(true)
+  showPlayerRatings Boolean   @default(true)
+  theme             String?   @default("dark")
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+
   accounts      Account[]
   favorites     Favorite[]
   sessions      Session[]
   userXI        UserXI?
+  loginActivity LoginActivity[]
+  subscription  Subscription?
+  blockedUsers  BlockedUser[]   @relation("Blocker")
+  blockedBy     BlockedUser[]   @relation("Blocked")
 }
 
 model Account {
@@ -79,7 +96,7 @@ model UserXI {
   userId    String   @unique
   user      User     @relation(fields: [userId], references: [id])
   formation String   @default("4-3-3")
-  players   Json // array of 11 player objects or nulls
+  players   Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -99,4 +116,44 @@ model PlayerIndex {
 
   @@index([name])
   @@index([teamId])
+}
+
+// New: Google/Facebook-style login history + active sessions view
+model LoginActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  ipAddress String?
+  userAgent String?
+  device    String?
+  location  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// New: Stripe-style billing lifecycle
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 String    @default("free") // "free" | "pro"
+  status               String    @default("active")
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+}
+
+// New: Self-referential block list (only useful if you add comments/mentions/social)
+model BlockedUser {
+  id        String   @id @default(cuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
 }
