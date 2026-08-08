@@ -2,6 +2,27 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
+async function getLocationFromIp(ip) {
+  if (!ip || ip === "::1" || ip === "127.0.0.1") return "Localhost"
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
+    const data = await res.json()
+    if (data.status === "success") {
+      return `${data.city}, ${data.country}`
+    }
+  } catch {
+    // silently fail
+  }
+  return null
+}
+
+function parseDevice(ua) {
+  if (!ua) return null
+  if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) return "Mobile"
+  if (/Tablet|iPad/.test(ua)) return "Tablet"
+  return "Desktop"
+}
+
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -10,43 +31,35 @@ export async function GET(req) {
       return Response.json({ message: "Not authenticated" }, { status: 401 })
     }
 
-    // Capture real IP/device from this request
     const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
       || req.headers.get("x-real-ip")
       || null
     const userAgent = req.headers.get("user-agent") || null
 
-    // Only log a new activity if we haven't seen one in the last hour
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000)
-    const recent = await prisma.loginActivity.findFirst({
-      where: {
-        userId: session.user.id,
-        createdAt: { gte: oneHourAgo },
-      },
+    // Find the most recent activity row for this user
+    const latestActivity = await prisma.loginActivity.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
     })
 
-    // app/api/user/profile/route.js — add this function
-
-    async function getLocationFromIp(ip) {
-      if (!ip || ip === "::1" || ip === "127.0.0.1") return "Localhost"
-      try {
-        const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
-        const data = await res.json()
-        if (data.status === "success") {
-          return `${data.city}, ${data.country}`
-        }
-      } catch {
-        // silently fail — location is non-critical
-      }
-      return null
-    }
-
-    if (!recent) {
+    if (!latestActivity) {
+      // First time — create with full data
       const location = await getLocationFromIp(ipAddress)
-
       await prisma.loginActivity.create({
         data: {
           userId: session.user.id,
+          ipAddress,
+          userAgent,
+          device: parseDevice(userAgent),
+          location,
+        },
+      })
+    } else if (!latestActivity.ipAddress) {
+      // Old null row exists — backfill it
+      const location = await getLocationFromIp(ipAddress)
+      await prisma.loginActivity.update({
+        where: { id: latestActivity.id },
+        data: {
           ipAddress,
           userAgent,
           device: parseDevice(userAgent),
@@ -83,13 +96,6 @@ export async function GET(req) {
   } catch (error) {
     return Response.json({ message: error.message }, { status: 500 })
   }
-}
-
-function parseDevice(ua) {
-  if (!ua) return null
-  if (/Mobile|Android|iPhone|iPad|iPod/.test(ua)) return "Mobile"
-  if (/Tablet|iPad/.test(ua)) return "Tablet"
-  return "Desktop"
 }
 
 export async function PATCH(req) {
