@@ -15,6 +15,35 @@ export const authOptions = {
 
   session: {
     strategy: "database",
+    maxAge: 30 * 24 * 60 * 60,      // 30 days
+    updateAge: 24 * 60 * 60,         // extend session if older than 24h
+  },
+
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id
+      }
+      return session
+    },
+
+    async signIn({ user, account, profile }) {
+      try {
+
+        // Update last login timestamp
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            lastLoginAt: new Date(),
+          },
+        })
+      } catch (e) {
+        // Don't block sign-in if logging fails
+        console.error("Login activity log failed:", e)
+      }
+
+      return true
+    },
   },
 
   pages: {

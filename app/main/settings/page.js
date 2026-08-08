@@ -6,7 +6,7 @@ import React from 'react'
 function settings() {
   return (
     <div className="parent-container" style={{ flexDirection: 'row', gap: '20px' }}>
-      <div className="">
+      <div className="leaguesLeftSide">
         <Settings />
       </div>
       <div className="leaguesRightSide">

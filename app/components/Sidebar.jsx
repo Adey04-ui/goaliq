@@ -8,6 +8,7 @@ import ball from "../assets/goalIQ17.png"
 import { useUser } from '@/context/userContext'
 import { useSignIn } from '@/context/signInContext'
 import { ChevronDown } from "lucide-react"
+import { signOut } from "next-auth/react"
 
 function Sidebar() {
   const pathname = usePathname()
@@ -82,6 +83,11 @@ function Sidebar() {
             Upgrade Now
           </button>
         </div>
+      <div>
+        <button onClick={()=> signOut()}>
+          sign out
+        </button>
+      </div>
         <div className="profile-premium">
           {status == "authenticated" ? (
             <>
