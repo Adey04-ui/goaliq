@@ -100,19 +100,19 @@ export default function Settings() {
   // Mapped user shape for the UI
   const user = profile
     ? {
-        displayName: profile.name || "",
-        email: profile.email || "",
-        avatar: profile.image || "/default-avatar.png",
-        isPremium: subscription?.plan === "pro",
-        country: profile.country || "",
-        language: profile.language || "en",
-        timezone: profile.timezone || "",
-        defaultMatchView: profile.defaultMatchView || "live",
-        dataSaver: profile.dataSaver || false,
-        autoPlayVideos: profile.autoPlayVideos ?? true,
-        showPlayerRatings: profile.showPlayerRatings ?? true,
-        theme: profile.theme || "dark",
-      }
+      displayName: profile.name || "",
+      email: profile.email || "",
+      avatar: profile.image || "/default-avatar.png",
+      isPremium: subscription?.plan === "pro",
+      country: profile.country || "",
+      language: profile.language || "en",
+      timezone: profile.timezone || "",
+      defaultMatchView: profile.defaultMatchView || "live",
+      dataSaver: profile.dataSaver || false,
+      autoPlayVideos: profile.autoPlayVideos ?? true,
+      showPlayerRatings: profile.showPlayerRatings ?? true,
+      theme: profile.theme || "dark",
+    }
     : null
 
   const loadData = useCallback(async () => {
@@ -418,7 +418,9 @@ export default function Settings() {
                       <div>
                         <span className="settingsRow__label">{a.device || "Unknown device"}</span>
                         <div className="settingsRow__description">
-                          {a.ipAddress || "Unknown IP"} · {new Date(a.createdAt).toLocaleString()}
+                          {a.ipAddress || "Unknown IP"}
+                          {a.location && ` · ${a.location}`}
+                          {" · "}{new Date(a.createdAt).toLocaleString()}
                         </div>
                       </div>
                       <span style={{ color: "#22c55e", fontSize: 12, fontWeight: 600 }}>Current</span>

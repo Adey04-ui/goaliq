@@ -25,13 +25,32 @@ export async function GET(req) {
       },
     })
 
+    // app/api/user/profile/route.js — add this function
+
+    async function getLocationFromIp(ip) {
+      if (!ip || ip === "::1" || ip === "127.0.0.1") return "Localhost"
+      try {
+        const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
+        const data = await res.json()
+        if (data.status === "success") {
+          return `${data.city}, ${data.country}`
+        }
+      } catch {
+        // silently fail — location is non-critical
+      }
+      return null
+    }
+
     if (!recent) {
+      const location = await getLocationFromIp(ipAddress)
+
       await prisma.loginActivity.create({
         data: {
           userId: session.user.id,
           ipAddress,
           userAgent,
           device: parseDevice(userAgent),
+          location,
         },
       })
     }
