@@ -2,18 +2,26 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-async function getLocationFromIp(ip) {
-  if (!ip || ip === "::1" || ip === "127.0.0.1") return "Localhost"
+async function getGeoFromIp(ip) {
+  if (!ip || ip === "::1" || ip === "127.0.0.1") {
+    return { country: "NG", timezone: "Africa/Lagos", location: "Localhost" }
+  }
   try {
-    const res = await fetch(`http://ip-api.com/json/${ip}?fields=status,city,country`)
+    const res = await fetch(
+      `http://ip-api.com/json/${ip}?fields=status,country,countryCode,timezone,city`
+    )
     const data = await res.json()
     if (data.status === "success") {
-      return `${data.city}, ${data.country}`
+      return {
+        country: data.countryCode,     // "NG"
+        timezone: data.timezone,       // "Africa/Lagos"
+        location: `${data.city}, ${data.country}`,
+      }
     }
   } catch {
     // silently fail
   }
-  return null
+  return { country: null, timezone: null, location: null }
 }
 
 function parseDevice(ua) {
@@ -31,43 +39,62 @@ export async function GET(req) {
       return Response.json({ message: "Not authenticated" }, { status: 401 })
     }
 
-    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("x-real-ip")
-      || null
+    const ipAddress =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      null
     const userAgent = req.headers.get("user-agent") || null
 
-    // Find the most recent activity row for this user
+    // Get geo data from IP
+    const geo = await getGeoFromIp(ipAddress)
+
+    // Find user to check if we need to backfill country/timezone
+    const existingUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { country: true, timezone: true },
+    })
+
+    // Backfill country and timezone if missing
+    const userUpdates = {}
+    if (!existingUser?.country && geo.country) userUpdates.country = geo.country
+    if (!existingUser?.timezone && geo.timezone) userUpdates.timezone = geo.timezone
+
+    if (Object.keys(userUpdates).length > 0) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: userUpdates,
+      })
+    }
+
+    // Handle login activity
     const latestActivity = await prisma.loginActivity.findFirst({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     })
 
     if (!latestActivity) {
-      // First time — create with full data
-      const location = await getLocationFromIp(ipAddress)
       await prisma.loginActivity.create({
         data: {
           userId: session.user.id,
           ipAddress,
           userAgent,
           device: parseDevice(userAgent),
-          location,
+          location: geo.location,
         },
       })
     } else if (!latestActivity.ipAddress) {
-      // Old null row exists — backfill it
-      const location = await getLocationFromIp(ipAddress)
       await prisma.loginActivity.update({
         where: { id: latestActivity.id },
         data: {
           ipAddress,
           userAgent,
           device: parseDevice(userAgent),
-          location,
+          location: geo.location,
         },
       })
     }
 
+    // Return full user profile
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {

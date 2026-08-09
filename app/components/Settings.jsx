@@ -281,17 +281,6 @@ export default function Settings() {
                 }
               />
               <SettingsRow
-                label="Password"
-                value="••••••••"
-                onClick={() =>
-                  openModal({
-                    label: "Password",
-                    fieldType: "password",
-                    onSave: () => alert("Password change requires email+password auth."),
-                  })
-                }
-              />
-              <SettingsRow
                 label="Country / Region"
                 value={COUNTRY_OPTIONS.find((c) => c.value === user.country)?.label || user.country || "Not set"}
                 onClick={() =>
