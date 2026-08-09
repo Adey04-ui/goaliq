@@ -26,19 +26,20 @@ export default function RootLayout({ children }) {
     <html lang="en" data-theme="dark">
       <body className={`${inter.variable} font-sans`}>
         <SignInProvider>
-          <UserProvider>
-            <FavoritesProvider>
-              <XIProvider>
-                <Providers>
+          {/* SessionProvider MUST wrap UserProvider */}
+          <Providers>
+            <UserProvider>
+              <FavoritesProvider>
+                <XIProvider>
                   <GetFavourites />
                   <ThemeWrapper>
                     {children}
                   </ThemeWrapper>
                   <ToastContainer />
-                </Providers>
-              </XIProvider>
-            </FavoritesProvider>
-          </UserProvider>
+                </XIProvider>
+              </FavoritesProvider>
+            </UserProvider>
+          </Providers>
         </SignInProvider>
       </body>
     </html>

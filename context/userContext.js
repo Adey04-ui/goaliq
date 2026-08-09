@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 const UserContext = createContext()
 
 export function UserProvider({ children }) {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession() || {}
   const [profile, setProfile] = useState(null)
   const [profileLoading, setProfileLoading] = useState(true)
 
