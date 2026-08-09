@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import useSWR from "swr"
 import { Search, X, ChevronDown, Check, Loader } from "lucide-react"
-import { PitchSVG } from "@/app/components/BuildYourXI"
+import { PitchSVG2 } from "@/app/components/BuildYourXI"
 import { useXI } from "@/context/xiContext"
 
 const fetcher = async (url) => {
@@ -473,7 +473,7 @@ export default function XIPage() {
           {/* Pitch */}
           <div className="xiPage__pitchWrap">
             <div className="xiPage__pitch">
-              <PitchSVG />
+              <PitchSVG2 />
               {positions.map((position, index) => (
                 <div key={`${formation}-${index}`}>
                   <EditableSlot
