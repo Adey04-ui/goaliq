@@ -4,6 +4,8 @@ import { useFavorites } from "@/context/favoriteContext"
 import { toggleFavourite } from "@/services/favourites"
 import { useState } from "react"
 import Link from "next/link"
+import { useUser } from "@/context/userContext"
+import { useFormatMatchTime, useLocale, useUserTimezone } from "@/lib/preferences"
 
 const DATES_PER_PAGE = 3 // how many date groups to show at a time
 
@@ -61,6 +63,12 @@ function groupByDate(matches) {
 function Results({ season, league, active }) {
   const { favorites, setFavorites } = useFavorites()
   const [visibleDates, setVisibleDates] = useState(DATES_PER_PAGE)
+
+  const { preferences } = useUser()
+  const formatMatchTime = useFormatMatchTime()
+  const locale = useLocale()
+  const timeZone = useUserTimezone()
+  const dataSaver = preferences?.dataSaver ?? false
 
   const handleFav = (match) => {
     const key = match.fixture.id
@@ -126,6 +134,10 @@ function Results({ season, league, active }) {
   const visibleGroups = allDates.slice(0, visibleDates)
   const hasMore = visibleDates < allDates.length
 
+  const tzAbbr = timeZone
+  ? new Date().toLocaleString(locale, { timeZone, timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+  : new Date().toLocaleString(locale, { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+
   return (
     <div className="resultsContainer">
       {visibleGroups.map((dateLabel) => (
@@ -146,16 +158,11 @@ function Results({ season, league, active }) {
                   {/* Time column */}
                   <div className="timestamp">
                     <span className="time">
-                      {new Date(match.fixture.date).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                        timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                      })}
+                      {formatMatchTime(match.date)}
                     </span>
                     <span className="timezone">
                       {/* e.g. GMT+1 */}
-                      {`${new Date().toLocaleString("en-US", { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")}`}
+                      {`${tzAbbr}`}
                     </span>
                   </div>
 

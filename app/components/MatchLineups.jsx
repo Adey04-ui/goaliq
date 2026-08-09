@@ -1,11 +1,12 @@
+"use client"
+
 import useSWR from "swr"
 import Image from "next/image"
 import { ArrowLeft, ArrowRight } from "lucide-react"
+import { useUser } from "@/context/userContext"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
-// Turns API-Football's "row:col" grid strings into pitch-relative percentages.
-// Row 1 is always the goalkeeper; higher rows move toward the halfway line.
 function computePositions(startXI) {
   const rows = {}
   for (const p of startXI) {
@@ -15,12 +16,10 @@ function computePositions(startXI) {
     rows[row].push({ ...p, col })
   }
 
-  const rowKeys = Object.keys(rows)
-    .map(Number)
-    .sort((a, b) => a - b)
+  const rowKeys = Object.keys(rows).map(Number).sort((a, b) => a - b)
   const totalRows = rowKeys.length
-
   const positioned = []
+
   rowKeys.forEach((rowNum, rowIndex) => {
     const playersInRow = rows[rowNum].sort((a, b) => a.col - b.col)
     const count = playersInRow.length
@@ -40,11 +39,7 @@ function attachSubEvents(players, events) {
   return players.map((p) => {
     const subOff = events.find((e) => e.type === "subst" && e.player === p.name)
     const subOn = events.find((e) => e.type === "subst" && e.assist === p.name)
-    return {
-      ...p,
-      subOffMinute: subOff ? subOff.time : null,
-      subOnMinute: subOn ? subOn.time : null,
-    }
+    return { ...p, subOffMinute: subOff ? subOff.time : null, subOnMinute: subOn ? subOn.time : null }
   })
 }
 
@@ -53,10 +48,10 @@ function ratingColor(rating) {
   if (rating >= 7.0) return "#1a7a3c"
   if (rating >= 6.0) return "#f09a0e"
   if (rating < 6.0) return "#5c6472"
-  return "#7a1a1a"
+  return "#7a1a3a"
 }
 
-function PlayerDot({ player, x, y, labelBelow, color }) {
+function PlayerDot({ player, x, y, labelBelow, showRating, dataSaver }) {
   const clipId = `clip-${player.id}`
   const badgeY = labelBelow ? -4.5 : 4.5
 
@@ -68,19 +63,19 @@ function PlayerDot({ player, x, y, labelBelow, color }) {
         </clipPath>
       </defs>
       <circle r="3.4" fill="#1b2b3e" />
-      <image
-        href={player.photo}
-        x="-3.2"
-        y="-3.2"
-        width="6.4"
-        height="6.4"
-        clipPath={`url(#${clipId})`}
-        preserveAspectRatio="xMidYMid slice"
-      />
+      {!dataSaver && (
+        <image
+          href={player.photo}
+          x="-3.2"
+          y="-3.2"
+          width="6.4"
+          height="6.4"
+          clipPath={`url(#${clipId})`}
+          preserveAspectRatio="xMidYMid slice"
+        />
+      )}
       <circle r="3.4" fill="none" strokeWidth="0.5" />
 
-      {/* corner badge: substitution indicator — nested <svg> icon, NOT inside <text>
-          (SVG <text> cannot contain nested <svg> content; that's why it silently didn't render before) */}
       {(player.subOffMinute || player.subOnMinute) && (
         <g transform="translate(2.6, 2.6)">
           <circle r="1.3" fill={player.subOnMinute ? "#1a7a3c" : "#d41b27"} />
@@ -96,7 +91,7 @@ function PlayerDot({ player, x, y, labelBelow, color }) {
         {player.number}. {player.name?.split(" ").slice(-1)[0]}
       </text>
 
-      {player.rating !== null && (
+      {showRating && player.rating !== null && (
         <g transform="translate(-5.4, -4.7)">
           <rect width="4.2" height="2.6" rx="0.4" fill={ratingColor(player.rating)} />
           <text x="1.9" y="1.9" textAnchor="middle" fontSize="1.9" fill="#fff" fontWeight="700">
@@ -107,9 +102,7 @@ function PlayerDot({ player, x, y, labelBelow, color }) {
 
       <g transform={`translate(0, ${badgeY})`}>
         {Array.from({ length: player.goals || 0 }).map((_, i) => (
-          <text key={`g${i}`} x={-3 + i * 2.2} fontSize="2.2" textAnchor="middle">
-            ⚽
-          </text>
+          <text key={`g${i}`} x={-3 + i * 2.2} fontSize="2.2" textAnchor="middle">⚽</text>
         ))}
         {player.yellowCards > 0 && (
           <rect x={-3 + (player.goals || 0) * 2.2} y="-1.6" width="1.4" height="2" fill="#f5c518" rx="0.2" />
@@ -122,7 +115,7 @@ function PlayerDot({ player, x, y, labelBelow, color }) {
   )
 }
 
-function Pitch({ homeSide, awaySide }) {
+function Pitch({ homeSide, awaySide, showRating, dataSaver }) {
   const homePositions = computePositions(homeSide.startXI)
   const awayPositions = computePositions(awaySide.startXI)
 
@@ -138,17 +131,16 @@ function Pitch({ homeSide, awaySide }) {
       <rect x="38" y="152" width="24" height="6" fill="none" stroke="#465261" strokeWidth="0.6" />
 
       {awayPositions.map((p) => (
-        <PlayerDot key={p.id} player={p} x={p.xPct} y={9 + p.yFraction * 65} labelBelow={false} color="#465261" />
+        <PlayerDot key={p.id} player={p} x={p.xPct} y={9 + p.yFraction * 65} labelBelow={false} showRating={showRating} dataSaver={dataSaver} />
       ))}
-
       {homePositions.map((p) => (
-        <PlayerDot key={p.id} player={p} x={p.xPct} y={150 - p.yFraction * 63} labelBelow={true} color="#d41b27" />
+        <PlayerDot key={p.id} player={p} x={p.xPct} y={150 - p.yFraction * 63} labelBelow={true} showRating={showRating} dataSaver={dataSaver} />
       ))}
     </svg>
   )
 }
 
-function TeamSubsList({ side }) {
+function TeamSubsList({ side, showRating, dataSaver }) {
   return (
     <div className="matchLineups__team">
       <div className="matchLineups__teamHeader">
@@ -160,19 +152,21 @@ function TeamSubsList({ side }) {
         <h4>Substitutes</h4>
         {side.substitutes.map((p) => (
           <div key={p.id} className="matchLineups__player">
-            <Image
-              src={p.photo}
-              alt=""
-              width={24}
-              height={24}
-              className="matchLineups__playerPhoto"
-              onError={(e) => { e.currentTarget.style.visibility = "hidden" }}
-            />
+            {!dataSaver && (
+              <Image
+                src={p.photo}
+                alt=""
+                width={24}
+                height={24}
+                className="matchLineups__playerPhoto"
+                onError={(e) => { e.currentTarget.style.visibility = "hidden" }}
+              />
+            )}
             <span className="matchLineups__number">{p.number}</span>
             <span>{p.name}</span>
             <span className="matchLineups__position">{p.position}</span>
             {p.subOnMinute && <span className="matchLineups__subBadge on"><ArrowLeft size={19} />{p.subOnMinute}&apos;</span>}
-            {p.rating !== null && (
+            {showRating && p.rating !== null && (
               <span className="matchLineups__ratingBadge" style={{ backgroundColor: ratingColor(p.rating) }}>
                 {p.rating?.toFixed(1)}
               </span>
@@ -186,6 +180,7 @@ function TeamSubsList({ side }) {
 }
 
 export default function MatchLineups({ match, matchId, active }) {
+  const { preferences } = useUser()
   const isActive = active === "Lineups"
   const { data, isLoading } = useSWR(isActive ? `/api/matches/${matchId}/lineups?status=${match.status}` : null, fetcher)
   const { data: eventsData } = useSWR(
@@ -198,10 +193,7 @@ export default function MatchLineups({ match, matchId, active }) {
   const events = eventsData?.data || []
 
   if (isLoading) return <div className="matchLineups__empty">Loading lineups...</div>
-
-  if (!lineups) {
-    return <div className="matchLineups__empty">{data?.message || "Lineups not available"}</div>
-  }
+  if (!lineups) return <div className="matchLineups__empty">{data?.message || "Lineups not available"}</div>
 
   const rawHomeSide = lineups.find((s) => s.team.id === match.teams.home.id)
   const rawAwaySide = lineups.find((s) => s.team.id === match.teams.away.id)
@@ -217,6 +209,9 @@ export default function MatchLineups({ match, matchId, active }) {
     substitutes: attachSubEvents(rawAwaySide.substitutes, events),
   }
 
+  const showRating = preferences?.showPlayerRatings ?? true
+  const dataSaver = preferences?.dataSaver ?? false
+
   return (
     <div className="matchLineups">
       <div className="matchLineups__pitchWrapper">
@@ -224,7 +219,7 @@ export default function MatchLineups({ match, matchId, active }) {
           <Image src={awaySide.team.logo} alt={awaySide.team.name} width={18} height={18} />
           <span>{awaySide.team.name} · {awaySide.formation}</span>
         </div>
-        <Pitch homeSide={homeSide} awaySide={awaySide} />
+        <Pitch homeSide={homeSide} awaySide={awaySide} showRating={showRating} dataSaver={dataSaver} />
         <div className="matchLineups__pitchTeamLabel home">
           <Image src={homeSide.team.logo} alt={homeSide.team.name} width={18} height={18} />
           <span>{homeSide.team.name} · {homeSide.formation}</span>
@@ -232,8 +227,8 @@ export default function MatchLineups({ match, matchId, active }) {
       </div>
 
       <div className="matchLineups__subsRow">
-        <TeamSubsList side={homeSide} />
-        <TeamSubsList side={awaySide} />
+        <TeamSubsList side={homeSide} showRating={showRating} dataSaver={dataSaver} />
+        <TeamSubsList side={awaySide} showRating={showRating} dataSaver={dataSaver} />
       </div>
     </div>
   )

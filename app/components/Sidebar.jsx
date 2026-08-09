@@ -21,7 +21,7 @@ function Sidebar() {
       <div className="logo-container">
         <Image width={20} height={20} alt="" className="goalIQ-name" src="/assets/goalIQ16.png" />
       </div>
-      <div className={`sidebar-link ${pathname == '/main/home' ? 'active' : ''}`} onClick={() => router.push('/main/home')}>
+      <div className={`sidebar-link ${pathname == '/main/matches' ? 'active' : ''}`} onClick={() => router.push('/main/matches')}>
         <Image width={30} height={30} src={ball} alt="ball" />
         <div>Matches</div>
       </div>
@@ -84,9 +84,6 @@ function Sidebar() {
           </button>
         </div>
       <div>
-        <button onClick={()=> signOut()}>
-          sign out
-        </button>
       </div>
         <div className="profile-premium">
           {status == "authenticated" ? (

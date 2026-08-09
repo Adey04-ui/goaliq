@@ -3,6 +3,8 @@
 import useSWR from "swr"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { useUser } from "@/context/userContext"
+import { useLocale, useUserTimezone } from "@/lib/preferences"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -13,17 +15,28 @@ const fetcher = async (url) => {
 
 function NewsPreview({ query = "football" }) {
   const router = useRouter()
+  const { preferences } = useUser()
+  const locale = useLocale()
+  const timeZone = useUserTimezone()
+  const dataSaver = preferences?.dataSaver ?? false
 
   const { data, isLoading } = useSWR(
     `/api/news?q=${encodeURIComponent(query)}&max=3`,
     fetcher,
     {
-      dedupingInterval: 1000 * 60 * 60 * 2, // match server cache
+      dedupingInterval: 1000 * 60 * 60 * 2,
       revalidateOnFocus: false,
     }
   )
 
   const articles = data?.data || []
+
+  const formatArticleDate = (dateString) => {
+    const d = new Date(dateString)
+    const opts = { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }
+    if (timeZone) opts.timeZone = timeZone
+    return d.toLocaleDateString(locale, opts)
+  }
 
   return (
     <div className="newsPreview">
@@ -50,28 +63,16 @@ function NewsPreview({ query = "football" }) {
                 rel="noopener noreferrer"
                 className="newsPreview__article"
               >
-                {article.image && (
+                {article.image && !dataSaver && (
                   <div className="newsPreview__article__image">
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                    />
+                    <img src={article.image} alt={article.title} loading="lazy" />
                   </div>
                 )}
                 <div className="newsPreview__article__content">
-                  <span className="newsPreview__article__source">
-                    {article.source.name}
-                  </span>
-                  <p className="newsPreview__article__title">
-                    {article.title}
-                  </p>
+                  <span className="newsPreview__article__source">{article.source.name}</span>
+                  <p className="newsPreview__article__title">{article.title}</p>
                   <span className="newsPreview__article__time">
-                    {new Date(article.publishedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    {formatArticleDate(article.publishedAt)}
                   </span>
                 </div>
               </a>

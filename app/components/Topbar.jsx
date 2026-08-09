@@ -5,6 +5,7 @@ import React from 'react'
 import { useSignIn } from '@/context/signInContext'
 import { useUser } from '@/context/userContext'
 import NotificationBell from './NotificationBell'
+import ProfileDropdown from './ProfileDropdown'
 
 function Topbar() {
   const { showSignIn, setShowSignIn } = useSignIn()
@@ -36,14 +37,15 @@ function Topbar() {
               <NotificationBell />
             </div>
             <div className="position-relative-container active">
-              <Image
-                className="profile-picture"
-                src={session?.user?.image}
-                alt="profile"
-                width={30}
-                height={30}
+              <ProfileDropdown
+                user={{
+                  name: session?.user?.name,
+                  email: session?.user?.email,
+                  image: session?.user?.image,
+                  isPremium: false, // or however you track this
+                }}
               />
-              <div className="position-absolute-profile"></div>
+
             </div>
           </>
         )}

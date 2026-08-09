@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import GetFavourites from "./components/GetFavourites";
 import { XIProvider } from "@/context/xiContext";
+import ThemeWrapper from "./components/ThemeWrapper";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,36 +23,24 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en"
-     className={`${inter.variable}`}
-    >
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>
-        <Providers>
-          <SignInProvider>
-            <UserProvider>
-              <FavoritesProvider>
-                <XIProvider>
-                  {children}
-                  <ToastContainer
-                    position="top-right"
-                    autoClose={3000}
-                    theme="dark"
-                  />
+    <html lang="en" data-theme="dark">
+      <body className={`${inter.variable} font-sans`}>
+        <SignInProvider>
+          <UserProvider>
+            <FavoritesProvider>
+              <XIProvider>
+                <Providers>
                   <GetFavourites />
-                </XIProvider>
-              </FavoritesProvider>
-            </UserProvider>
-          </SignInProvider>
-        </Providers>
+                  <ThemeWrapper>
+                    {children}
+                  </ThemeWrapper>
+                  <ToastContainer />
+                </Providers>
+              </XIProvider>
+            </FavoritesProvider>
+          </UserProvider>
+        </SignInProvider>
       </body>
     </html>
-  );
+  )
 }

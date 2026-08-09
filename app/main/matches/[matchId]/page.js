@@ -10,7 +10,7 @@ import MatchLineups from "@/app/components/MatchLineups"
 import MatchStats from "@/app/components/MatchStats"
 import MatchH2H from "@/app/components/MatchH2H"
 import MatchStandings from "@/app/components/MatchStandings"
-import { formatMatchTime } from "@/lib/matchTime"
+import { useFormatMatchTime, useFormatDate } from "@/lib/preferences"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -31,6 +31,9 @@ export default function MatchPage() {
 
   const match = matchData?.data
   const activeIndex = TABS.indexOf(active)
+
+  const formatMatchTime = useFormatMatchTime()
+  const formatDate = useFormatDate()
 
   if (matchLoading || !match) {
     return (
@@ -77,7 +80,7 @@ export default function MatchPage() {
                 <>
                   <div className="matchPage__kickoffTime">{formatMatchTime(match.date)}</div>
                   <div className="matchPage__status">
-                    {new Date(match.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}
+                    {formatDate(match.date, { weekday: "short", month: "short", day: "numeric" })}
                   </div>
                 </>
               )}

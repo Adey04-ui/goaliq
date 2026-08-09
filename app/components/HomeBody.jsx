@@ -6,6 +6,10 @@ import useSWR from "swr"
 import LeagueGroup from "./LeagueGroup"
 import { getUserTimeZone } from "@/lib/matchTime"
 import { toggleFavourite } from "@/services/favourites" // adjust path if this actually lives in app/api/favourites/route.js exports
+import BuildYourXI from "./BuildYourXI"
+import AIAssistant from "./AIAssistant"
+import NewsPreview from "./NewsPreview"
+import { useUser } from "@/context/userContext"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -40,8 +44,9 @@ const TABS = [
 ]
 
 function HomeBody() {
+  const { preferences } = useUser()
   const [offsetDays, setOffsetDays] = useState(0)
-  const [tab, setTab] = useState("all")
+  const [tab, setTab] = useState(preferences?.defaultMatchView || "live")
   const [favouriteIds, setFavouriteIds] = useState(new Set())
   const [page, setPage] = useState(1)
   const [accumulatedLeagues, setAccumulatedLeagues] = useState([])
@@ -234,7 +239,7 @@ function HomeBody() {
               <div className="resultsContainer">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="resultsContainer__dateGroup">
-                    <div className="resultsContainer__skeletonLabel" style={{height: '50px', width: '240px'}} />
+                    <div className="resultsContainer__skeletonLabel" style={{ height: '50px', width: '240px' }} />
                     {Array.from({ length: 3 }).map((_, j) => (
                       <div key={j} className="resultsContainer__skeletonMatch" />
                     ))}
@@ -270,7 +275,11 @@ function HomeBody() {
         </div>)}
       </div>
 
-      <div className="right-side"></div>
+      <div className="right-side">
+        <BuildYourXI players={[]} />
+        <AIAssistant />
+        <NewsPreview />
+      </div>
     </div>
   )
 }
