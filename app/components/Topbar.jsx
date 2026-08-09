@@ -4,6 +4,7 @@ import Image from 'next/image'
 import React from 'react'
 import { useSignIn } from '@/context/signInContext'
 import { useUser } from '@/context/userContext'
+import NotificationBell from './NotificationBell'
 
 function Topbar() {
   const { showSignIn, setShowSignIn } = useSignIn()
@@ -32,14 +33,7 @@ function Topbar() {
         {status === "authenticated" && (
           <>
             <div className="position-relative-container">
-              <svg className="notifications-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="22"
-                viewBox="0 0 20 22" fill="none">
-                <path d="M10 2C10 2 5 4 5 10V15L3 17H17L15 15V10C15 4 10 2 10 2Z" stroke="white" strokeWidth="1.5"
-                  strokeLinejoin="round" fill="none" />
-                <path d="M8 17C8 18.1 8.9 19 10 19C11.1 19 12 18.1 12 17" stroke="white" strokeWidth="1.5" fill="none" />
-                <line x1="10" y1="1" x2="10" y2="3" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-              <div className="position-absolute-container">3</div>
+              <NotificationBell />
             </div>
             <div className="position-relative-container active">
               <Image

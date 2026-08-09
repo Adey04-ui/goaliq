@@ -6,13 +6,13 @@ import React from 'react'
 function settings() {
   return (
     <div className="parent-container" style={{ flexDirection: 'row', gap: '20px' }}>
-      <div className="leaguesLeftSide">
+      <div className="leaguesLeftSide" style={{ width: '100%' }}>
         <Settings />
       </div>
-      <div className="leaguesRightSide">
+      {/* <div className="leaguesRightSide">
         <BuildYourXI players={[]} />
         <NewsPreview />
-      </div>
+      </div> */}
     </div>
   )
 }

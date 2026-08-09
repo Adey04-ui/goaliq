@@ -90,12 +90,44 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState("account")
   const [modalConfig, setModalConfig] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
   // Raw API data
   const [profile, setProfile] = useState(null)
   const [subscription, setSubscription] = useState(null)
   const [activities, setActivities] = useState([])
   const [blockedList, setBlockedList] = useState([])
+
+  async function handleAvatarChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploadingAvatar(true)
+
+    const formData = new FormData()
+    formData.append("file", file)
+
+    try {
+      const res = await fetch("/api/user/upload-avatar", {
+        method: "POST",
+        body: formData,
+      })
+      const data = await res.json()
+
+      if (data.success) {
+        setProfile(data.user)
+      } else {
+        alert(data.message || "Upload failed")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Something went wrong uploading the image")
+    } finally {
+      setUploadingAvatar(false)
+      // Reset input so the same file can be selected again
+      e.target.value = ""
+    }
+  }
 
   // Mapped user shape for the UI
   const user = profile
@@ -112,6 +144,16 @@ export default function Settings() {
       autoPlayVideos: profile.autoPlayVideos ?? true,
       showPlayerRatings: profile.showPlayerRatings ?? true,
       theme: profile.theme || "dark",
+      matchReminders: profile.matchReminders ?? true,
+      goalAlerts: profile.goalAlerts ?? true,
+      redCardAlerts: profile.redCardAlerts ?? true,
+      halfTimeScores: profile.halfTimeScores ?? false,
+      fullTimeScores: profile.fullTimeScores ?? true,
+      newsAlerts: profile.newsAlerts ?? true,
+      transferAlerts: profile.transferAlerts ?? false,
+      pushEnabled: profile.pushEnabled ?? true,
+      emailEnabled: profile.emailEnabled ?? false,
+      quietHoursEnabled: profile.quietHoursEnabled ?? false,
     }
     : null
 
@@ -155,6 +197,16 @@ export default function Settings() {
     if (updates.autoPlayVideos !== undefined) payload.autoPlayVideos = updates.autoPlayVideos
     if (updates.showPlayerRatings !== undefined) payload.showPlayerRatings = updates.showPlayerRatings
     if (updates.theme !== undefined) payload.theme = updates.theme
+    if (updates.matchReminders !== undefined) payload.matchReminders = updates.matchReminders
+    if (updates.goalAlerts !== undefined) payload.goalAlerts = updates.goalAlerts
+    if (updates.redCardAlerts !== undefined) payload.redCardAlerts = updates.redCardAlerts
+    if (updates.halfTimeScores !== undefined) payload.halfTimeScores = updates.halfTimeScores
+    if (updates.fullTimeScores !== undefined) payload.fullTimeScores = updates.fullTimeScores
+    if (updates.newsAlerts !== undefined) payload.newsAlerts = updates.newsAlerts
+    if (updates.transferAlerts !== undefined) payload.transferAlerts = updates.transferAlerts
+    if (updates.pushEnabled !== undefined) payload.pushEnabled = updates.pushEnabled
+    if (updates.emailEnabled !== undefined) payload.emailEnabled = updates.emailEnabled
+    if (updates.quietHoursEnabled !== undefined) payload.quietHoursEnabled = updates.quietHoursEnabled
 
     // Optimistic local update
     setProfile((prev) => (prev ? { ...prev, ...payload } : prev))
@@ -243,9 +295,20 @@ export default function Settings() {
                     height={56}
                     className="settingsCard__avatar"
                   />
+                  {uploadingAvatar && (
+                    <div style={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}>
+                      <span style={{ fontSize: 12, color: "#888" }}>Uploading...</span>
+                    </div>
+                  )}
                   <label className="settingsCard__avatarEditBtn">
                     <Camera size={14} />
-                    <input type="file" accept="image/*" hidden />
+                    <input type="file" accept="image/*" hidden onChange={handleAvatarChange} disabled={uploadingAvatar}/>
                   </label>
                 </div>
                 <div className="settingsCard__profileInfo">
@@ -518,12 +581,113 @@ export default function Settings() {
             </div>
           )}
 
-          {(activeTab === "notifications" || activeTab === "about") && (
+          {activeTab === "notifications" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>{NAV_ITEMS.find((n) => n.key === activeTab)?.label}</h2>
-                <p>This section isn't built yet.</p>
+                <h2>Notifications</h2>
+                <p>Choose what you want to be notified about.</p>
               </div>
+
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
+                Match Alerts
+              </h3>
+              <ToggleRow
+                label="Match Reminders"
+                description="30 minutes before kickoff for favorite teams"
+                checked={user.matchReminders}
+                onChange={(val) => updateUser({ matchReminders: val })}
+              />
+              <ToggleRow
+                label="Goal Alerts"
+                description="Instant alert when a goal is scored in a followed match"
+                checked={user.goalAlerts}
+                onChange={(val) => updateUser({ goalAlerts: val })}
+              />
+              <ToggleRow
+                label="Red Cards"
+                description="Alert on red card incidents"
+                checked={user.redCardAlerts}
+                onChange={(val) => updateUser({ redCardAlerts: val })}
+              />
+              <ToggleRow
+                label="Half-Time Scores"
+                description="Receive score update at half-time"
+                checked={user.halfTimeScores}
+                onChange={(val) => updateUser({ halfTimeScores: val })}
+              />
+              <ToggleRow
+                label="Full-Time Results"
+                description="Final whistle score for followed matches"
+                checked={user.fullTimeScores}
+                onChange={(val) => updateUser({ fullTimeScores: val })}
+              />
+
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
+                Updates
+              </h3>
+              <ToggleRow
+                label="News Alerts"
+                description="Breaking football news and headlines"
+                checked={user.newsAlerts}
+                onChange={(val) => updateUser({ newsAlerts: val })}
+              />
+              <ToggleRow
+                label="Transfer Rumors"
+                description="Major transfer updates and confirmed deals"
+                checked={user.transferAlerts}
+                onChange={(val) => updateUser({ transferAlerts: val })}
+              />
+
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
+                Delivery
+              </h3>
+              <ToggleRow
+                label="Push Notifications"
+                description="In-app and device push (requires permission)"
+                checked={user.pushEnabled}
+                onChange={(val) => updateUser({ pushEnabled: val })}
+              />
+              <ToggleRow
+                label="Email Digest"
+                description="Weekly summary of your favorite teams"
+                checked={user.emailEnabled}
+                onChange={(val) => updateUser({ emailEnabled: val })}
+              />
+              <ToggleRow
+                label="Quiet Hours"
+                description="Pause all alerts from 11PM — 7AM"
+                checked={user.quietHoursEnabled}
+                onChange={(val) => updateUser({ quietHoursEnabled: val })}
+              />
+            </div>
+          )}
+
+          {activeTab === "about" && (
+            <div className="settingsCard">
+              <div className="settingsCard__header">
+                <h2>About GOALIQ</h2>
+              </div>
+
+              <div className="settingsRow" style={{ cursor: "default" }}>
+                <span className="settingsRow__label">Version</span>
+                <span style={{ color: "#888", fontSize: 14 }}>1.0.0</span>
+              </div>
+              <div className="settingsRow" style={{ cursor: "default" }}>
+                <span className="settingsRow__label">Build</span>
+                <span style={{ color: "#888", fontSize: 14 }}>2026.08.09</span>
+              </div>
+
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
+                Legal
+              </h3>
+              <SettingsRow label="Terms of Service" value="" onClick={() => alert("Terms page coming soon")} />
+              <SettingsRow label="Privacy Policy" value="" onClick={() => alert("Privacy page coming soon")} />
+
+              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
+                Support
+              </h3>
+              <SettingsRow label="Contact Support" value="" onClick={() => window.location.href = "mailto:support@goaliq.com"} />
+              <SettingsRow label="Report a Bug" value="" onClick={() => window.location.href = "mailto:bugs@goaliq.com"} />
             </div>
           )}
         </div>

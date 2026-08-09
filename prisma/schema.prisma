@@ -25,6 +25,16 @@ model User {
   theme             String?   @default("dark")
   lastLoginAt       DateTime?
   lastLoginIp       String?
+  matchReminders    Boolean  @default(true)
+  goalAlerts        Boolean  @default(true)
+  redCardAlerts     Boolean  @default(true)
+  halfTimeScores    Boolean  @default(false)
+  fullTimeScores    Boolean  @default(true)
+  newsAlerts        Boolean  @default(true)
+  transferAlerts    Boolean  @default(false)
+  pushEnabled       Boolean  @default(true)
+  emailEnabled      Boolean  @default(false)
+  quietHoursEnabled Boolean  @default(false)
 
   accounts      Account[]
   favorites     Favorite[]
@@ -34,6 +44,7 @@ model User {
   subscription  Subscription?
   blockedUsers  BlockedUser[]   @relation("Blocker")
   blockedBy     BlockedUser[]   @relation("Blocked")
+  notifications Notification[]
 }
 
 model Account {
@@ -156,4 +167,20 @@ model BlockedUser {
   blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
 
   @@unique([blockerId, blockedId])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("general") // welcome, match, goal, transfer, system
+  read      Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt])
+  @@index([userId, read])
 }

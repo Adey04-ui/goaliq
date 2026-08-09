@@ -54,6 +54,21 @@ export async function GET(req) {
       select: { country: true, timezone: true },
     })
 
+    // Seed welcome notification if user has none
+    const notifCount = await prisma.notification.count({
+      where: { userId: session.user.id },
+    })
+    if (notifCount === 0) {
+      await prisma.notification.create({
+        data: {
+          userId: session.user.id,
+          title: "Welcome to GOALIQ",
+          message: "Thanks for joining! Explore live scores, build your dream XI, and get AI-powered insights.",
+          type: "welcome",
+        },
+      })
+    }
+
     // Backfill country and timezone if missing
     const userUpdates = {}
     if (!existingUser?.country && geo.country) userUpdates.country = geo.country
@@ -145,6 +160,10 @@ export async function PATCH(req) {
       "autoPlayVideos",
       "showPlayerRatings",
       "theme",
+      "matchReminders", "goalAlerts", "redCardAlerts",
+      "halfTimeScores", "fullTimeScores", "newsAlerts",
+      "transferAlerts", "pushEnabled", "emailEnabled",
+      "quietHoursEnabled",
     ]
 
     const updateData = {}
