@@ -34,7 +34,6 @@ export default function ProfileDropdown({ user }) {
 
   async function handleLogout() {
     await signOut({ redirect: false })
-    router.push("/")
     setOpen(false)
   }
 
