@@ -11,16 +11,21 @@ import {
   Settings,
   Crown,
   Moon,
+  Sun,
   HelpCircle,
   LogOut,
   ChevronRight,
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useUser } from "@/context/userContext"
 
 export default function ProfileDropdown({ user }) {
   const [open, setOpen] = useState(false)
   const panelRef = useRef(null)
   const router = useRouter()
+  const { preferences, updatePreferences } = useUser()
+
+  const theme = preferences?.theme || "dark"
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -34,6 +39,12 @@ export default function ProfileDropdown({ user }) {
 
   async function handleLogout() {
     await signOut({ redirect: false })
+    setOpen(false)
+  }
+
+  async function handleThemeToggle() {
+    const nextTheme = theme === "dark" ? "light" : "dark"
+    await updatePreferences({ theme: nextTheme })
     setOpen(false)
   }
 
@@ -62,10 +73,9 @@ export default function ProfileDropdown({ user }) {
       onClick: () => alert("Pro upgrade coming soon!"),
     },
     {
-      icon: <Moon size={16} />,
-      label: "Dark Mode",
-      toggle: true,
-      onClick: () => alert("Theme toggle coming with your restyle!"),
+      icon: theme === "dark" ? <Sun size={16} /> : <Moon size={16} />,
+      label: theme === "dark" ? "Light Mode" : "Dark Mode",
+      onClick: handleThemeToggle,
     },
     { divider: true },
     {
@@ -83,7 +93,6 @@ export default function ProfileDropdown({ user }) {
 
   return (
     <div style={{ position: "relative" }} ref={panelRef}>
-      {/* Profile trigger */}
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -151,7 +160,6 @@ export default function ProfileDropdown({ user }) {
               flexDirection: "column",
             }}
           >
-            {/* User info header */}
             <div
               style={{
                 padding: "16px 18px",
@@ -210,7 +218,6 @@ export default function ProfileDropdown({ user }) {
               </div>
             </div>
 
-            {/* Menu items */}
             <div style={{ padding: "6px 0" }}>
               {menuItems.map((item, i) =>
                 item.divider ? (
@@ -223,7 +230,7 @@ export default function ProfileDropdown({ user }) {
                     }}
                   />
                 ) : (
-                  <MenuItem key={i} item={item} />
+                  <MenuItem key={i} item={item} onClose={() => setOpen(false)} />
                 )
               )}
             </div>
@@ -234,7 +241,7 @@ export default function ProfileDropdown({ user }) {
   )
 }
 
-function MenuItem({ item }) {
+function MenuItem({ item, onClose }) {
   const baseStyle = {
     width: "100%",
     display: "flex",
@@ -252,6 +259,11 @@ function MenuItem({ item }) {
     borderRadius: 0,
   }
 
+  const handleClick = () => {
+    if (item.onClick) item.onClick()
+    onClose()
+  }
+
   const content = (
     <>
       <span style={{ display: "flex", alignItems: "center", opacity: 0.8 }}>
@@ -264,13 +276,12 @@ function MenuItem({ item }) {
     </>
   )
 
-  // If it has an href and NO custom onClick → use Link
   if (item.href && !item.onClick) {
     return (
       <Link
         href={item.href}
         style={baseStyle}
-        onClick={() => setOpen(false)}
+        onClick={onClose}
         onMouseEnter={(e) => { e.currentTarget.style.background = "#161d27" }}
         onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
       >
@@ -279,10 +290,9 @@ function MenuItem({ item }) {
     )
   }
 
-  // Otherwise → button (handles onClick manually)
   return (
     <button
-      onClick={item.onClick}
+      onClick={handleClick}
       style={baseStyle}
       onMouseEnter={(e) => { e.currentTarget.style.background = "#161d27" }}
       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}

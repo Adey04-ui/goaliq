@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
+import { signIn } from "next-auth/react"
 import {
   User,
   Settings as SettingsIcon,
@@ -13,9 +14,11 @@ import {
   Info,
   ChevronRight,
   Camera,
+  LogIn,
 } from "lucide-react"
 import { useUser } from "@/context/userContext"
 import EditFieldModal from "./EditFieldModal"
+import { useSignIn } from "@/context/signInContext"
 
 const NAV_ITEMS = [
   { key: "account", label: "Account", icon: User },
@@ -54,6 +57,163 @@ const MATCH_VIEW_OPTIONS = [
   { label: "Results", value: "results" },
 ]
 
+/* ───────── Skeleton ───────── */
+function SkeletonPulse({ width, height, radius = 6, style = {} }) {
+  return (
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: radius,
+        background: "linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)",
+        backgroundSize: "200% 100%",
+        animation: "settingsSkeletonShimmer 1.4s ease-in-out infinite",
+        ...style,
+      }}
+    />
+  )
+}
+
+function SettingsSkeleton() {
+  return (
+    <div className="settingsMiddle">
+      <style>{`
+        @keyframes settingsSkeletonShimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
+
+      {/* Header */}
+      <div className="settingsMiddle__header">
+        <SkeletonPulse width={140} height={28} style={{ marginBottom: 8 }} />
+        <SkeletonPulse width={260} height={16} />
+      </div>
+
+      <div className="settingsMiddle__body" style={{ width: '100%' }}>
+        {/* Nav */}
+        <div className="settingsNav">
+          {NAV_ITEMS.map((_, i) => (
+            <div key={i} className="settingsNav__item" style={{ opacity: 0.4 }}>
+              <SkeletonPulse width={16} height={16} radius={4} style={{ marginRight: 8, flexShrink: 0 }} />
+              <SkeletonPulse width={80} height={14} />
+            </div>
+          ))}
+        </div>
+
+        {/* Content card */}
+        <div className="settingsContent">
+          <div className="settingsCard">
+            <div className="settingsCard__header" style={{ marginBottom: 20 }}>
+              <SkeletonPulse width={160} height={22} style={{ marginBottom: 6 }} />
+              <SkeletonPulse width={240} height={14} />
+            </div>
+
+            {/* Profile row skeleton */}
+            <div className="settingsCard__profileRow" style={{ marginBottom: 16 }}>
+              <SkeletonPulse width={56} height={56} radius="50%" style={{ marginRight: 16 }} />
+              <div style={{ flex: 1 }}>
+                <SkeletonPulse width={120} height={16} style={{ marginBottom: 8 }} />
+                <SkeletonPulse width={180} height={12} />
+              </div>
+              <SkeletonPulse width={80} height={32} radius={8} />
+            </div>
+
+            {/* Rows skeleton */}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="settingsRow"
+                style={{
+                  borderBottom: "1px solid #1a1a1a",
+                  padding: "14px 0",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <SkeletonPulse width={100} height={14} />
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <SkeletonPulse width={60} height={14} />
+                  <SkeletonPulse width={16} height={16} radius={4} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ───────── Not Authenticated ───────── */
+function NotAuthenticated() {
+  const { showSignIn, setShowSignIn } = useSignIn()
+  return (
+    <div
+      className="settingsMiddle"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "60vh",
+      }}
+    >
+      <div
+        style={{
+          textAlign: "center",
+          maxWidth: 360,
+          padding: "40px 24px",
+          background: "#111",
+          borderRadius: 16,
+          border: "1px solid #222",
+        }}
+      >
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: "50%",
+            background: "#1a1a1a",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 20px",
+          }}
+        >
+          <LogIn size={28} color="#888" />
+        </div>
+        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px", color: "#fff" }}>
+          Sign in required
+        </h2>
+        <p style={{ fontSize: 14, color: "#888", lineHeight: 1.5, margin: "0 0 24px" }}>
+          Please sign in to manage your account settings and preferences.
+        </p>
+        <button
+          onClick={() => setShowSignIn(true)}
+          style={{
+            background: "#3b82f6",
+            color: "#fff",
+            border: "none",
+            borderRadius: 8,
+            padding: "10px 24px",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <LogIn size={16} />
+          Sign In
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/* ───────── UI Components ───────── */
 function SettingsRow({ label, value, onClick }) {
   return (
     <div className="settingsRow" onClick={onClick}>
@@ -85,8 +245,9 @@ function ToggleRow({ label, description, checked, onChange }) {
   )
 }
 
+/* ───────── Main Component ───────── */
 export default function Settings() {
-  const { status, session } = useUser()
+  const { status } = useUser()
   const [activeTab, setActiveTab] = useState("account")
   const [modalConfig, setModalConfig] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -124,12 +285,10 @@ export default function Settings() {
       alert("Something went wrong uploading the image")
     } finally {
       setUploadingAvatar(false)
-      // Reset input so the same file can be selected again
       e.target.value = ""
     }
   }
 
-  // Mapped user shape for the UI
   const user = profile
     ? {
       displayName: profile.name || "",
@@ -186,7 +345,6 @@ export default function Settings() {
   }, [status, loadData])
 
   async function updateUser(updates) {
-    // Map UI field names back to API field names
     const payload = {}
     if (updates.displayName !== undefined) payload.name = updates.displayName
     if (updates.country !== undefined) payload.country = updates.country
@@ -208,7 +366,6 @@ export default function Settings() {
     if (updates.emailEnabled !== undefined) payload.emailEnabled = updates.emailEnabled
     if (updates.quietHoursEnabled !== undefined) payload.quietHoursEnabled = updates.quietHoursEnabled
 
-    // Optimistic local update
     setProfile((prev) => (prev ? { ...prev, ...payload } : prev))
 
     try {
@@ -222,7 +379,6 @@ export default function Settings() {
         setProfile(data.user)
       } else {
         console.error(data.message)
-        // Revert would go here if needed
       }
     } catch (e) {
       console.error("Update failed:", e)
@@ -251,8 +407,13 @@ export default function Settings() {
     setModalConfig(null)
   }
 
+  /* ───────── Guards ───────── */
+  if (status === "unauthenticated") {
+    return <NotAuthenticated />
+  }
+
   if (status === "loading" || loading) {
-    return <div className="settingsMiddle__loading">Loading settings...</div>
+    return <SettingsSkeleton />
   }
 
   if (!user) return null
@@ -308,7 +469,7 @@ export default function Settings() {
                   )}
                   <label className="settingsCard__avatarEditBtn">
                     <Camera size={14} />
-                    <input type="file" accept="image/*" hidden onChange={handleAvatarChange} disabled={uploadingAvatar}/>
+                    <input type="file" accept="image/*" hidden onChange={handleAvatarChange} disabled={uploadingAvatar} />
                   </label>
                 </div>
                 <div className="settingsCard__profileInfo">
