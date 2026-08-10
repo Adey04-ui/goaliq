@@ -273,7 +273,7 @@ export default function NotificationBell() {
               }}
             >
               <Link
-                href="/notifications"
+                href="/main/notifications"
                 onClick={() => setOpen(false)}
                 style={{ color: "#888", fontSize: 13, textDecoration: "none" }}
               >

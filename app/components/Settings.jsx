@@ -164,9 +164,8 @@ function NotAuthenticated() {
           textAlign: "center",
           maxWidth: 360,
           padding: "40px 24px",
-          background: "#111",
+          background: "#0c1117",
           borderRadius: 16,
-          border: "1px solid #222",
         }}
       >
         <div
@@ -665,11 +664,11 @@ export default function Settings() {
             <div className="settingsCard">
               <div className="settingsCard__header">
                 <h2>Blocked Users</h2>
-                <p>Users you've blocked from interacting with you.</p>
+                <p>Users you&apos;ve blocked from interacting with you.</p>
               </div>
 
               {blockedList.length === 0 ? (
-                <p style={{ color: "#888", padding: "12px 0" }}>You haven't blocked anyone yet.</p>
+                <p style={{ color: "#888", padding: "12px 0" }}>You haven&apos;t blocked anyone yet.</p>
               ) : (
                 blockedList.map((b) => (
                   <div key={b.id} className="settingsRow" style={{ gap: 12 }}>
