@@ -1,59 +1,53 @@
-import React from 'react'
-import Image from 'next/image'
-import Skeleton from './Skeleton'
+import React from "react"
 
-function LeagueSkeleton() {
+function SkeletonPulse({ width, height, radius = 8 }) {
   return (
-    <div className="eachList">
-      <div className="left">
-        <div className="leagueImage">
-          <Skeleton
-            height="40px"
-            borderRadius="10px"
-            width='40px'
-          />
-        </div>
-        <div className="leagueDetails">
-          <div className="leagueName">
-            <Skeleton
-              height="13px"
-              borderRadius="10px"
-              width='250px'
-            />
-          </div>
-          <div className="countryName">
-            <div className="countryImage">
-              <Skeleton
-                height="15px"
-                borderRadius="10px"
-                width='15px'
-              />
-            </div>
-            <Skeleton
-              height="13px"
-              borderRadius="10px"
-              width='200px'
-            />
-          </div>
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: radius,
+        background:
+          "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
+        backgroundSize: "200% 100%",
+        animation: "leagueShimmer 1.4s ease-in-out infinite",
+      }}
+    />
+  )
+}
+
+export default function LeagueSkeleton() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        padding: "14px 18px",
+        background: "rgba(12, 17, 23, 0.5)",
+        border: "1px solid rgba(70, 82, 97, 0.12)",
+        borderRadius: 16,
+      }}
+    >
+      <style>{`
+        @keyframes leagueShimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 14, flex: 1 }}>
+        <SkeletonPulse width={40} height={40} radius={10} />
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, flex: 1 }}>
+          <SkeletonPulse width="40%" height={14} radius={6} />
+          <SkeletonPulse width="25%" height={12} radius={6} />
         </div>
       </div>
-      <div className="right">
-        <div className="favourite-btn">
-          <svg style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff', }} viewBox="0 0 24 24"
-            className={`favourite-svg`}>
-            <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
-          </svg>
-        </div>
-        <div className="navigation-btn">
-          <Skeleton
-            height="13px"
-            borderRadius="10px"
-            width='15px'
-          />
-        </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <SkeletonPulse width={34} height={34} radius={10} />
+        <SkeletonPulse width={16} height={16} radius={4} />
       </div>
     </div>
   )
 }
-
-export default LeagueSkeleton

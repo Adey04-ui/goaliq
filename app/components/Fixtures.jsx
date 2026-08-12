@@ -3,11 +3,10 @@ import Image from "next/image"
 import { useFavorites } from "@/context/favoriteContext"
 import { toggleFavourite } from "@/services/favourites"
 import { useState } from "react"
-import { div } from "three/src/nodes/math/OperatorNode.js"
 import { useUser } from "@/context/userContext"
 import { useFormatMatchTime, useLocale, useUserTimezone } from "@/lib/preferences"
 
-const DATES_PER_PAGE = 3 // how many date groups to show at a time
+const DATES_PER_PAGE = 3
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -50,7 +49,7 @@ function groupByDate(matches) {
       year: "numeric",
       month: "long",
       day: "numeric",
-      timeZone: userTz, // group by local date, not UTC date
+      timeZone: userTz,
     })
 
     if (!groups[label]) groups[label] = []
@@ -135,8 +134,8 @@ function Fixtures({ season, league, active }) {
   const hasMore = visibleDates < allDates.length
 
   const tzAbbr = timeZone
-  ? new Date().toLocaleString(locale, { timeZone, timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
-  : new Date().toLocaleString(locale, { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+    ? new Date().toLocaleString(locale, { timeZone, timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+    : new Date().toLocaleString(locale, { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
 
   return (
     <div className="resultsContainer">
@@ -151,28 +150,32 @@ function Fixtures({ season, league, active }) {
               (f) => f.itemId === match.fixture.id
             )
 
+            const matchDate = match.fixture?.date
+            const matchStatus = match.fixture?.status?.short
+
             return (
               <div className="eachMatch" key={match.fixture.id}>
 
                 {/* Time column */}
                 <div className="timestamp">
                   <span className="time">
-                    {formatMatchTime(match.date)}
+                    {formatMatchTime(matchDate) ?? (matchStatus === "FT" ? "FT" : "--")}
                   </span>
                   <span className="timezone">
-                    {/* e.g. GMT+1 */}
-                    {`${tzAbbr}`}
+                    {tzAbbr}
                   </span>
                 </div>
 
                 {/* Home team */}
                 <div className="home">
-                  <Image
-                    src={match.teams.home.logo}
-                    alt={match.teams.home.name}
-                    width={28}
-                    height={28}
-                  />
+                  {!dataSaver && (
+                    <Image
+                      src={match.teams.home.logo}
+                      alt={match.teams.home.name}
+                      width={28}
+                      height={28}
+                    />
+                  )}
                   <span>{match.teams.home.name}</span>
                 </div>
 
@@ -181,17 +184,19 @@ function Fixtures({ season, league, active }) {
                   <span className="score">
                     {match.goals.home} - {match.goals.away}
                   </span>
-                  <span className="status">{match.fixture.status.short}</span>
+                  <span className="status">{matchStatus}</span>
                 </div>
 
                 {/* Away team */}
                 <div className="away">
-                  <Image
-                    src={match.teams.away.logo}
-                    alt={match.teams.away.name}
-                    width={28}
-                    height={28}
-                  />
+                  {!dataSaver && (
+                    <Image
+                      src={match.teams.away.logo}
+                      alt={match.teams.away.name}
+                      width={28}
+                      height={28}
+                    />
+                  )}
                   <span>{match.teams.away.name}</span>
                 </div>
 
@@ -232,7 +237,6 @@ function Fixtures({ season, league, active }) {
       )}
     </div>
   )
-
 }
 
 export default Fixtures

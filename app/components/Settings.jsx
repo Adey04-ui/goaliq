@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
-import { signIn } from "next-auth/react"
 import {
   User,
   Settings as SettingsIcon,
@@ -17,6 +16,7 @@ import {
   LogIn,
 } from "lucide-react"
 import { useUser } from "@/context/userContext"
+import { useToast } from "@/lib/useToast"
 import EditFieldModal from "./EditFieldModal"
 import { useSignIn } from "@/context/signInContext"
 
@@ -84,14 +84,12 @@ function SettingsSkeleton() {
         }
       `}</style>
 
-      {/* Header */}
       <div className="settingsMiddle__header">
         <SkeletonPulse width={140} height={28} style={{ marginBottom: 8 }} />
         <SkeletonPulse width={260} height={16} />
       </div>
 
-      <div className="settingsMiddle__body" style={{ width: '100%' }}>
-        {/* Nav */}
+      <div className="settingsMiddle__body" style={{ width: "100%" }}>
         <div className="settingsNav">
           {NAV_ITEMS.map((_, i) => (
             <div key={i} className="settingsNav__item" style={{ opacity: 0.4 }}>
@@ -101,7 +99,6 @@ function SettingsSkeleton() {
           ))}
         </div>
 
-        {/* Content card */}
         <div className="settingsContent">
           <div className="settingsCard">
             <div className="settingsCard__header" style={{ marginBottom: 20 }}>
@@ -109,7 +106,6 @@ function SettingsSkeleton() {
               <SkeletonPulse width={240} height={14} />
             </div>
 
-            {/* Profile row skeleton */}
             <div className="settingsCard__profileRow" style={{ marginBottom: 16 }}>
               <SkeletonPulse width={56} height={56} radius="50%" style={{ marginRight: 16 }} />
               <div style={{ flex: 1 }}>
@@ -119,7 +115,6 @@ function SettingsSkeleton() {
               <SkeletonPulse width={80} height={32} radius={8} />
             </div>
 
-            {/* Rows skeleton */}
             {Array.from({ length: 5 }).map((_, i) => (
               <div
                 key={i}
@@ -148,7 +143,7 @@ function SettingsSkeleton() {
 
 /* ───────── Not Authenticated ───────── */
 function NotAuthenticated() {
-  const { showSignIn, setShowSignIn } = useSignIn()
+  const { setShowSignIn } = useSignIn()
   return (
     <div
       className="settingsMiddle"
@@ -247,12 +242,12 @@ function ToggleRow({ label, description, checked, onChange }) {
 /* ───────── Main Component ───────── */
 export default function Settings() {
   const { status } = useUser()
+  const { success, error } = useToast()
   const [activeTab, setActiveTab] = useState("account")
   const [modalConfig, setModalConfig] = useState(null)
   const [loading, setLoading] = useState(true)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
-  // Raw API data
   const [profile, setProfile] = useState(null)
   const [subscription, setSubscription] = useState(null)
   const [activities, setActivities] = useState([])
@@ -276,12 +271,13 @@ export default function Settings() {
 
       if (data.success) {
         setProfile(data.user)
+        success("Avatar updated", "Your profile picture has been changed.")
       } else {
-        alert(data.message || "Upload failed")
+        error("Upload failed", data.message || "Could not upload image.")
       }
     } catch (err) {
       console.error(err)
-      alert("Something went wrong uploading the image")
+      error("Upload failed", "Something went wrong uploading the image.")
     } finally {
       setUploadingAvatar(false)
       e.target.value = ""
@@ -334,10 +330,11 @@ export default function Settings() {
       if (bData.success) setBlockedList(bData.blocked)
     } catch (e) {
       console.error("Failed to load settings:", e)
+      error("Failed to load", "Could not fetch your settings. Please refresh.")
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [error])
 
   useEffect(() => {
     if (status === "authenticated") loadData()
@@ -376,11 +373,14 @@ export default function Settings() {
       const data = await res.json()
       if (data.success) {
         setProfile(data.user)
+        success("Saved", "Your preference has been updated.")
       } else {
         console.error(data.message)
+        error("Update failed", data.message || "Could not save changes.")
       }
     } catch (e) {
       console.error("Update failed:", e)
+      error("Update failed", "Something went wrong. Please try again.")
     }
   }
 
@@ -392,9 +392,13 @@ export default function Settings() {
       const data = await res.json()
       if (data.success) {
         setBlockedList((prev) => prev.filter((b) => b.blocked.id !== blockedId))
+        success("User unblocked", "They can now interact with you again.")
+      } else {
+        error("Unblock failed", data.message || "Could not unblock user.")
       }
     } catch (e) {
       console.error(e)
+      error("Unblock failed", "Something went wrong.")
     }
   }
 
@@ -650,7 +654,7 @@ export default function Settings() {
                   style={{ background: "transparent", border: "1px solid #ff4444", color: "#ff4444" }}
                   onClick={() => {
                     if (confirm("Delete your account permanently? This cannot be undone.")) {
-                      alert("Account deletion not yet implemented.")
+                      error("Not available", "Account deletion is not yet implemented.")
                     }
                   }}
                 >
@@ -725,7 +729,7 @@ export default function Settings() {
                   <button
                     className="settingsCard__editProfileBtn"
                     style={{ marginTop: 8 }}
-                    onClick={() => alert("Stripe integration coming soon")}
+                    onClick={() => error("Coming soon", "Stripe integration is not ready yet.")}
                   >
                     Upgrade to Pro
                   </button>
@@ -840,8 +844,8 @@ export default function Settings() {
               <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
                 Legal
               </h3>
-              <SettingsRow label="Terms of Service" value="" onClick={() => alert("Terms page coming soon")} />
-              <SettingsRow label="Privacy Policy" value="" onClick={() => alert("Privacy page coming soon")} />
+              <SettingsRow label="Terms of Service" value="" onClick={() => error("Coming soon", "Terms page is under construction.")} />
+              <SettingsRow label="Privacy Policy" value="" onClick={() => error("Coming soon", "Privacy page is under construction.")} />
 
               <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
                 Support

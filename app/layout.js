@@ -4,8 +4,7 @@ import Providers from "./providers";
 import { SignInProvider } from "@/context/signInContext";
 import { UserProvider } from "@/context/userContext";
 import { FavoritesProvider } from "@/context/favoriteContext";
-import { ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
+import { ToastProvider } from "./components/ToastProvider"
 import GetFavourites from "./components/GetFavourites";
 import { XIProvider } from "@/context/xiContext";
 import ThemeWrapper from "./components/ThemeWrapper";
@@ -31,11 +30,12 @@ export default function RootLayout({ children }) {
             <UserProvider>
               <FavoritesProvider>
                 <XIProvider>
-                  <GetFavourites />
                   <ThemeWrapper>
-                    {children}
+                    <ToastProvider>
+                      <GetFavourites />
+                      {children}
+                    </ToastProvider>
                   </ThemeWrapper>
-                  <ToastContainer />
                 </XIProvider>
               </FavoritesProvider>
             </UserProvider>

@@ -1,11 +1,9 @@
 import Image from "next/image"
-import { formatMatchTime } from "@/lib/matchTime"
 import Link from "next/link"
 import { useUser } from "@/context/userContext"
 import { useFormatMatchTime, useLocale, useUserTimezone } from "@/lib/preferences"
 
 function MatchRow({ match, isFavourite, onToggleFavourite }) {
-
   const isScheduled = match?.status === "UPCOMING"
 
   const { preferences } = useUser()
@@ -14,34 +12,37 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
   const timeZone = useUserTimezone()
   const dataSaver = preferences?.dataSaver ?? false
 
-  const tzAbbr = timeZone
-  ? new Date().toLocaleString(locale, { timeZone, timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
-  : new Date().toLocaleString(locale, { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+  // API returns date in different shapes — handle both
+  const matchDate = match.fixture?.date ?? match.date
+  const matchStatus = match.fixture?.status?.short ?? match.status
 
-  console.log("match: ", match)
+  const tzAbbr = timeZone
+    ? new Date().toLocaleString(locale, { timeZone, timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
+    : new Date().toLocaleString(locale, { timeZoneName: "short" }).split(" ").pop().replace("UTC", "GMT")
 
   return (
-    <Link href={`/main/matches/${match.id}`} className="matchRow" style={{ textDecoration: 'none' }}>
-      <div className="eachMatch" key={match.id}>
+    <Link href={`/main/matches/${match.id ?? match.fixture?.id}`} className="matchRow" style={{ textDecoration: 'none' }}>
+      <div className="eachMatch" key={match.id ?? match.fixture?.id}>
 
         <div className="timestamp">
-          <span className={`time ${match.status === "LIVE" ? "live" : ""}`}>
-            {formatMatchTime(match.date)}
+          <span className={`time ${matchStatus === "LIVE" ? "live" : ""}`}>
+            {formatMatchTime(matchDate) ?? (matchStatus === "FT" ? "FT" : "--")}
           </span>
           <span className="timezone">
-            {/* e.g. GMT+1 */}
-            {`${tzAbbr}`}
+            {tzAbbr}
           </span>
         </div>
 
         {/* Home team */}
         <div className="home">
-          <Image
-            src={match.teams.home.logo}
-            alt={match.teams.home.name}
-            width={28}
-            height={28}
-          />
+          {!dataSaver && (
+            <Image
+              src={match.teams.home.logo}
+              alt={match.teams.home.name}
+              width={28}
+              height={28}
+            />
+          )}
           <span>{match.teams.home.name.length > 14 ? match.teams.home.name.slice(0, 14) + "..." : match.teams.home.name}</span>
         </div>
 
@@ -50,10 +51,10 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
           <span className="score">
             {match.goals.home} - {match.goals.away}
           </span>
-          <span className={`status ${match.status === "LIVE" ? "live" : ""}`}>
+          <span className={`status ${matchStatus === "LIVE" ? "live" : ""}`}>
             {isScheduled
-              ? formatMatchTime(match.date)
-              : match.status === "LIVE"
+              ? formatMatchTime(matchDate)
+              : matchStatus === "LIVE"
                 ? `${match.elapsed}'`
                 : "FT"}
           </span>
@@ -61,12 +62,14 @@ function MatchRow({ match, isFavourite, onToggleFavourite }) {
 
         {/* Away team */}
         <div className="away">
-          <Image
-            src={match.teams.away.logo}
-            alt={match.teams.away.name}
-            width={28}
-            height={28}
-          />
+          {!dataSaver && (
+            <Image
+              src={match.teams.away.logo}
+              alt={match.teams.away.name}
+              width={28}
+              height={28}
+            />
+          )}
           <span>{match.teams.away.name.length > 14 ? match.teams.away.name.slice(0, 14) + "..." : match.teams.away.name}</span>
         </div>
 
