@@ -2,22 +2,19 @@ export async function toggleFavourite(data) {
   try {
     const res = await fetch("/api/favourites", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
 
     const result = await res.json()
 
+    // Check HTTP status FIRST, then check the JSON body
     if (!res.ok) {
       return {
         success: false,
-        message: result.message,
+        message: result.message || "Something went wrong",
       }
     }
-
-
 
     return {
       success: true,
@@ -39,7 +36,7 @@ export async function getFavourites() {
     if (!res.ok) {
       return {
         success: false,
-        message: result.message,
+        message: result.message || "Something went wrong",
       }
     }
 

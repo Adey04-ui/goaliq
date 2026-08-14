@@ -11,6 +11,8 @@ import BuildYourXI from "./BuildYourXI"
 import AIAssistant from "./AIAssistant"
 import NewsPreview from "./NewsPreview"
 import { useUser } from "@/context/userContext"
+import {useToast} from "@/lib/useToast"
+import { useFavorites } from "@/context/favoriteContext"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -329,11 +331,19 @@ function EmptyState({ tab, offsetDays }) {
 /* ─── Main Component ─── */
 function HomeBody() {
   const { preferences } = useUser()
+  const { favorites } = useFavorites()
   const [offsetDays, setOffsetDays] = useState(0)
   const [tab, setTab] = useState(preferences?.defaultMatchView || "live")
   const [favouriteIds, setFavouriteIds] = useState(new Set())
   const [page, setPage] = useState(1)
   const [accumulatedLeagues, setAccumulatedLeagues] = useState([])
+
+  useEffect(() => {
+    if (favorites?.match?.length > 0) {
+      const ids = new Set(favorites.match.map((f) => String(f.itemId)))
+      setFavouriteIds(ids)
+    }
+  }, [favorites])
 
   const date = formatDate(offsetDays)
   const tz = getUserTimeZone()
@@ -367,6 +377,8 @@ function HomeBody() {
   const mainLeagues = accumulatedLeagues
   const totalPages = mainData?.data?.totalPages || 1
   const hasMorePages = page < totalPages
+
+  const {success, error} = useToast()
 
   const liveLeagueGroups = useMemo(
     () =>
@@ -404,7 +416,9 @@ function HomeBody() {
         wasFavourite ? next.add(id) : next.delete(id)
         return next
       })
+      error(result.message)
     }
+    success(result.message || (wasFavourite ? "Removed from favourites" : "Added to favourites"))
   }
 
   return (
@@ -430,7 +444,7 @@ function HomeBody() {
             gap: 14,
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexWrap: "wrap", gap: 12, flexDirection: 'column' }}>
             <DateNavigator offsetDays={offsetDays} onChange={setOffsetDays} />
             <TabBar activeTab={tab} onChange={setTab} />
           </div>
@@ -438,7 +452,7 @@ function HomeBody() {
 
         {/* ─── Live Matches ─── */}
         <AnimatePresence mode="wait">
-          {(hasLiveMatches || (tab === "live" && mainLeagues.length > 0)) && (
+          {(tab === "live" || tab === "all") && (hasLiveMatches || (tab === "live" && mainLeagues.length > 0)) && (
             <motion.div
               key="live-section"
               variants={sectionVariants}

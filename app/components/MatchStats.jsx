@@ -1,4 +1,7 @@
+"use client"
+
 import useSWR from "swr"
+import { motion } from "framer-motion"
 import { shadeColor } from "@/lib/color"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
@@ -17,13 +20,47 @@ const STAT_ORDER = [
   "Passes accurate",
 ]
 
+function SkeletonPulse({ width, height, radius = 8, style = {} }) {
+  return (
+    <div
+      style={{
+        width,
+        height,
+        borderRadius: radius,
+        background: "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
+        backgroundSize: "200% 100%",
+        animation: "statsShimmer 1.4s ease-in-out infinite",
+        ...style,
+      }}
+    />
+  )
+}
+
+function StatsSkeleton() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+      <style>{`@keyframes statsShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <SkeletonPulse width={30} height={13} radius={6} style={{ opacity: 0.5 }} />
+            <SkeletonPulse width={90} height={12} radius={6} style={{ opacity: 0.35 }} />
+            <SkeletonPulse width={30} height={13} radius={6} style={{ opacity: 0.5 }} />
+          </div>
+          <SkeletonPulse width="100%" height={8} radius={4} style={{ opacity: 0.25 }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function parseValue(v) {
   if (v === null || v === undefined) return 0
   if (typeof v === "string" && v.includes("%")) return parseFloat(v)
   return Number(v) || 0
 }
 
-function StatBar({ label, homeValue, awayValue, homeColor, awayColor }) {
+function StatBar({ label, homeValue, awayValue, homeColor, awayColor, index }) {
   const homeNum = parseValue(homeValue)
   const awayNum = parseValue(awayValue)
   const total = homeNum + awayNum || 1
@@ -33,17 +70,22 @@ function StatBar({ label, homeValue, awayValue, homeColor, awayColor }) {
   const awayGradient = `linear-gradient(to bottom, ${shadeColor(awayColor, 25)} 0%, ${awayColor} 50%, ${shadeColor(awayColor, -25)} 100%)`
 
   return (
-    <div className="matchStats__row">
-      <div className="matchStats__values">
-        <span>{homeValue ?? 0}</span>
-        <span className="matchStats__label">{label}</span>
-        <span>{awayValue ?? 0}</span>
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.04, duration: 0.3 }}
+      style={{ display: "flex", flexDirection: "column", gap: 8, padding: "14px 20px", background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 14 }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 600 }}>
+        <span style={{ color: "#fff", minWidth: 36, textAlign: "left" }}>{homeValue ?? 0}</span>
+        <span style={{ color: "#8896a8", fontSize: 12, fontWeight: 500, textTransform: "capitalize" }}>{label}</span>
+        <span style={{ color: "#fff", minWidth: 36, textAlign: "right" }}>{awayValue ?? 0}</span>
       </div>
-      <div className="matchStats__bar">
-        <div className="matchStats__barHome" style={{ width: `${homePct}%`, background: homeGradient }} />
-        <div className="matchStats__barAway" style={{ width: `${100 - homePct}%`, background: awayGradient }} />
+      <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
+        <motion.div initial={{ width: 0 }} animate={{ width: `${homePct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} style={{ background: homeGradient, height: "100%" }} />
+        <motion.div initial={{ width: 0 }} animate={{ width: `${100 - homePct}%` }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }} style={{ background: awayGradient, height: "100%" }} />
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -58,26 +100,25 @@ export default function MatchStats({ match, matchId, active }) {
   const homeColor = homeColorData?.data?.color || "#d41b27"
   const awayColor = awayColorData?.data?.color || "#465261"
 
-  if (isLoading) return <div className="matchStats__empty">Loading stats...</div>
+  if (isLoading) return <StatsSkeleton />
 
   if (!stats) {
-    return <div className="matchStats__empty">{data?.message || "Stats not available yet"}</div>
+    return <div style={{ textAlign: "center", padding: "40px 0", color: "#556677", fontSize: 13 }}>{data?.message || "Stats not available yet"}</div>
   }
 
   return (
-    <div className="matchStats">
-      {STAT_ORDER.filter((key) => stats.home.stats[key] !== undefined || stats.away.stats[key] !== undefined).map(
-        (key) => (
-          <StatBar
-            key={key}
-            label={key}
-            homeValue={stats.home.stats[key]}
-            awayValue={stats.away.stats[key]}
-            homeColor={homeColor}
-            awayColor={awayColor}
-          />
-        )
-      )}
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {STAT_ORDER.filter((key) => stats.home.stats[key] !== undefined || stats.away.stats[key] !== undefined).map((key, i) => (
+        <StatBar
+          key={key}
+          label={key}
+          homeValue={stats.home.stats[key]}
+          awayValue={stats.away.stats[key]}
+          homeColor={homeColor}
+          awayColor={awayColor}
+          index={i}
+        />
+      ))}
     </div>
   )
 }

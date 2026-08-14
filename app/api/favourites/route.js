@@ -11,95 +11,81 @@ export async function POST(req) {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.email) {
-      return Response.json(
-        { message: "Not authenticated" },
-        { status: 401 }
-      )
+      return Response.json({ message: "Not authenticated" }, { status: 401 })
     }
 
     const body = await req.json()
+    let { itemId, type, name, logo } = body
 
-    const { itemId, type, name, logo } = body
+    // Prisma expects itemId as Int, frontend sends String
+    const numericItemId = parseInt(itemId, 10)
+    if (isNaN(numericItemId)) {
+      return Response.json({ message: "Invalid itemId" }, { status: 400 })
+    }
+
+    type = type.toUpperCase()
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
+      where: { email: session.user.email },
     })
 
     if (!user) {
-      return Response.json(
-        { message: "User not found" },
-        { status: 404 }
-      )
+      return Response.json({ message: "User not found" }, { status: 404 })
     }
 
-    const existing = await prisma.favorite.findUnique({
+    const existing = await prisma.favorite.findFirst({
       where: {
-        userId_type_itemId: {
-          userId: user.id,
-          type,
-          itemId,
-        },
+        AND: [
+          { userId: user.id },
+          { type },
+          { itemId: numericItemId },
+        ],
       },
     })
 
     if (existing) {
-      await prisma.favorite.delete({
-        where: {
-          id: existing.id,
-        },
-      })
+      await prisma.favorite.delete({ where: { id: existing.id } })
 
-      const updatedFavorites = await prisma.favorite.findMany({
-        where: {
-          userId: user.id,
-        },
+      const updated = await prisma.favorite.findMany({
+        where: { userId: user.id },
       })
 
       const formatted = {
-        league: updatedFavorites.filter((f) => f.type === "LEAGUE"),
-        team: updatedFavorites.filter((f) => f.type === "TEAM"),
-        match: updatedFavorites.filter((f) => f.type === "MATCH"),
+        league: updated.filter((f) => f.type === "LEAGUE"),
+        team: updated.filter((f) => f.type === "TEAM"),
+        match: updated.filter((f) => f.type === "MATCH"),
       }
 
       await setFavoritesCache(user.id, formatted)
 
-      return Response.json({
-        success: true,
-        removed: true,
-      })
+      return Response.json({ success: true, removed: true })
     }
 
     const favorite = await prisma.favorite.create({
       data: {
         userId: user.id,
-        itemId,
+        itemId: numericItemId,
         type,
         name,
         logo,
       },
     })
 
-    const updatedFavorites = await prisma.favorite.findMany({
-      where: {
-        userId: user.id,
-      },
+    const updated = await prisma.favorite.findMany({
+      where: { userId: user.id },
     })
 
     const formatted = {
-      league: updatedFavorites.filter((f) => f.type === "LEAGUE"),
-      team: updatedFavorites.filter((f) => f.type === "TEAM"),
-      match: updatedFavorites.filter((f) => f.type === "MATCH"),
+      league: updated.filter((f) => f.type === "LEAGUE"),
+      team: updated.filter((f) => f.type === "TEAM"),
+      match: updated.filter((f) => f.type === "MATCH"),
     }
 
     await setFavoritesCache(user.id, formatted)
 
-    return Response.json({
-      success: true,
-      favorite,
-    })
+    return Response.json({ success: true, favorite })
   } catch (error) {
+    console.error("FAVOURITES POST ERROR:", error)
     return Response.json(
       { message: error.message },
       { status: 500 }
@@ -109,29 +95,21 @@ export async function POST(req) {
 
 export async function GET(req) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions)
 
     if (!session?.user?.email) {
-      return Response.json(
-        { message: "Not authenticated" },
-        { status: 401 }
-      );
+      return Response.json({ message: "Not authenticated" }, { status: 401 })
     }
 
-    const { searchParams } = new URL(req.url);
-    const type = searchParams.get("type");
+    const { searchParams } = new URL(req.url)
+    const type = searchParams.get("type")
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: session.user.email,
-      },
-    });
+      where: { email: session.user.email },
+    })
 
     if (!user) {
-      return Response.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return Response.json({ message: "User not found" }, { status: 404 })
     }
 
     const cached = await getFavoritesCache(user.id)
@@ -144,14 +122,13 @@ export async function GET(req) {
       })
     }
 
+    const where = { userId: user.id }
+    if (type) where.type = type.toUpperCase()
+
     const favorites = await prisma.favorite.findMany({
-      where: {
-        userId: user.id,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+      where,
+      orderBy: { createdAt: "desc" },
+    })
 
     const formatted = {
       league: favorites.filter((f) => f.type === "LEAGUE"),
@@ -167,9 +144,7 @@ export async function GET(req) {
       source: "database",
     })
   } catch (error) {
-    return Response.json(
-      { message: error.message },
-      { status: 500 }
-    );
+    console.error("FAVOURITES GET ERROR:", error)
+    return Response.json({ message: error.message }, { status: 500 })
   }
 }

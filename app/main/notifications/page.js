@@ -14,7 +14,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
-function SkeletonPulse({ width, height, radius = 6 }) {
+function SkeletonPulse({ width, height, radius = 6, style = {} }) {
   return (
     <div
       style={{
@@ -24,6 +24,7 @@ function SkeletonPulse({ width, height, radius = 6 }) {
         background: "linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)",
         backgroundSize: "200% 100%",
         animation: "notifSkeletonShimmer 1.4s ease-in-out infinite",
+        ...style,
       }}
     />
   )
@@ -31,38 +32,116 @@ function SkeletonPulse({ width, height, radius = 6 }) {
 
 function NotificationsSkeleton() {
   return (
-    <div className="notificationsPage">
-      <style>{`
-        @keyframes notifSkeletonShimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
+    <div className="parent-container">
+      <div
+        className="notificationsPage"
+        style={{ display: "flex", flexDirection: "column", gap: 20, padding: "20px 0" }}
+      >
+        <style>{`
+          @keyframes notifSkeletonShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+          }
+        `}</style>
 
-      <div className="notificationsPage__header">
-        <SkeletonPulse width={180} height={24} style={{ marginBottom: 6 }} />
-        <SkeletonPulse width={260} height={14} />
-      </div>
+        {/* Header */}
+        <div className="notificationsPage__header">
+          <SkeletonPulse width={60} height={18} radius={6} style={{ marginBottom: 12 }} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 16,
+            }}
+          >
+            <div>
+              <SkeletonPulse width={160} height={28} radius={8} style={{ marginBottom: 6 }} />
+              <SkeletonPulse width={220} height={16} radius={6} />
+            </div>
+            <SkeletonPulse width={100} height={36} radius={10} />
+          </div>
+        </div>
 
-      <div className="notificationsPage__toolbar">
-        <SkeletonPulse width={100} height={32} radius={8} />
-        <SkeletonPulse width={80} height={32} radius={8} />
-      </div>
+        {/* Toolbar */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", gap: 8 }}>
+            <SkeletonPulse width={60} height={32} radius={8} />
+            <SkeletonPulse width={80} height={32} radius={8} />
+          </div>
+          <SkeletonPulse width={130} height={18} radius={6} />
+        </div>
 
-      <div className="notificationsPage__list">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="notificationsPage__item" style={{ opacity: 0.5 }}>
-            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flex: 1 }}>
-              <SkeletonPulse width={8} height={8} radius="50%" style={{ marginTop: 6 }} />
-              <div style={{ flex: 1 }}>
-                <SkeletonPulse width="60%" height={14} style={{ marginBottom: 8 }} />
-                <SkeletonPulse width="90%" height={12} style={{ marginBottom: 6 }} />
-                <SkeletonPulse width={80} height={10} />
+        {/* List */}
+        <div className="notificationsPage__list">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              style={{
+                padding: "16px 20px",
+                borderBottom: "1px solid #1a1a1a",
+                display: "flex",
+                gap: 12,
+                alignItems: "flex-start",
+                background: i % 2 === 0 ? "rgba(59,130,246,0.04)" : "transparent",
+              }}
+            >
+              {/* Unread dot */}
+              <SkeletonPulse
+                width={8}
+                height={8}
+                radius="50%"
+                style={{
+                  marginTop: 6,
+                  flexShrink: 0,
+                  opacity: i % 2 === 0 ? 0.6 : 0.15,
+                }}
+              />
+
+              {/* Content */}
+              <div
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 6,
+                }}
+              >
+                <SkeletonPulse
+                  width={`${50 + (i % 3) * 12}%`}
+                  height={15}
+                  radius={6}
+                />
+                <SkeletonPulse
+                  width={`${70 + (i % 2) * 25}%`}
+                  height={13}
+                  radius={6}
+                  style={{ opacity: 0.55 }}
+                />
+                <SkeletonPulse
+                  width={65 + (i % 3) * 20}
+                  height={11}
+                  radius={5}
+                  style={{ opacity: 0.35 }}
+                />
+              </div>
+
+              {/* Actions */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: 4,
+                  flexShrink: 0,
+                  marginTop: 2,
+                }}
+              >
+                <SkeletonPulse width={28} height={28} radius={6} style={{ opacity: 0.25 }} />
+                <SkeletonPulse width={28} height={28} radius={6} style={{ opacity: 0.25 }} />
               </div>
             </div>
-            <SkeletonPulse width={32} height={32} radius={8} />
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -204,7 +283,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Toolbar */}
-        <div className="notificationsPage__toolbar" style={{display: 'flex', flexDirection: 'column', gap: 12}}>
+        <div className="notificationsPage__toolbar" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: "flex", gap: 8 }}>
             {["all", "unread"].map((f) => (
               <button
