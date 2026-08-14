@@ -1,68 +1,152 @@
 'use client'
 
-import Image from "next/image"
-import { useState } from "react"
-import { usePathname } from "next/navigation"
-import { useRouter } from "next/navigation"
-import ball from "../assets/goalIQ17.png"
+import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
+import { useSidebar } from '@/context/sidebarContext'
 import { useUser } from '@/context/userContext'
 import { useSignIn } from '@/context/signInContext'
-import { ChevronDown } from "lucide-react"
-import { signOut } from "next-auth/react"
+import { ChevronDown, X } from 'lucide-react'
+import { signOut } from 'next-auth/react'
+import ball from '../assets/goalIQ17.png'
+
+const navItems = [
+  { href: '/main/matches',   label: 'Matches',   type: 'image', src: ball },
+  { href: '/main/leagues',   label: 'Leagues',   type: 'icon',  id: 'leagues' },
+  { href: '/main/news',      label: 'News',      type: 'icon',  id: 'news' },
+  { href: '/main/following', label: 'Following', type: 'icon',  id: 'following' },
+  { href: '/main/calendar',  label: 'Calendar',  type: 'icon',  id: 'calendar' },
+  { href: '/main/settings',  label: 'Settings',  type: 'icon',  id: 'settings' },
+]
 
 function Sidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [current, setCurrent] = useState('matches')
-    const { session, status } = useUser()
-      const { showSignIn, setShowSignIn } = useSignIn()
+  const router   = useRouter()
+  const { isOpen, isMobile, close } = useSidebar()
+  const { session, status } = useUser()
+  const { setShowSignIn } = useSignIn()
+
+  const navigate = (href) => {
+    router.push(href)
+    if (isMobile) close()
+  }
+
   return (
-    <div className="sidebar">
-      <div className="logo-container">
-        <Image width={20} height={20} alt="" className="goalIQ-name" src="/assets/goalIQ16.png" />
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/matches' ? 'active' : ''}`} onClick={() => router.push('/main/matches')}>
-        <Image width={30} height={30} src={ball} alt="ball" />
-        <div>Matches</div>
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/leagues' ? 'active' : ''}`} onClick={() => router.push('/main/leagues')}>
-        <svg viewBox="0 0 24 24">
-          <path d="M6 4h12v3a6 6 0 0 1-12 0z" />
-          <path d="M9 21h6" />
-          <path d="M12 16v5" />
-          <path d="M6 7H4a3 3 0 0 0 3 3" />
-          <path d="M18 7h2a3 3 0 0 1-3 3" />
-        </svg>
-        <div>Leagues</div>
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/news' ? 'active' : ''}`} onClick={() => router.push('/main/news')}>
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="4" width="18" height="16" rx="2" />
-          <rect x="6" y="7" width="6" height="4" />
-          <line x1="13" y1="8" x2="18" y2="8" />
-          <line x1="13" y1="11" x2="18" y2="11" />
-          <line x1="6" y1="13" x2="18" y2="13" />
-          <line x1="6" y1="16" x2="14" y2="16" />
-        </svg>
-        <div>News</div>
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/following' ? 'active' : ''}`} onClick={() => router.push('/main/following')}>
-        <svg viewBox="0 0 24 24">
-          <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
-        </svg>
-        <div>Following</div>
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/calender' ? 'active' : ''}`} onClick={() => router.push('/main/calender')}>
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="5" width="18" height="16" rx="2" />
-          <line x1="3" y1="10" x2="21" y2="10" />
-          <line x1="8" y1="3" x2="8" y2="7" />
-          <line x1="16" y1="3" x2="16" y2="7" />
-        </svg>
-        <div>Calender</div>
-      </div>
-      <div className={`sidebar-link ${pathname == '/main/settings' ? 'active' : ''}`} onClick={() => router.push('/main/settings')}>
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <>
+      {/* Mobile backdrop */}
+      {isMobile && (
+        <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={close} />
+      )}
+
+      <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+        {isMobile && (
+          <button className="sidebar__closeBtn" onClick={close} aria-label="Close menu">
+            <X size={20} strokeWidth={2.5} />
+          </button>
+        )}
+
+        <div className="logo-container">
+          <Image
+            width={120}
+            height={28}
+            alt="GoalIQ"
+            className="goalIQ-name"
+            src="/assets/goalIQ16.png"
+            priority
+          />
+        </div>
+
+        <nav className="sidebar__nav">
+          {navItems.map((item) => (
+            <div
+              key={item.href}
+              className={`sidebar-link ${pathname === item.href ? 'active' : ''}`}
+              onClick={() => navigate(item.href)}
+            >
+              {item.type === 'image' ? (
+                <Image width={26} height={26} src={item.src} alt={item.label} className="sidebar-link__img" />
+              ) : (
+                <NavIcon name={item.id} />
+              )}
+              <div>{item.label}</div>
+            </div>
+          ))}
+        </nav>
+
+        <div className="sidebar__bottom">
+          <div className="crown-upgradecontainer">
+            <div className="icon-text">
+              <Image width={20} height={20} alt="Pro" className="goalIQ-pro-icon" src="/assets/goalIQ18.png" />
+              <div className="upgrade-text">
+                Upgrade to GoalIQ Pro for exclusive insights and ad-free experience.
+              </div>
+              <button className="upgrade-button">Upgrade Now</button>
+            </div>
+          </div>
+
+          <div className="profile-premium">
+            {status === 'authenticated' ? (
+              <div className="gap-container">
+                <div style={{ position: 'relative' }}>
+                  <Image
+                    width={35}
+                    height={35}
+                    alt="Profile"
+                    className="profile-picture"
+                    src={session?.user?.image || '/assets/default-avatar.png'}
+                  />
+                  <div className="position-absolute-premium-proflie" />
+                </div>
+                <div className="profile-info">
+                  <p className="profile-name">{session?.user?.name}</p>
+                  <p className="text-premuim">Premium</p>
+                </div>
+                <button className="dropdownarrow-button">
+                  <ChevronDown size={14} />
+                </button>
+              </div>
+            ) : (
+              <button className="sign-in-btn" onClick={() => setShowSignIn(true)}>
+                Sign In
+              </button>
+            )}
+          </div>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+function NavIcon({ name }) {
+  const icons = {
+    leagues: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 4h12v3a6 6 0 0 1-12 0z" />
+        <path d="M9 21h6" /><path d="M12 16v5" />
+        <path d="M6 7H4a3 3 0 0 0 3 3" /><path d="M18 7h2a3 3 0 0 1-3 3" />
+      </svg>
+    ),
+    news: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <rect x="6" y="7" width="6" height="4" />
+        <line x1="13" y1="8" x2="18" y2="8" /><line x1="13" y1="11" x2="18" y2="11" />
+        <line x1="6" y1="13" x2="18" y2="13" /><line x1="6" y1="16" x2="14" y2="16" />
+      </svg>
+    ),
+    following: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 3 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9" />
+      </svg>
+    ),
+    calendar: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+        <line x1="8" y1="3" x2="8" y2="7" /><line x1="16" y1="3" x2="16" y2="7" />
+      </svg>
+    ),
+    settings: (
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
           <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
           <g id="SVGRepo_iconCarrier">
@@ -71,49 +155,9 @@ function Sidebar() {
               fill="#000000"></path>
           </g>
         </svg>
-        <div>Settings</div>
-      </div>
-      <div className="crown-upgradecontainer">
-        <div className="icon-text">
-          <Image width={20} height={20} alt="" className="goalIQ-pro-icon" src="/assets/goalIQ18.png" />
-          <div className="upgrade-text">
-            I LOVE CHINENYE SO SOO MUCH
-          </div>
-          <button className="upgrade-button">
-            Upgrade Now
-          </button>
-        </div>
-      <div>
-      </div>
-        <div className="profile-premium">
-          {status == "authenticated" ? (
-            <>
-          <div className="gap-container">
-            <Image width={35} height={35} alt="" className="profile-picture" src={session?.user?.image} />
-            <div className="position-absolute-premium-proflie"></div>
-            <div>
-              <p>
-                {session?.user?.name}
-              </p>
-              <p className="text-premuim">
-                Premium
-              </p>
-            </div>
-          </div>
-          <ChevronDown className="dropdownarrow" />
-          </>
-        ) : (
-          <div style={{padding: '0px 40px'}}>
-            <button className="sign-in-btn" onClick={() => setShowSignIn(true)}>
-              Sign In
-            </button>
-          </div>
-        )
-}
-        </div>
-      </div>
-    </div>
-  )
+    ),
+  }
+  return icons[name] || null
 }
 
 export default Sidebar

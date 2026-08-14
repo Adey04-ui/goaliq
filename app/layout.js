@@ -8,6 +8,7 @@ import { ToastProvider } from "./components/ToastProvider"
 import GetFavourites from "./components/GetFavourites";
 import { XIProvider } from "@/context/xiContext";
 import ThemeWrapper from "./components/ThemeWrapper";
+import { SidebarProvider } from "@/context/sidebarContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,20 +27,22 @@ export default function RootLayout({ children }) {
       <body className={`${inter.variable} font-sans`}>
         <SignInProvider>
           {/* SessionProvider MUST wrap UserProvider */}
-          <Providers>
-            <UserProvider>
-              <FavoritesProvider>
-                <XIProvider>
-                  <ThemeWrapper>
-                    <ToastProvider>
-                      <GetFavourites />
-                      {children}
-                    </ToastProvider>
-                  </ThemeWrapper>
-                </XIProvider>
-              </FavoritesProvider>
-            </UserProvider>
-          </Providers>
+          <SidebarProvider>
+            <Providers>
+              <UserProvider>
+                <FavoritesProvider>
+                  <XIProvider>
+                    <ThemeWrapper>
+                      <ToastProvider>
+                        <GetFavourites />
+                        {children}
+                      </ToastProvider>
+                    </ThemeWrapper>
+                  </XIProvider>
+                </FavoritesProvider>
+              </UserProvider>
+            </Providers>
+          </SidebarProvider>
         </SignInProvider>
       </body>
     </html>

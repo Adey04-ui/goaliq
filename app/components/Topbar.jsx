@@ -6,6 +6,19 @@ import { useSignIn } from '@/context/signInContext'
 import { useUser } from '@/context/userContext'
 import NotificationBell from './NotificationBell'
 import ProfileDropdown from './ProfileDropdown'
+import { Menu } from 'lucide-react'
+import { useSidebar } from '@/context/sidebarContext'
+
+export function HeaderSidebarToggle() {
+  const { toggle, isMobile } = useSidebar()
+  if (!isMobile) return null
+
+  return (
+    <button className="header__sidebarToggle" onClick={toggle} aria-label="Open menu">
+      <Menu size={20} strokeWidth={2} />
+    </button>
+  )
+}
 
 function Topbar() {
   const { showSignIn, setShowSignIn } = useSignIn()
@@ -13,7 +26,9 @@ function Topbar() {
 
   return (
     <div className="header">
-      <div className="header-left"></div>
+      <div className="header-left">
+        <HeaderSidebarToggle />
+      </div>
 
       <div className="header-middle">
         <div className="search-box">
