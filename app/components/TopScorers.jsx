@@ -1,5 +1,6 @@
 import useSWR from "swr"
 import Image from "next/image"
+import Link from "next/link"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -68,7 +69,9 @@ function TopScorers({ league, season, active }) {
             </div>
             <div className="topScorers__player-info">
               <span className="topScorers__player-name">
-                {entry.player.name}
+                <Link href={`/main/players/${entry.player.id}`} className="player-link">
+                  {entry.player.name}
+                </Link>
               </span>
               <span className="topScorers__player-sub">
                 Goals (Penalties)

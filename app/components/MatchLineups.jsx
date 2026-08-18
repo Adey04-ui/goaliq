@@ -5,6 +5,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 import { useUser } from "@/context/userContext"
+import {useRouter} from "next/navigation"
 
 const fetcher = (url) => fetch(url).then((res) => res.json())
 
@@ -94,10 +95,11 @@ function ratingColor(rating) {
 }
 
 function PlayerDot({ player, x, y, labelBelow, showRating, dataSaver }) {
+  const router = useRouter()
   const clipId = `clip-${player.id}`
   const badgeY = labelBelow ? -4.5 : 4.5
   return (
-    <g transform={`translate(${x}, ${y})`}>
+    <g transform={`translate(${x}, ${y})`} onClick={() => router.push(`/main/players/${player.id}`)}>
       <defs>
         <clipPath id={clipId}><circle r="3.2" /></clipPath>
       </defs>
@@ -158,6 +160,8 @@ function Pitch({ homeSide, awaySide, showRating, dataSaver }) {
 }
 
 function TeamSubsList({ side, showRating, dataSaver }) {
+  const router = useRouter()
+  console.log("side", side)
   return (
     <div style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 2 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 10, paddingBottom: 12, borderBottom: "1px solid rgba(70, 82, 97, 0.12)", marginBottom: 8 }}>
@@ -167,7 +171,7 @@ function TeamSubsList({ side, showRating, dataSaver }) {
       </div>
       <h4 style={{ fontSize: 11, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 0.8, margin: "8px 0 6px" }}>Substitutes</h4>
       {side.substitutes.map((p) => (
-        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", fontSize: 13, color: "#d1d5db" }}>
+        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", fontSize: 13, color: "#d1d5db", cursor: 'pointer' }} onClick={() => router.push(`/main/players/${p.id}`)}>
           {!dataSaver && (
             <Image src={p.photo} alt="" width={26} height={26} style={{ borderRadius: "50%", objectFit: "cover", background: "rgba(255,255,255,0.06)" }} onError={(e) => { e.currentTarget.style.visibility = "hidden" }} />
           )}
@@ -180,7 +184,9 @@ function TeamSubsList({ side, showRating, dataSaver }) {
           )}
         </div>
       ))}
-      {side.coach && <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(70, 82, 97, 0.12)", fontSize: 12, color: "#8896a8" }}>Coach: {side.coach}</div>}
+      {side.coach && <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(70, 82, 97, 0.12)", fontSize: 12, color: "#8896a8", cursor: 'pointer' }} onClick={() => router.push(`/main/coaches/${side.coachId}`)}>
+        Coach: {side.coach}
+      </div>}
     </div>
   )
 }

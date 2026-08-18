@@ -7,6 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ==========================================
+//  YOUR EXISTING MODELS (UNCHANGED)
+// ==========================================
+
 model User {
   id                String    @id @default(cuid())
   name              String?
@@ -25,16 +29,16 @@ model User {
   theme             String?   @default("dark")
   lastLoginAt       DateTime?
   lastLoginIp       String?
-  matchReminders    Boolean  @default(true)
-  goalAlerts        Boolean  @default(true)
-  redCardAlerts     Boolean  @default(true)
-  halfTimeScores    Boolean  @default(false)
-  fullTimeScores    Boolean  @default(true)
-  newsAlerts        Boolean  @default(true)
-  transferAlerts    Boolean  @default(false)
-  pushEnabled       Boolean  @default(true)
-  emailEnabled      Boolean  @default(false)
-  quietHoursEnabled Boolean  @default(false)
+  matchReminders    Boolean   @default(true)
+  goalAlerts        Boolean   @default(true)
+  redCardAlerts     Boolean   @default(true)
+  halfTimeScores    Boolean   @default(false)
+  fullTimeScores    Boolean   @default(true)
+  newsAlerts        Boolean   @default(true)
+  transferAlerts    Boolean   @default(false)
+  pushEnabled       Boolean   @default(true)
+  emailEnabled      Boolean   @default(false)
+  quietHoursEnabled Boolean   @default(false)
 
   accounts      Account[]
   favorites     Favorite[]
@@ -129,7 +133,6 @@ model PlayerIndex {
   @@index([teamId])
 }
 
-// New: Google/Facebook-style login history + active sessions view
 model LoginActivity {
   id        String   @id @default(cuid())
   userId    String
@@ -143,12 +146,11 @@ model LoginActivity {
   @@index([userId, createdAt])
 }
 
-// New: Stripe-style billing lifecycle
 model Subscription {
   id                   String    @id @default(cuid())
   userId               String    @unique
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan                 String    @default("free") // "free" | "pro"
+  plan                 String    @default("free")
   status               String    @default("active")
   stripeCustomerId     String?
   stripeSubscriptionId String?
@@ -157,7 +159,6 @@ model Subscription {
   updatedAt            DateTime  @updatedAt
 }
 
-// New: Self-referential block list (only useful if you add comments/mentions/social)
 model BlockedUser {
   id        String   @id @default(cuid())
   blockerId String
@@ -174,7 +175,7 @@ model Notification {
   userId    String
   title     String
   message   String
-  type      String   @default("general") // welcome, match, goal, transfer, system
+  type      String   @default("general")
   read      Boolean  @default(false)
   link      String?
   createdAt DateTime @default(now())
@@ -183,4 +184,97 @@ model Notification {
   
   @@index([userId, createdAt])
   @@index([userId, read])
+}
+
+// ==========================================
+//  NEW / EXPANDED MODELS
+// ==========================================
+
+model CsvPlayer {
+  id        Int      @id @default(autoincrement())
+  name      String
+  nation    String
+  position  String
+  squad     String
+  comp      String
+  age       Float
+  born      Int?
+
+  // Standard stats
+  mp        Int?
+  starts    Int?
+  minutes   Int
+  n90s      Float?     @map("nineties")
+  goals     Int
+  assists   Int
+  gA        Int?        @map("g_a")
+  gPk       Int?        @map("g_pk")
+  pk        Int?
+  pkatt     Int?
+  crdY      Int?
+  crdR      Int?
+
+  // Keeper stats
+  ga        Int?
+  ga90      Float?
+  sota      Int?
+  saves     Int?
+  savePct   Float?     @map("save_pct")
+  cs        Int?
+  csPct     Float?     @map("cs_pct")
+
+  // Shooting
+  shots     Int?
+  shotsOnTarget Int?   @map("shots_on_target")
+  sotPct    Float?     @map("sot_pct")
+  sh90      Float?     @map("sh_90")
+  sot90     Float?     @map("sot_90")
+  gSh       Float?     @map("g_sh")
+  gSot      Float?     @map("g_sot")
+
+  // Playing time
+  mnMp      Int?       @map("mn_mp")
+  minPct    Float?     @map("min_pct")
+  mnStart   Int?       @map("mn_start")
+  compl     Int?
+  subs      Int?
+  mnSub     Int?       @map("mn_sub")
+  unSub     Int?
+  ppm       Float?
+  onG       Int?
+  onGa      Int?
+  plusMinus Int?       @map("plus_minus")
+  plusMinus90 Float?   @map("plus_minus_90")
+
+  // Misc / Defense
+  fls       Int?
+  fld       Int?
+  off       Int?
+  crs       Int?
+  int       Int?
+  tklW      Int?       @map("tkl_w")
+  og        Int?
+
+  season    String     @default("2025-2026")
+
+  links     PlayerLink[]
+
+  @@index([name])
+  @@index([squad])
+  @@index([comp])
+  @@map("csv_players")
+}
+
+model PlayerLink {
+  id              Int       @id @default(autoincrement())
+  apiFootballId   Int       @unique @map("api_football_id")
+  apiFootballName String    @map("api_football_name")
+  
+  csvPlayer       CsvPlayer @relation(fields: [csvPlayerId], references: [id])
+  csvPlayerId     Int       @map("csv_player_id")
+  
+  confidence      Int
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("player_links")
 }

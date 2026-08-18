@@ -13,6 +13,7 @@ import MatchStandings from "@/app/components/MatchStandings"
 import { useFormatMatchTime, useFormatDate } from "@/lib/preferences"
 import { useUser } from "@/context/userContext"
 import { MapPin, UserCheck } from "lucide-react"
+import {useRouter} from "next/navigation"
 
 const fetcher = async (url) => {
   const res = await fetch(url)
@@ -120,6 +121,7 @@ export default function MatchPage() {
   const [active, setActive] = useState("Overview")
   const { preferences } = useUser()
   const dataSaver = preferences?.dataSaver ?? false
+  const router = useRouter()
 
   const { data: matchData, isLoading: matchLoading } = useSWR(`/api/matches/${matchId}`, fetcher, {
     refreshInterval: 30000,
@@ -176,7 +178,7 @@ export default function MatchPage() {
           {/* Scoreboard */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             {/* Home */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, flex: 1, minWidth: 100 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, flex: 1, minWidth: 100, cursor: 'pointer' }} onClick={()=> router.push(`/main/team/${match.teams.home.id}`)}>
               {!dataSaver ? (
                 <Image src={match.teams.home.logo} alt={match.teams.home.name} width={64} height={64} style={{ objectFit: "contain" }} />
               ) : (
@@ -224,7 +226,7 @@ export default function MatchPage() {
             </div>
 
             {/* Away */}
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, flex: 1, minWidth: 100 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, flex: 1, minWidth: 100, cursor: 'pointer' }} onClick={() => router.push(`/main/team/${match.teams.away.id}`)}>
               {!dataSaver ? (
                 <Image src={match.teams.away.logo} alt={match.teams.away.name} width={64} height={64} style={{ objectFit: "contain" }} />
               ) : (
