@@ -36,14 +36,14 @@ function SkeletonPulse({ width, height, radius = 8, style = {} }) {
 
 function OverviewSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <div className="matchOverview">
       <style>{`@keyframes overviewShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
 
       {/* Timeline skeleton */}
-      <div style={{ background: "rgba(12,17,23,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70,82,97,0.12)", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 12 }}>
+      <div className="matchOverview__card">
         <SkeletonPulse width={120} height={16} radius={6} style={{ marginBottom: 4 }} />
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid rgba(70,82,97,0.08)" }}>
+          <div key={i} className="matchEvent">
             <SkeletonPulse width={32} height={12} radius={4} style={{ opacity: 0.5 }} />
             <SkeletonPulse width={16} height={16} radius="50%" style={{ opacity: 0.4 }} />
             <SkeletonPulse width={`${50 + (i % 3) * 15}%`} height={14} radius={6} />
@@ -52,7 +52,7 @@ function OverviewSkeleton() {
       </div>
 
       {/* Stats highlight skeleton */}
-      <div style={{ background: "rgba(12,17,23,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70,82,97,0.12)", borderRadius: 16, padding: 24, display: "flex", flexDirection: "column", gap: 20 }}>
+      <div className="matchOverview__card" style={{ padding: 24, gap: 20 }}>
         {Array.from({ length: 3 }).map((_, i) => (
           <div key={i} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -76,7 +76,7 @@ function EventIcon({ type, detail }) {
   if (type === "Card" && detail === "Second Yellow card") return <YellowCardIcon size={16} />
   if (type === "Card" && detail === "Red Card") return <RedCardIcon size={16} />
   if (type === "subst") return <SubstitutionIcon size={16} />
-  return <span style={{ color: "#8896a8" }}>•</span>
+  return <span style={{ color: "var(--text-label)" }}>•</span>
 }
 
 function LiveOrFinishedOverview({ match, matchId, isActive }) {
@@ -99,37 +99,29 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
   if (eventsLoading || statsLoading) return <OverviewSkeleton />
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="matchOverview">
       {/* Timeline */}
-      <motion.div variants={itemVariants} style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 2 }}>
-        <h3 style={{ fontSize: 12, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 10 }}>Match Events</h3>
+      <motion.div variants={itemVariants} className="matchOverview__card">
+        <h3 className="matchOverview__cardTitle">Match Events</h3>
         {events.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "32px 0", color: "#556677", fontSize: 13 }}>No events recorded yet</div>
+          <div className="matchEmpty">No events recorded yet</div>
         ) : (
           events.map((e, i) => {
             const isHome = e.team?.id === match.teams.home.id
             return (
               <div
                 key={i}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "10px 0",
-                  borderBottom: i < events.length - 1 ? "1px solid rgba(70, 82, 97, 0.08)" : "none",
-                  flexDirection: isHome ? "row" : "row-reverse",
-                  textAlign: isHome ? "left" : "right",
-                }}
+                className={`matchEvent ${isHome ? "matchEvent--home" : "matchEvent--away"}`}
               >
-                <span style={{ fontSize: 12, fontWeight: 700, color: "#556677", minWidth: 36, fontVariantNumeric: "tabular-nums" }}>
+                <span className="matchEvent__time">
                   {e.time}{e.extraTime ? `+${e.extraTime}` : ""}&apos;
                 </span>
-                <div style={{ color: "#cfcfcf", fontSize: 13, display: "flex", alignItems: "center", gap: 8, flex: 1, justifyContent: isHome ? "flex-start" : "flex-end" }}>
+                <div className={`matchEvent__content ${isHome ? "matchEvent__content--home" : "matchEvent__content--away"}`}>
                   {e.type !== "subst" && <EventIcon type={e.type} detail={e.detail} />}
                   <span style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", justifyContent: isHome ? "flex-start" : "flex-end" }}>
                     {e.player}
                     {e.type === "subst" && e.assist && (
-                      <span style={{ display: "flex", alignItems: "center", gap: 4, color: "#8896a8" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--text-label)" }}>
                         <EventIcon type={e.type} detail={e.detail} /> {e.assist}
                       </span>
                     )}
@@ -143,8 +135,8 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
 
       {/* Stats Highlight */}
       {stats && (
-        <motion.div variants={itemVariants} style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
-          <h3 style={{ fontSize: 12, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 1 }}>Key Stats</h3>
+        <motion.div variants={itemVariants} className="matchOverview__card" style={{ padding: "24px 28px", gap: 20 }}>
+          <h3 className="matchOverview__cardTitle" style={{ marginBottom: 0 }}>Key Stats</h3>
           {[
             { label: "Possession", home: stats.home.stats["Ball Possession"], away: stats.away.stats["Ball Possession"] },
             { label: "Total Shots", home: stats.home.stats["Total Shots"], away: stats.away.stats["Total Shots"] },
@@ -155,15 +147,15 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
             const total = homeNum + awayNum || 1
             const homePct = (homeNum / total) * 100
             return (
-              <div key={stat.label} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 600 }}>
-                  <span style={{ color: "#fff", minWidth: 40, textAlign: "left" }}>{stat.home ?? "-"}</span>
-                  <span style={{ color: "#8896a8", fontSize: 12, fontWeight: 500, textTransform: "capitalize" }}>{stat.label}</span>
-                  <span style={{ color: "#fff", minWidth: 40, textAlign: "right" }}>{stat.away ?? "-"}</span>
+              <div key={stat.label} className="matchStatBar" style={{ background: "none", border: "none", padding: 0 }}>
+                <div className="matchStatBar__header">
+                  <span className="matchStatBar__value matchStatBar__value--home">{stat.home ?? "-"}</span>
+                  <span className="matchStatBar__label">{stat.label}</span>
+                  <span className="matchStatBar__value matchStatBar__value--away">{stat.away ?? "-"}</span>
                 </div>
-                <div style={{ display: "flex", height: 6, borderRadius: 3, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${homePct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} style={{ background: "#3b82f6", height: "100%" }} />
-                  <motion.div initial={{ width: 0 }} animate={{ width: `${100 - homePct}%` }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }} style={{ background: "#ef4444", height: "100%" }} />
+                <div className="matchStatBar__track">
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${homePct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} className="matchStatBar__fill" style={{ background: "var(--accent-blue)" }} />
+                  <motion.div initial={{ width: 0 }} animate={{ width: `${100 - homePct}%` }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }} className="matchStatBar__fill" style={{ background: "var(--accent-red)" }} />
                 </div>
               </div>
             )
@@ -177,23 +169,12 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
 function FormBadges({ form }) {
   if (!form?.length) return null
   return (
-    <div style={{ display: "flex", gap: 6 }}>
+    <div className="matchForm">
       {form.map((f, i) => (
         <span
           key={i}
           title={`${f.opponent} ${f.score}`}
-          style={{
-            width: 26,
-            height: 26,
-            borderRadius: "50%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 11,
-            fontWeight: 700,
-            color: "#fff",
-            background: f.result === "W" ? "#22c55e" : f.result === "D" ? "#f5a623" : "#ef4444",
-          }}
+          className={`matchForm__badge ${f.result === "W" ? "matchForm__badge--win" : f.result === "D" ? "matchForm__badge--draw" : "matchForm__badge--loss"}`}
         >
           {f.result}
         </span>
@@ -223,19 +204,19 @@ function UpcomingOverview({ match, matchId, isActive }) {
   if (h2hLoading || formLoading || oddsLoading) return <OverviewSkeleton />
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="matchOverview">
       {/* Form */}
-      <motion.div variants={itemVariants} style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px" }}>
-        <h3 style={{ fontSize: 12, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>Recent Form</h3>
+      <motion.div variants={itemVariants} className="matchOverview__card" style={{ gap: 16 }}>
+        <h3 className="matchOverview__cardTitle" style={{ marginBottom: 16 }}>Recent Form</h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {!dataSaver && <Image src={match.teams.home.logo} alt={match.teams.home.name} width={22} height={22} style={{ objectFit: "contain" }} />}
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", flex: 1 }}>{match.teams.home.name}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", flex: 1 }}>{match.teams.home.name}</span>
             <FormBadges form={form?.home} />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             {!dataSaver && <Image src={match.teams.away.logo} alt={match.teams.away.name} width={22} height={22} style={{ objectFit: "contain" }} />}
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", flex: 1 }}>{match.teams.away.name}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", flex: 1 }}>{match.teams.away.name}</span>
             <FormBadges form={form?.away} />
           </div>
         </div>
@@ -243,23 +224,23 @@ function UpcomingOverview({ match, matchId, isActive }) {
 
       {/* H2H */}
       {h2h && (
-        <motion.div variants={itemVariants} style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px" }}>
-          <h3 style={{ fontSize: 12, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>Head-to-Head</h3>
-          <div style={{ display: "flex", justifyContent: "space-around", padding: "12px 0", borderBottom: "1px solid rgba(70, 82, 97, 0.12)", marginBottom: 12, fontWeight: 700, fontSize: 14 }}>
-            <span style={{ color: "#3b82f6" }}>{h2h.record.homeWins}W</span>
-            <span style={{ color: "#8896a8" }}>{h2h.record.draws}D</span>
-            <span style={{ color: "#ef4444" }}>{h2h.record.awayWins}W</span>
+        <motion.div variants={itemVariants} className="matchOverview__card" style={{ gap: 16 }}>
+          <h3 className="matchOverview__cardTitle" style={{ marginBottom: 16 }}>Head-to-Head</h3>
+          <div className="matchH2H__record">
+            <span className="matchH2H__recordHome">{h2h.record.homeWins}W</span>
+            <span className="matchH2H__recordDraw">{h2h.record.draws}D</span>
+            <span className="matchH2H__recordAway">{h2h.record.awayWins}W</span>
           </div>
           {h2h.meetings.slice(0, 3).map((m) => (
-            <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", fontSize: 13, color: "#d1d5db" }}>
+            <div key={m.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", fontSize: 13, color: "var(--text-secondary)" }}>
               <span style={{ display: "flex", alignItems: "center", gap: 8, flex: 1 }}>
                 {!dataSaver && <Image src={m.teams.home.logo} alt="" width={16} height={16} style={{ objectFit: "contain" }} />}
                 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.teams.home.name}</span>
-                <span style={{ fontWeight: 700, color: "#fff", margin: "0 4px" }}>{m.goals.home}-{m.goals.away}</span>
+                <span style={{ fontWeight: 700, color: "var(--text-primary)", margin: "0 4px" }}>{m.goals.home}-{m.goals.away}</span>
                 <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{m.teams.away.name}</span>
                 {!dataSaver && <Image src={m.teams.away.logo} alt="" width={16} height={16} style={{ objectFit: "contain" }} />}
               </span>
-              <span style={{ color: "#556677", fontSize: 11, flexShrink: 0 }}>{new Date(m.date).toLocaleDateString()}</span>
+              <span style={{ color: "var(--text-muted)", fontSize: 11, flexShrink: 0 }}>{new Date(m.date).toLocaleDateString()}</span>
             </div>
           ))}
         </motion.div>
@@ -267,31 +248,31 @@ function UpcomingOverview({ match, matchId, isActive }) {
 
       {/* Odds */}
       {(odds?.prediction || odds?.odds) && (
-        <motion.div variants={itemVariants} style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px" }}>
-          <h3 style={{ fontSize: 12, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 1, marginBottom: 16 }}>Prediction & Odds</h3>
+        <motion.div variants={itemVariants} className="matchOverview__card" style={{ gap: 16 }}>
+          <h3 className="matchOverview__cardTitle" style={{ marginBottom: 16 }}>Prediction & Odds</h3>
           {odds.prediction && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
               {[
-                { label: "Home Win", pct: odds.prediction.homeWinPercent, color: "#3b82f6" },
-                { label: "Draw", pct: odds.prediction.drawPercent, color: "#8896a8" },
-                { label: "Away Win", pct: odds.prediction.awayWinPercent, color: "#ef4444" },
+                { label: "Home Win", pct: odds.prediction.homeWinPercent, color: "var(--accent-blue)" },
+                { label: "Draw", pct: odds.prediction.drawPercent, color: "var(--text-label)" },
+                { label: "Away Win", pct: odds.prediction.awayWinPercent, color: "var(--accent-red)" },
               ].map((p) => (
-                <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <span style={{ fontSize: 12, color: "#8896a8", width: 70 }}>{p.label}</span>
-                  <div style={{ flex: 1, height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
-                    <motion.div initial={{ width: 0 }} animate={{ width: p.pct }} transition={{ duration: 0.8, ease: "easeOut" }} style={{ height: "100%", background: p.color, borderRadius: 3 }} />
+                <div key={p.label} className="matchOdds__row">
+                  <span className="matchOdds__label">{p.label}</span>
+                  <div className="matchOdds__track">
+                    <motion.div initial={{ width: 0 }} animate={{ width: p.pct }} transition={{ duration: 0.8, ease: "easeOut" }} className="matchOdds__fill" style={{ background: p.color }} />
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: "#fff", minWidth: 36, textAlign: "right" }}>{p.pct}</span>
+                  <span className="matchOdds__value">{p.pct}</span>
                 </div>
               ))}
             </div>
           )}
           {odds.odds && (
-            <div style={{ display: "flex", justifyContent: "space-around", paddingTop: 12, borderTop: "1px solid rgba(70, 82, 97, 0.12)" }}>
+            <div className="matchOdds__grid">
               {odds.odds.values.map((v) => (
-                <div key={v.value} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                  <span style={{ fontSize: 11, color: "#8896a8" }}>{v.value}</span>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{v.odd}</span>
+                <div key={v.value} className="matchOdds__item">
+                  <span className="matchOdds__itemLabel">{v.value}</span>
+                  <span className="matchOdds__itemValue">{v.odd}</span>
                 </div>
               ))}
             </div>

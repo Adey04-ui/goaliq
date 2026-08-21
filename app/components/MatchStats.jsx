@@ -38,7 +38,7 @@ function SkeletonPulse({ width, height, radius = 8, style = {} }) {
 
 function StatsSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+    <div className="matchStats">
       <style>{`@keyframes statsShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -66,6 +66,7 @@ function StatBar({ label, homeValue, awayValue, homeColor, awayColor, index }) {
   const total = homeNum + awayNum || 1
   const homePct = (homeNum / total) * 100
 
+  // Team colors are extracted per-match data, not theme colors, so these gradients stay inline.
   const homeGradient = `linear-gradient(to bottom, ${shadeColor(homeColor, 25)} 0%, ${homeColor} 50%, ${shadeColor(homeColor, -25)} 100%)`
   const awayGradient = `linear-gradient(to bottom, ${shadeColor(awayColor, 25)} 0%, ${awayColor} 50%, ${shadeColor(awayColor, -25)} 100%)`
 
@@ -74,16 +75,16 @@ function StatBar({ label, homeValue, awayValue, homeColor, awayColor, index }) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.3 }}
-      style={{ display: "flex", flexDirection: "column", gap: 8, padding: "14px 20px", background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 14 }}
+      className="matchStats__card"
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, fontWeight: 600 }}>
-        <span style={{ color: "#fff", minWidth: 36, textAlign: "left" }}>{homeValue ?? 0}</span>
-        <span style={{ color: "#8896a8", fontSize: 12, fontWeight: 500, textTransform: "capitalize" }}>{label}</span>
-        <span style={{ color: "#fff", minWidth: 36, textAlign: "right" }}>{awayValue ?? 0}</span>
+      <div className="matchStats__header">
+        <span className="matchStats__value matchStats__value--home">{homeValue ?? 0}</span>
+        <span className="matchStats__label">{label}</span>
+        <span className="matchStats__value matchStats__value--away">{awayValue ?? 0}</span>
       </div>
-      <div style={{ display: "flex", height: 8, borderRadius: 4, overflow: "hidden", background: "rgba(255,255,255,0.06)" }}>
-        <motion.div initial={{ width: 0 }} animate={{ width: `${homePct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} style={{ background: homeGradient, height: "100%" }} />
-        <motion.div initial={{ width: 0 }} animate={{ width: `${100 - homePct}%` }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }} style={{ background: awayGradient, height: "100%" }} />
+      <div className="matchStats__track">
+        <motion.div initial={{ width: 0 }} animate={{ width: `${homePct}%` }} transition={{ duration: 0.8, ease: "easeOut" }} className="matchStats__fill" style={{ background: homeGradient }} />
+        <motion.div initial={{ width: 0 }} animate={{ width: `${100 - homePct}%` }} transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }} className="matchStats__fill" style={{ background: awayGradient }} />
       </div>
     </motion.div>
   )
@@ -103,11 +104,11 @@ export default function MatchStats({ match, matchId, active }) {
   if (isLoading) return <StatsSkeleton />
 
   if (!stats) {
-    return <div style={{ textAlign: "center", padding: "40px 0", color: "#556677", fontSize: 13 }}>{data?.message || "Stats not available yet"}</div>
+    return <div className="matchEmpty">{data?.message || "Stats not available yet"}</div>
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="matchStats">
       {STAT_ORDER.filter((key) => stats.home.stats[key] !== undefined || stats.away.stats[key] !== undefined).map((key, i) => (
         <StatBar
           key={key}
