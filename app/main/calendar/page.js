@@ -65,36 +65,28 @@ function getWeekRange(dateStr) {
 function SkeletonPulse({ width, height, radius = 8, style = {} }) {
   return (
     <div
-      style={{
-        width,
-        height,
-        borderRadius: radius,
-        background: "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
-        backgroundSize: "200% 100%",
-        animation: "calendarShimmer 1.4s ease-in-out infinite",
-        ...style,
-      }}
+      className="skeleton-pulse"
+      style={{ width, height, borderRadius: radius, ...style }}
     />
   )
 }
 
 function CalendarSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <style>{`@keyframes calendarShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    <div className="calendar-skeleton">
+      <div className="calendar-skeleton__header">
         <SkeletonPulse width={140} height={20} radius={6} />
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="calendar-skeleton__nav">
           <SkeletonPulse width={32} height={32} radius={10} />
           <SkeletonPulse width={32} height={32} radius={10} />
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+      <div className="calendar-skeleton__weekdays">
         {Array.from({ length: 7 }).map((_, i) => (
           <SkeletonPulse key={i} width="100%" height={14} radius={4} style={{ opacity: 0.4 }} />
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+      <div className="calendar-skeleton__grid">
         {Array.from({ length: 35 }).map((_, i) => (
           <SkeletonPulse key={i} width="100%" height={64} radius={12} style={{ opacity: 0.25 + (i % 3) * 0.05 }} />
         ))}
@@ -105,19 +97,12 @@ function CalendarSkeleton() {
 
 function MatchListSkeleton() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <style>{`@keyframes calendarShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
+    <div className="match-list-skeleton">
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          style={{
-            height: 80,
-            borderRadius: 14,
-            background: "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
-            backgroundSize: "200% 100%",
-            animation: "calendarShimmer 1.4s infinite",
-            animationDelay: `${i * 0.1}s`,
-          }}
+          className="match-list-skeleton__item"
+          style={{ animationDelay: `${i * 0.1}s` }}
         />
       ))}
     </div>
@@ -129,23 +114,15 @@ function EmptyState({ message }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "40px 20px",
-        gap: 12,
-        color: "#556677",
-      }}
+      className="empty-state"
     >
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" opacity={0.3}>
+      <svg className="empty-state__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <line x1="3" y1="10" x2="21" y2="10" />
         <line x1="8" y1="3" x2="8" y2="7" />
         <line x1="16" y1="3" x2="16" y2="7" />
       </svg>
-      <span style={{ fontSize: 14, fontWeight: 500 }}>{message}</span>
+      <span className="empty-state__text">{message}</span>
     </motion.div>
   )
 }
@@ -229,59 +206,45 @@ export default function CalendarPage() {
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ scale: 1.01, backgroundColor: "rgba(27, 43, 62, 0.6)" }}
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
         onClick={() => router.push(`/main/matches/${match.id}`)}
-        style={{
-          background: "rgba(12, 17, 23, 0.5)",
-          backdropFilter: "blur(8px)",
-          border: "1px solid rgba(70, 82, 97, 0.12)",
-          borderRadius: 16,
-          padding: 16,
-          display: "flex",
-          flexDirection: "column",
-          gap: 12,
-          cursor: "pointer",
-          transition: "background 0.2s",
-        }}
+        className="match-card"
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div className="match-card__header">
           {isLive ? (
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#ef4444", textTransform: "uppercase", letterSpacing: 0.5, display: "flex", alignItems: "center", gap: 6 }}>
+            <span className="match-card__status match-card__status--live">
               <motion.span
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444" }}
+                className="match-card__live-dot"
               />
               {match.elapsed || 0}' LIVE
             </span>
           ) : isFinished ? (
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 0.5 }}>FT</span>
+            <span className="match-card__status match-card__status--finished">FT</span>
           ) : (
-            <span style={{ fontSize: 11, fontWeight: 700, color: "#3b82f6", textTransform: "uppercase", letterSpacing: 0.5 }}>
+            <span className="match-card__status match-card__status--upcoming">
               {new Date(match.timestamp * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit", timeZone: tz })}
             </span>
           )}
-          <span style={{ fontSize: 11, color: "#556677" }}>{match.league.name}</span>
+          <span className="match-card__league">{match.league.name}</span>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+        <div className="match-card__teams">
+          <div className="match-card__team match-card__team--home">
             {!dataSaver && (
-              <Image src={match.teams.home.logo} alt="" width={28} height={28} style={{ borderRadius: 8, objectFit: "contain", flexShrink: 0 }} />
+              <Image src={match.teams.home.logo} alt="" width={28} height={28} className="match-card__logo" />
             )}
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {match.teams.home.name}
-            </span>
+            <span className="match-card__team-name">{match.teams.home.name}</span>
           </div>
-          <span style={{ fontSize: isLive || isFinished ? 18 : 14, fontWeight: 800, color: isLive || isFinished ? "#fff" : "#556677", minWidth: 50, textAlign: "center" }}>
+          <span className={`match-card__score ${isLive || isFinished ? "match-card__score--active" : "match-card__score--upcoming"}`}>
             {isLive || isFinished ? `${match.goals.home ?? 0} - ${match.goals.away ?? 0}` : "vs"}
           </span>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, justifyContent: "flex-end" }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#fff", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textAlign: "right" }}>
-              {match.teams.away.name}
-            </span>
+          <div className="match-card__team match-card__team--away">
+            <span className="match-card__team-name">{match.teams.away.name}</span>
             {!dataSaver && (
-              <Image src={match.teams.away.logo} alt="" width={28} height={28} style={{ borderRadius: 8, objectFit: "contain", flexShrink: 0 }} />
+              <Image src={match.teams.away.logo} alt="" width={28} height={28} className="match-card__logo" />
             )}
           </div>
         </div>
@@ -296,55 +259,42 @@ export default function CalendarPage() {
     const todayFlag = cell.date ? isToday(cell.date) : false
     const hasData = info && info.total > 0
 
+    const cellClasses = [
+      "calendar__cell",
+      `calendar__cell--${cell.type}`,
+      isSelected && "calendar__cell--selected",
+      todayFlag && "calendar__cell--today",
+    ].filter(Boolean).join(" ")
+
     return (
       <motion.div
         whileHover={cell.date ? { scale: 1.03 } : {}}
         whileTap={cell.date ? { scale: 0.97 } : {}}
         onClick={() => cell.date && setSelectedDate(cell.date)}
-        style={{
-          aspectRatio: 1,
-          borderRadius: 12,
-          padding: 8,
-          background: isSelected ? "rgba(59, 130, 246, 0.12)" : todayFlag ? "rgba(255, 255, 255, 0.04)" : cell.type === "current" ? "rgba(255, 255, 255, 0.02)" : "transparent",
-          border: isSelected ? "1px solid rgba(59, 130, 246, 0.4)" : todayFlag ? "1px solid rgba(70, 82, 97, 0.2)" : "1px solid transparent",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          cursor: cell.date ? "pointer" : "default",
-          opacity: cell.type === "current" ? 1 : 0.25,
-          position: "relative",
-        }}
+        className={cellClasses}
       >
-        <span style={{ fontSize: 13, fontWeight: isSelected || todayFlag ? 700 : 600, color: isSelected ? "#3b82f6" : todayFlag ? "#fff" : "#8896a8" }}>
-          {cell.day}
-        </span>
+        <span className="calendar__cell-day">{cell.day}</span>
 
         {hasData && (
-          <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          <div className="calendar__cell-dots">
             {Array.from({ length: Math.min(info.total, 8) }).map((_, i) => (
               <div
                 key={i}
-                style={{
-                  width: 4,
-                  height: 4,
-                  borderRadius: "50%",
-                  background:
-                    i < info.live
-                      ? "#ef4444"
-                      : i < info.live + info.finished
-                      ? "#a855f7"
-                      : "#3b82f6",
-                  opacity: i < info.live ? 1 : 0.7,
-                }}
+                className={`calendar__cell-dot ${
+                  i < info.live
+                    ? "calendar__cell-dot--live"
+                    : i < info.live + info.finished
+                    ? "calendar__cell-dot--finished"
+                    : "calendar__cell-dot--upcoming"
+                }`}
+                style={{ opacity: i < info.live ? 1 : 0.7 }}
               />
             ))}
-            {info.total > 8 && <span style={{ fontSize: 8, color: "#556677", marginLeft: 2 }}>+</span>}
+            {info.total > 8 && <span className="calendar__cell-more">+</span>}
           </div>
         )}
 
-        {info?.hasLive && (
-          <div style={{ position: "absolute", top: 6, right: 6, width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px rgba(34, 197, 94, 0.6)" }} />
-        )}
+        {info?.hasLive && <div className="calendar__cell-live-indicator" />}
       </motion.div>
     )
   }
@@ -352,13 +302,19 @@ export default function CalendarPage() {
   /* ─── Week Row ─── */
   function WeekRow() {
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
+      <div className="week-row">
+        <div className="week-row__grid">
           {weekDays.map((date) => {
             const info = dayMap.get(date)
             const d = new Date(date + "T00:00:00")
             const isSelected = date === selectedDate
             const todayFlag = isToday(date)
+
+            const btnClasses = [
+              "week-row__day",
+              isSelected && "week-row__day--selected",
+              todayFlag && "week-row__day--today",
+            ].filter(Boolean).join(" ")
 
             return (
               <motion.button
@@ -366,46 +322,29 @@ export default function CalendarPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedDate(date)}
-                style={{
-                  background: isSelected ? "rgba(59, 130, 246, 0.15)" : todayFlag ? "rgba(255, 255, 255, 0.05)" : "rgba(255, 255, 255, 0.02)",
-                  border: isSelected ? "1px solid rgba(59, 130, 246, 0.4)" : "1px solid rgba(70, 82, 97, 0.1)",
-                  borderRadius: 14,
-                  padding: "12px 8px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: "pointer",
-                  color: isSelected ? "#3b82f6" : todayFlag ? "#fff" : "#8896a8",
-                }}
+                className={btnClasses}
               >
-                <span style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase" }}>
+                <span className="week-row__day-name">
                   {WEEKDAYS[d.getDay() === 0 ? 6 : d.getDay() - 1]}
                 </span>
-                <span style={{ fontSize: 18, fontWeight: 800 }}>{d.getDate()}</span>
+                <span className="week-row__day-number">{d.getDate()}</span>
                 {info && info.total > 0 && (
-                  <div style={{ display: "flex", gap: 2 }}>
+                  <div className="week-row__day-dots">
                     {Array.from({ length: Math.min(info.total, 5) }).map((_, i) => (
                       <div
                         key={i}
-                        style={{
-                          width: 3,
-                          height: 3,
-                          borderRadius: "50%",
-                          background:
-                            i < info.live
-                              ? "#ef4444"
-                              : i < info.live + info.finished
-                              ? "#a855f7"
-                              : "#3b82f6",
-                        }}
+                        className={`week-row__day-dot ${
+                          i < info.live
+                            ? "week-row__day-dot--live"
+                            : i < info.live + info.finished
+                            ? "week-row__day-dot--finished"
+                            : "week-row__day-dot--upcoming"
+                        }`}
                       />
                     ))}
                   </div>
                 )}
-                {info?.hasLive && (
-                  <div style={{ width: 5, height: 5, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 4px rgba(34, 197, 94, 0.5)" }} />
-                )}
+                {info?.hasLive && <div className="week-row__day-live-indicator" />}
               </motion.button>
             )
           })}
@@ -421,39 +360,31 @@ export default function CalendarPage() {
     const upcoming = selectedDayInfo?.upcoming || 0
 
     return (
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div className="day-panel">
         <motion.div
           key={selectedDate}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          style={{
-            background: "rgba(12, 17, 23, 0.7)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(70, 82, 97, 0.18)",
-            borderRadius: 20,
-            padding: 20,
-          }}
+          className="day-panel__card"
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+          <div className="day-panel__header">
             <div>
-              <p style={{ margin: "0 0 4px", fontSize: 11, fontWeight: 700, color: "#3b82f6", textTransform: "uppercase", letterSpacing: 0.8 }}>
-                {formatDateLabel(selectedDate)}
-              </p>
-              <h3 style={{ margin: 0, fontSize: 24, fontWeight: 800, color: "#fff" }}>
+              <p className="day-panel__date-label">{formatDateLabel(selectedDate)}</p>
+              <h3 className="day-panel__match-count">
                 {total} Match{total !== 1 ? "es" : ""}
               </h3>
             </div>
-            <div style={{ width: 40, height: 40, borderRadius: 12, background: "rgba(59, 130, 246, 0.12)", border: "1px solid rgba(59, 130, 246, 0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round">
+            <div className="day-panel__icon-wrap">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <circle cx="12" cy="12" r="10" />
                 <polyline points="12 6 12 12 16 14" />
               </svg>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            {live > 0 && <span style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", fontSize: 11, fontWeight: 700 }}>{live} Live</span>}
-            {upcoming > 0 && <span style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(59, 130, 246, 0.1)", color: "#3b82f6", fontSize: 11, fontWeight: 700 }}>{upcoming} Upcoming</span>}
-            {selectedDayInfo?.finished > 0 && <span style={{ padding: "4px 10px", borderRadius: 8, background: "rgba(168, 85, 247, 0.1)", color: "#a855f7", fontSize: 11, fontWeight: 700 }}>{selectedDayInfo.finished} Finished</span>}
+          <div className="day-panel__badges">
+            {live > 0 && <span className="day-panel__badge day-panel__badge--live">{live} Live</span>}
+            {upcoming > 0 && <span className="day-panel__badge day-panel__badge--upcoming">{upcoming} Upcoming</span>}
+            {selectedDayInfo?.finished > 0 && <span className="day-panel__badge day-panel__badge--finished">{selectedDayInfo.finished} Finished</span>}
           </div>
         </motion.div>
 
@@ -463,7 +394,7 @@ export default function CalendarPage() {
           ) : !hasDayMatches ? (
             <EmptyState key="empty" message="No favourite matches on this day" />
           ) : (
-            <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="day-panel__list">
               {dayMatches.map((group) => group.matches.map((match) => <MatchCard key={match.id} match={match} />))}
             </motion.div>
           )}
@@ -475,12 +406,17 @@ export default function CalendarPage() {
   /* ─── Render ─── */
   return (
     <div className="parent-container">
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+      <div className="calendar-page">
         {/* Top Bar */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59, 130, 246, 0.15)", border: "1px solid rgba(59, 130, 246, 0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="calendar-page__top-bar"
+        >
+          <div className="calendar-page__title-block">
+            <div className="calendar-page__icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <rect x="3" y="5" width="18" height="16" rx="2" />
                 <line x1="3" y1="10" x2="21" y2="10" />
                 <line x1="8" y1="3" x2="8" y2="7" />
@@ -488,31 +424,20 @@ export default function CalendarPage() {
               </svg>
             </div>
             <div>
-              <h1 style={{ margin: 0, fontSize: 20, fontWeight: 800, letterSpacing: -0.3, color: "#fff" }}>Match Calendar</h1>
-              <p style={{ margin: "2px 0 0", fontSize: 12, color: "#556677" }}>
+              <h1 className="calendar-page__title">Match Calendar</h1>
+              <p className="calendar-page__subtitle">
                 {MONTH_NAMES[currentMonth.month - 1]} {currentMonth.year}
                 {selectedDayInfo ? ` · ${selectedDayInfo.total} fixtures` : ""}
               </p>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
+          <div className="calendar-page__view-toggle">
             {["month", "week"].map((v) => (
               <button
                 key={v}
                 onClick={() => setView(v)}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 10,
-                  border: view === v ? "none" : "1px solid rgba(70, 82, 97, 0.3)",
-                  background: view === v ? "#1b3a5c" : "rgba(27, 43, 62, 0.5)",
-                  color: view === v ? "#fff" : "#8896a8",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  textTransform: "capitalize",
-                  transition: "all 0.2s",
-                }}
+                className={`calendar-page__view-btn ${view === v ? "calendar-page__view-btn--active" : ""}`}
               >
                 {v}
               </button>
@@ -521,45 +446,37 @@ export default function CalendarPage() {
         </motion.div>
 
         {/* Main Grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20 }}>
+        <div className="calendar-page__main-grid">
           {/* LEFT: Calendar */}
           <motion.div
+            className="calendar__container"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.1 }}
-            style={{
-              background: "rgba(12, 17, 23, 0.7)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(70, 82, 97, 0.18)",
-              borderRadius: 20,
-              padding: 24,
-              boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
-            }}
           >
             {calendarLoading ? (
               <CalendarSkeleton />
             ) : (
               <>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <div className="calendar__nav">
                   <motion.button
-                    whileHover={{ scale: 1.08, backgroundColor: "rgba(255,255,255,0.08)" }}
+                    whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.92 }}
                     onClick={() => (view === "month" ? shiftMonth(-1) : shiftWeek(-1))}
-                    style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "rgba(255,255,255,0.04)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    className="calendar__nav-btn"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="15 18 9 12 15 6" /></svg>
                   </motion.button>
 
-                  <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#fff" }}>
+                  <h2 className="calendar__month-title">
                     {view === "month" ? `${MONTH_NAMES[currentMonth.month - 1]} ${currentMonth.year}` : `Week of ${formatDateLabel(weekDays[0])}`}
                   </h2>
 
                   <motion.button
-                    whileHover={{ scale: 1.08, backgroundColor: "rgba(255,255,255,0.08)" }}
+                    whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.92 }}
                     onClick={() => (view === "month" ? shiftMonth(1) : shiftWeek(1))}
-                    style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "rgba(255,255,255,0.04)", color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                    className="calendar__nav-btn"
                   >
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="9 18 15 12 9 6" /></svg>
                   </motion.button>
@@ -567,14 +484,23 @@ export default function CalendarPage() {
 
                 {view === "month" ? (
                   <>
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8, marginBottom: 8 }}>
+                    <div className="calendar__weekdays">
                       {WEEKDAYS.map((w) => (
-                        <div key={w} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "#556677", textTransform: "uppercase", letterSpacing: 0.5 }}>{w}</div>
+                        <div key={w} className="calendar__weekday">{w}</div>
                       ))}
                     </div>
-                    <motion.div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }} initial="hidden" animate="show" variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.01 } } }}>
+                    <motion.div
+                      className="calendar__grid"
+                      initial="hidden"
+                      animate="show"
+                      variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.01 } } }}
+                    >
                       {grid.map((cell, i) => (
-                        <motion.div key={`${cell.type}-${cell.day}-${i}`} variants={{ hidden: { opacity: 0, scale: 0.9 }, show: { opacity: 1, scale: 1 } }}>
+                        <motion.div
+                          key={`${cell.type}-${cell.day}-${i}`}
+                          variants={{ hidden: { opacity: 0, scale: 0.9 }, show: { opacity: 1, scale: 1 } }}
+                          className="calendar__cell-wrapper"
+                        >
                           <DayCell cell={cell} />
                         </motion.div>
                       ))}
@@ -584,18 +510,30 @@ export default function CalendarPage() {
                   <WeekRow />
                 )}
 
-                <div style={{ display: "flex", gap: 16, marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(70, 82, 97, 0.12)", flexWrap: "wrap" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#3b82f6" }} /><span style={{ fontSize: 11, color: "#556677" }}>Upcoming</span></div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#a855f7" }} /><span style={{ fontSize: 11, color: "#556677" }}>Finished</span></div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#ef4444" }} /><span style={{ fontSize: 11, color: "#556677" }}>Live</span></div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 4px rgba(34,197,94,0.5)" }} /><span style={{ fontSize: 11, color: "#556677" }}>Live today</span></div>
+                <div className="calendar-legend">
+                  <div className="calendar-legend__item">
+                    <div className="calendar-legend__dot calendar-legend__dot--upcoming" />
+                    <span>Upcoming</span>
+                  </div>
+                  <div className="calendar-legend__item">
+                    <div className="calendar-legend__dot calendar-legend__dot--finished" />
+                    <span>Finished</span>
+                  </div>
+                  <div className="calendar-legend__item">
+                    <div className="calendar-legend__dot calendar-legend__dot--live" />
+                    <span>Live</span>
+                  </div>
+                  <div className="calendar-legend__item">
+                    <div className="calendar-legend__dot calendar-legend__dot--live-today" />
+                    <span>Live today</span>
+                  </div>
                 </div>
               </>
             )}
           </motion.div>
 
           {/* RIGHT: Selected Day Panel */}
-          <div style={{ minWidth: 0 }}><DayPanel /></div>
+          <div className="day-panel__wrapper"><DayPanel /></div>
         </div>
       </div>
     </div>

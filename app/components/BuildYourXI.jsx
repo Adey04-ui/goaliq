@@ -79,7 +79,6 @@ export default function BuildYourXI({
     <div
       className={`createYourXI ${className}`}
       style={{
-        background: "#0c1117",
         borderRadius: 16,
         padding: 20,
         color: "#fff",
@@ -114,6 +113,7 @@ export default function BuildYourXI({
               fontSize: 18,
               fontWeight: 700,
             }}
+            className="text-primary"
           >
             {title}
           </h3>

@@ -32,7 +32,6 @@ export default function AIAssistant({
     <div
       className={`aiAssistant ${className}`}
       style={{
-        background: "#0c1117",
         borderRadius: 16,
         padding: 20,
         color: "#fff",
@@ -44,6 +43,7 @@ export default function AIAssistant({
           fontSize: 18,
           fontWeight: 700,
         }}
+        className="text-primary"
       >
         {title}
       </h3>

@@ -166,8 +166,8 @@ function TeamSubsList({ side, showRating, dataSaver }) {
     <div style={{ backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 2 }} className="matchLineups__subs">
       <div style={{ display: "flex", alignItems: "center", gap: 10, paddingBottom: 12, borderBottom: "1px solid rgba(70, 82, 97, 0.12)", marginBottom: 8 }}>
         {!dataSaver && <Image src={side.team.logo} alt={side.team.name} width={22} height={22} style={{ objectFit: "contain" }} />}
-        <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>{side.team.name}</span>
-        <span style={{ marginLeft: "auto", fontSize: 12, color: "#8896a8", background: "rgba(27, 43, 62, 0.6)", padding: "3px 10px", borderRadius: 8 }}>{side.formation}</span>
+        <span className="text-primary" style={{ fontSize: 14, fontWeight: 700 }}>{side.team.name}</span>
+        <span className="text-primary" style={{ marginLeft: "auto", fontSize: 12, color: "#8896a8", background: "rgba(27, 43, 62, 0.6)", padding: "3px 10px", borderRadius: 8 }}>{side.formation}</span>
       </div>
       <h4 style={{ fontSize: 11, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 0.8, margin: "8px 0 6px" }}>Substitutes</h4>
       {side.substitutes.map((p) => (
@@ -176,7 +176,7 @@ function TeamSubsList({ side, showRating, dataSaver }) {
             <Image src={p.photo} alt="" width={26} height={26} style={{ borderRadius: "50%", objectFit: "cover", background: "rgba(255,255,255,0.06)" }} onError={(e) => { e.currentTarget.style.visibility = "hidden" }} />
           )}
           <span style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(27, 43, 62, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{p.number}</span>
-          <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
+          <span className="text-primary" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
           <span style={{ fontSize: 11, color: "#556677", marginLeft: "auto", paddingRight: 8 }}>{p.position}</span>
           {p.subOnMinute && <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "#22c55e", background: "rgba(34,197,94,0.1)", padding: "2px 8px", borderRadius: 6 }}><ArrowLeft size={12} />{p.subOnMinute}&apos;</span>}
           {showRating && p.rating !== null && (

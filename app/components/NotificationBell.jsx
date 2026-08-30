@@ -86,12 +86,11 @@ export default function NotificationBell() {
           position: "relative",
           background: "transparent",
           border: "none",
-          color: "#fff",
           cursor: "pointer",
           padding: 8,
         }}
       >
-        <Bell size={20} />
+        <Bell size={20} className="notification-bell" />
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.span

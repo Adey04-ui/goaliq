@@ -130,9 +130,9 @@ export default function LeaguesComponent() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="controlBar__leaguesComponent"
         style={{
           width: "100%",
-          background: "rgba(12, 17, 23, 0.7)",
           backdropFilter: "blur(12px)",
           border: "1px solid rgba(70, 82, 97, 0.18)",
           borderRadius: 20,
@@ -158,12 +158,13 @@ export default function LeaguesComponent() {
                 layout
                 key={item}
                 onClick={() => setFilter(item)}
+                className="text-primary"
                 style={{
                   padding: "7px 16px",
                   borderRadius: 10,
                   border: "none",
                   background: active ? "#1b3a5c" : "rgba(27, 43, 62, 0.4)",
-                  color: active ? "#fff" : "#8896a8",
+                  color: active && "#fff",
                   fontSize: 13,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -211,11 +212,11 @@ export default function LeaguesComponent() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search leagues..."
+              className="text-primary"
               style={{
                 background: "transparent",
                 border: "none",
                 outline: "none",
-                color: "#fff",
                 fontSize: 13,
                 width: "100%",
               }}
@@ -244,17 +245,16 @@ export default function LeaguesComponent() {
                 >
                   <div style={{ display: "flex", gap: 6, fontSize: 13, alignItems: "center" }}>
                     <span style={{ color: "#8896a8" }}>season</span>
-                    <span style={{ fontWeight: 600 }}>{selected}</span>
+                    <span className="text-primary" style={{ fontWeight: 600 }}>{selected}</span>
                   </div>
                   <ChevronDown size={16} color="#8896a8" />
                 </button>
               </DropdownMenu.Trigger>
               <DropdownMenu.Portal>
                 <DropdownMenu.Content
-                  className="dropdown-container"
+                  className="dropdown-container bg-card text-primary"
                   sideOffset={8}
                   style={{
-                    background: "#111",
                     border: "1px solid #333",
                     borderRadius: 12,
                     padding: 6,
@@ -266,11 +266,11 @@ export default function LeaguesComponent() {
                     <DropdownMenu.Item
                       key={season}
                       onSelect={() => setSelected(season)}
+                      className="text-primary"
                       style={{
                         padding: "8px 12px",
                         borderRadius: 8,
                         fontSize: 13,
-                        color: "#fff",
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",

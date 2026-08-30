@@ -82,8 +82,8 @@ function Topbar() {
       <div className="header-middle" ref={wrapperRef}>
         <div className={`search-box ${open && query.length >= 2 ? 'search-box--active' : ''}`}>
           <svg className="search-icon" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2" fill="none" />
-            <line x1="16" y1="16" x2="21" y2="21" stroke="white" strokeWidth="2" />
+            <circle cx="11" cy="11" r="7" strokeWidth="2" fill="none" className="search-icon-outline" />
+            <line x1="16" y1="16" x2="21" y2="21" className="search-icon-outline" strokeWidth="2" />
           </svg>
           <input
             type="text"
@@ -201,7 +201,7 @@ function Topbar() {
         {status === 'authenticated' && (
           <>
             <div className="position-relative-container">
-              <NotificationBell />
+              <NotificationBell className="notification-bell" color="#000" />
             </div>
             <div className="position-relative-container active">
               <ProfileDropdown
