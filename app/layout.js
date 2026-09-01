@@ -9,6 +9,7 @@ import GetFavourites from "./components/GetFavourites";
 import { XIProvider } from "@/context/xiContext";
 import ThemeWrapper from "./components/ThemeWrapper";
 import { SidebarProvider } from "@/context/sidebarContext"
+import { ThemeProvider } from "@/context/themeContext"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,16 +31,18 @@ export default function RootLayout({ children }) {
           <SidebarProvider>
             <Providers>
               <UserProvider>
-                <FavoritesProvider>
-                  <XIProvider>
-                    <ThemeWrapper>
-                      <ToastProvider>
-                        <GetFavourites />
-                        {children}
-                      </ToastProvider>
-                    </ThemeWrapper>
-                  </XIProvider>
-                </FavoritesProvider>
+                <ThemeProvider>
+                  <FavoritesProvider>
+                    <XIProvider>
+                      <ThemeWrapper>
+                        <ToastProvider>
+                          <GetFavourites />
+                          {children}
+                        </ToastProvider>
+                      </ThemeWrapper>
+                    </XIProvider>
+                  </FavoritesProvider>
+                </ThemeProvider>
               </UserProvider>
             </Providers>
           </SidebarProvider>

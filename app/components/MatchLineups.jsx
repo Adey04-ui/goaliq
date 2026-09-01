@@ -16,7 +16,7 @@ function SkeletonPulse({ width, height, radius = 8, style = {} }) {
         width,
         height,
         borderRadius: radius,
-        background: "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
+        background: "linear-gradient(90deg, var(--skeleton-start) 25%, var(--skeleton-mid) 50%, var(--skeleton-start) 75%)",
         backgroundSize: "200% 100%",
         animation: "lineupShimmer 1.4s ease-in-out infinite",
         ...style,
@@ -30,7 +30,7 @@ function LineupsSkeleton() {
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <style>{`@keyframes lineupShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }`}</style>
       {/* Pitch skeleton */}
-      <div style={{ background: "rgba(12,17,23,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70,82,97,0.12)", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
+      <div style={{ background: "var(--bg-glass)", backdropFilter: "blur(8px)", border: "1px solid var(--border-glass)", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 12, alignItems: "center" }}>
         <SkeletonPulse width={140} height={14} radius={6} style={{ opacity: 0.5, alignSelf: "flex-start" }} />
         <SkeletonPulse width="100%" height={320} radius={12} style={{ maxWidth: 500, opacity: 0.3 }} />
         <SkeletonPulse width={140} height={14} radius={6} style={{ opacity: 0.5, alignSelf: "flex-end" }} />
@@ -38,7 +38,7 @@ function LineupsSkeleton() {
       {/* Subs skeleton */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         {Array.from({ length: 2 }).map((_, ti) => (
-          <div key={ti} style={{ background: "rgba(12,17,23,0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70,82,97,0.12)", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
+          <div key={ti} style={{ background: "var(--bg-glass)", backdropFilter: "blur(8px)", border: "1px solid var(--border-glass)", borderRadius: 16, padding: 20, display: "flex", flexDirection: "column", gap: 10 }}>
             <SkeletonPulse width={120} height={16} radius={6} style={{ marginBottom: 6 }} />
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -163,28 +163,28 @@ function TeamSubsList({ side, showRating, dataSaver }) {
   const router = useRouter()
   console.log("side", side)
   return (
-    <div style={{ backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 2 }} className="matchLineups__subs">
-      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingBottom: 12, borderBottom: "1px solid rgba(70, 82, 97, 0.12)", marginBottom: 8 }}>
+    <div style={{ backdropFilter: "blur(8px)", border: "1px solid var(--border-glass)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 2 }} className="matchLineups__subs">
+      <div style={{ display: "flex", alignItems: "center", gap: 10, paddingBottom: 12, borderBottom: "1px solid var(--border-glass)", marginBottom: 8 }}>
         {!dataSaver && <Image src={side.team.logo} alt={side.team.name} width={22} height={22} style={{ objectFit: "contain" }} />}
         <span className="text-primary" style={{ fontSize: 14, fontWeight: 700 }}>{side.team.name}</span>
-        <span className="text-primary" style={{ marginLeft: "auto", fontSize: 12, color: "#8896a8", background: "rgba(27, 43, 62, 0.6)", padding: "3px 10px", borderRadius: 8 }}>{side.formation}</span>
+        <span className="text-primary" style={{ marginLeft: "auto", fontSize: 12, color: "var(--text-label)", background: "var(--bg-hover)", padding: "3px 10px", borderRadius: 8 }}>{side.formation}</span>
       </div>
-      <h4 style={{ fontSize: 11, fontWeight: 700, color: "#8896a8", textTransform: "uppercase", letterSpacing: 0.8, margin: "8px 0 6px" }}>Substitutes</h4>
+      <h4 style={{ fontSize: 11, fontWeight: 700, color: "var(--text-label)", textTransform: "uppercase", letterSpacing: 0.8, margin: "8px 0 6px" }}>Substitutes</h4>
       {side.substitutes.map((p) => (
-        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", fontSize: 13, color: "#d1d5db", cursor: 'pointer' }} onClick={() => router.push(`/main/players/${p.id}`)}>
+        <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "7px 0", fontSize: 13, color: "var(--text-secondary)", cursor: 'pointer' }} onClick={() => router.push(`/main/players/${p.id}`)}>
           {!dataSaver && (
             <Image src={p.photo} alt="" width={26} height={26} style={{ borderRadius: "50%", objectFit: "cover", background: "rgba(255,255,255,0.06)" }} onError={(e) => { e.currentTarget.style.visibility = "hidden" }} />
           )}
-          <span style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(27, 43, 62, 0.6)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{p.number}</span>
+          <span style={{ width: 24, height: 24, borderRadius: "50%", background: "var(--bg-hover)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "var(--text-primary)", flexShrink: 0 }}>{p.number}</span>
           <span className="text-primary" style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.name}</span>
-          <span style={{ fontSize: 11, color: "#556677", marginLeft: "auto", paddingRight: 8 }}>{p.position}</span>
+          <span style={{ fontSize: 11, color: "var(--text-muted)", marginLeft: "auto", paddingRight: 8 }}>{p.position}</span>
           {p.subOnMinute && <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 11, color: "#22c55e", background: "rgba(34,197,94,0.1)", padding: "2px 8px", borderRadius: 6 }}><ArrowLeft size={12} />{p.subOnMinute}&apos;</span>}
           {showRating && p.rating !== null && (
             <span style={{ fontSize: 11, fontWeight: 700, color: "#fff", background: ratingColor(p.rating), padding: "2px 8px", borderRadius: 6, minWidth: 32, textAlign: "center" }}>{p.rating?.toFixed(1)}</span>
           )}
         </div>
       ))}
-      {side.coach && <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid rgba(70, 82, 97, 0.12)", fontSize: 12, color: "#8896a8", cursor: 'pointer' }} onClick={() => router.push(`/main/coaches/${side.coachId}`)}>
+      {side.coach && <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border-glass)", fontSize: 12, color: "var(--text-label)", cursor: 'pointer' }} onClick={() => router.push(`/main/coaches/${side.coachId}`)}>
         Coach: {side.coach}
       </div>}
     </div>
@@ -205,7 +205,7 @@ export default function MatchLineups({ match, matchId, active }) {
   const events = eventsData?.data || []
 
   if (isLoading) return <LineupsSkeleton />
-  if (!lineups) return <div style={{ textAlign: "center", padding: "40px 0", color: "#556677", fontSize: 13 }}>{data?.message || "Lineups not available"}</div>
+  if (!lineups) return <div style={{ textAlign: "center", padding: "40px 0", color: "var(--text-muted)", fontSize: 13 }}>{data?.message || "Lineups not available"}</div>
 
   const rawHomeSide = lineups.find((s) => s.team.id === match.teams.home.id)
   const rawAwaySide = lineups.find((s) => s.team.id === match.teams.away.id)
@@ -218,13 +218,13 @@ export default function MatchLineups({ match, matchId, active }) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ background: "rgba(12, 17, 23, 0.5)", backdropFilter: "blur(8px)", border: "1px solid rgba(70, 82, 97, 0.12)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#d1d5db" }}>
+      <div style={{ background: "var(--bg-glass-inverse)", backdropFilter: "blur(8px)", border: "1px solid var(--border-glass)", borderRadius: 16, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)" }}>
           {!dataSaver && <Image src={awaySide.team.logo} alt={awaySide.team.name} width={18} height={18} style={{ objectFit: "contain" }} />}
           <span>{awaySide.team.name} · {awaySide.formation}</span>
         </div>
         <Pitch homeSide={homeSide} awaySide={awaySide} showRating={showRating} dataSaver={dataSaver} />
-        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "#d1d5db", justifyContent: "flex-end" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", justifyContent: "flex-end" }}>
           {!dataSaver && <Image src={homeSide.team.logo} alt={homeSide.team.name} width={18} height={18} style={{ objectFit: "contain" }} />}
           <span>{homeSide.team.name} · {homeSide.formation}</span>
         </div>

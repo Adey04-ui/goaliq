@@ -88,9 +88,10 @@ export default function NotificationBell() {
           border: "none",
           cursor: "pointer",
           padding: 8,
+          color: "var(--text-primary)",
         }}
       >
-        <Bell size={20} className="notification-bell" />
+        <Bell size={20} />
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.span
@@ -101,7 +102,7 @@ export default function NotificationBell() {
                 position: "absolute",
                 top: 2,
                 right: 2,
-                background: "#ef4444",
+                background: "var(--accent-red)",
                 color: "#fff",
                 fontSize: 10,
                 fontWeight: 700,
@@ -111,7 +112,7 @@ export default function NotificationBell() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                border: "2px solid #0a0a0a",
+                border: "2px solid var(--bg-primary)",
               }}
             >
               {unreadCount > 9 ? "9+" : unreadCount}
@@ -133,7 +134,7 @@ export default function NotificationBell() {
               right: 0,
               width: 360,
               maxHeight: 480,
-              background: "#0c1117",
+              background: "var(--bg-primary)",
               borderRadius: 16,
               boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
               zIndex: 100,
@@ -149,17 +150,19 @@ export default function NotificationBell() {
                 justifyContent: "space-between",
                 alignItems: "center",
                 padding: "16px 20px",
-                borderBottom: "1px solid #222",
+                borderBottom: "1px solid var(--border-color)",
               }}
             >
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600 }}>Notifications</h3>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>
+                Notifications
+              </h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
                   style={{
                     background: "transparent",
                     border: "none",
-                    color: "#3b82f6",
+                    color: "var(--accent-blue)",
                     fontSize: 13,
                     cursor: "pointer",
                     display: "flex",
@@ -176,11 +179,11 @@ export default function NotificationBell() {
             {/* List */}
             <div style={{ overflowY: "auto", flex: 1 }}>
               {loading && notifications.length === 0 ? (
-                <div style={{ padding: 40, textAlign: "center", color: "#888", fontSize: 14 }}>
+                <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
                   Loading...
                 </div>
               ) : notifications.length === 0 ? (
-                <div style={{ padding: 40, textAlign: "center", color: "#888", fontSize: 14 }}>
+                <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)", fontSize: 14 }}>
                   No notifications yet
                 </div>
               ) : (
@@ -190,16 +193,16 @@ export default function NotificationBell() {
                     onClick={() => !n.read && markAsRead(n.id)}
                     style={{
                       padding: "14px 20px",
-                      borderBottom: "1px solid #1a1a1a",
+                      borderBottom: "1px solid var(--border-subtle)",
                       cursor: "pointer",
-                      background: n.read ? "transparent" : "rgba(59,130,246,0.06)",
+                      background: n.read ? "transparent" : "var(--bg-highlight)",
                       display: "flex",
                       gap: 12,
                       alignItems: "flex-start",
                       transition: "background 0.15s",
                     }}
                     onMouseEnter={(e) => {
-                      if (n.read) e.currentTarget.style.background = "rgba(255,255,255,0.02)"
+                      if (n.read) e.currentTarget.style.background = "var(--bg-hover)"
                     }}
                     onMouseLeave={(e) => {
                       if (n.read) e.currentTarget.style.background = "transparent"
@@ -210,7 +213,7 @@ export default function NotificationBell() {
                         style={{
                           fontSize: 14,
                           fontWeight: n.read ? 400 : 600,
-                          color: "#fff",
+                          color: "var(--text-primary)",
                           marginBottom: 4,
                           display: "flex",
                           alignItems: "center",
@@ -223,7 +226,7 @@ export default function NotificationBell() {
                               width: 6,
                               height: 6,
                               borderRadius: "50%",
-                              background: "#3b82f6",
+                              background: "var(--accent-blue)",
                               flexShrink: 0,
                             }}
                           />
@@ -233,14 +236,14 @@ export default function NotificationBell() {
                       <div
                         style={{
                           fontSize: 13,
-                          color: "#888",
+                          color: "var(--text-muted)",
                           lineHeight: 1.4,
                           marginBottom: 6,
                         }}
                       >
                         {n.message}
                       </div>
-                      <div style={{ fontSize: 12, color: "#555" }}>{timeAgo(n.createdAt)}</div>
+                      <div style={{ fontSize: 12, color: "var(--text-dim)" }}>{timeAgo(n.createdAt)}</div>
                     </div>
                     <button
                       onClick={(e) => {
@@ -250,7 +253,7 @@ export default function NotificationBell() {
                       style={{
                         background: "transparent",
                         border: "none",
-                        color: "#555",
+                        color: "var(--text-dim)",
                         cursor: "pointer",
                         padding: 4,
                         flexShrink: 0,
@@ -267,14 +270,14 @@ export default function NotificationBell() {
             <div
               style={{
                 padding: "12px 20px",
-                borderTop: "1px solid #222",
+                borderTop: "1px solid var(--border-color)",
                 textAlign: "center",
               }}
             >
               <Link
                 href="/main/notifications"
                 onClick={() => setOpen(false)}
-                style={{ color: "#888", fontSize: 13, textDecoration: "none" }}
+                style={{ color: "var(--text-muted)", fontSize: 13, textDecoration: "none" }}
               >
                 View all notifications
               </Link>

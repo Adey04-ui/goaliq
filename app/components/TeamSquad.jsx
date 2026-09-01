@@ -12,7 +12,6 @@ const fetcher = async (url) => {
 const POSITION_ORDER = ["Goalkeeper", "Defender", "Midfielder", "Attacker"]
 
 export default function TeamSquad({ teamId, active }) {
-  // Only fires when this tab is actually active — zero wasted requests
   const { data, isLoading } = useSWR(
     active === "Squad" ? `/api/teams/${teamId}/squad` : null,
     fetcher,
@@ -47,7 +46,7 @@ export default function TeamSquad({ teamId, active }) {
                   alt={player.name}
                   width={36}
                   height={36}
-                  style={{ borderRadius: "50%" }}
+                  className="teamSquad__photo"
                 />
                 <div className="teamSquad__rowInfo">
                   <span className="teamSquad__rowName">{player.name}</span>

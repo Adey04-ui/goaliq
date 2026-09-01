@@ -10,19 +10,13 @@ const fetcher = async (url) => {
 }
 
 export default function TeamOverview({ team, active, teamId }) {
-  // News — only loads when Overview tab is active
   const { data: newsData, isLoading: newsLoading } = useSWR(
-    active === "Overview"
-      ? `/api/news?q=${encodeURIComponent(team.team.name)}&max=3`
-      : null,
+    active === "Overview" ? `/api/news?q=${encodeURIComponent(team.team.name)}&max=3` : null,
     fetcher
   )
 
-  // Fixtures — reused for next match + recent form
   const { data: fixturesData, isLoading: fixturesLoading } = useSWR(
-    active === "Overview"
-      ? `/api/teams/${teamId}/fixtures`
-      : null,
+    active === "Overview" ? `/api/teams/${teamId}/fixtures` : null,
     fetcher
   )
 
@@ -34,16 +28,16 @@ export default function TeamOverview({ team, active, teamId }) {
     <div className="teamOverview">
       {/* Next fixture */}
       {fixturesLoading ? (
-        <div className="teamOverview__skeleton" style={{ height: 80 }} />
+        <div className="teamOverview__skeleton teamOverview__skeleton--lg" />
       ) : nextFixture && (
         <div className="teamOverview__nextFixture">
           <span className="teamOverview__sectionLabel">Next match</span>
           <div className="teamOverview__matchRow">
-            <Image src={nextFixture.teams.home.logo} alt="" width={28} height={28} />
+            <Image src={nextFixture.teams.home.logo} alt="" width={28} height={28} className="matchRow__logo" />
             <span>{nextFixture.teams.home.name}</span>
             <span className="teamOverview__vs">vs</span>
             <span>{nextFixture.teams.away.name}</span>
-            <Image src={nextFixture.teams.away.logo} alt="" width={28} height={28} />
+            <Image src={nextFixture.teams.away.logo} alt="" width={28} height={28} className="matchRow__logo" />
           </div>
         </div>
       )}
@@ -74,7 +68,7 @@ export default function TeamOverview({ team, active, teamId }) {
         <span className="teamOverview__sectionLabel">Latest news</span>
         {newsLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="teamOverview__skeleton" style={{ height: 60 }} />
+            <div key={i} className="teamOverview__skeleton teamOverview__skeleton--md" />
           ))
         ) : (
           news.map(article => (
@@ -86,7 +80,7 @@ export default function TeamOverview({ team, active, teamId }) {
               className="teamOverview__newsRow"
             >
               {article.image && (
-                <Image src={article.image} alt="" width={60} height={44} style={{ objectFit: "cover", borderRadius: 6 }} />
+                <Image src={article.image} alt="" width={60} height={44} className="teamOverview__newsThumb" />
               )}
               <p>{article.title}</p>
             </a>

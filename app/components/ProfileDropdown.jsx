@@ -18,14 +18,13 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useUser } from "@/context/userContext"
+import { useTheme } from "@/context/themeContext"
 
 export default function ProfileDropdown({ user }) {
   const [open, setOpen] = useState(false)
   const panelRef = useRef(null)
   const router = useRouter()
-  const { preferences, updatePreferences } = useUser()
-
-  const theme = preferences?.theme || "dark"
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -44,26 +43,14 @@ export default function ProfileDropdown({ user }) {
 
   async function handleThemeToggle() {
     const nextTheme = theme === "dark" ? "light" : "dark"
-    await updatePreferences({ theme: nextTheme })
+    setTheme(nextTheme)
     setOpen(false)
   }
 
   const menuItems = [
-    {
-      icon: <User size={16} />,
-      label: "My Profile",
-      href: "/main/settings",
-    },
-    {
-      icon: <Heart size={16} />,
-      label: "Following",
-      href: "/main/following",
-    },
-    {
-      icon: <Settings size={16} />,
-      label: "Settings",
-      href: "/main/settings",
-    },
+    { icon: <User size={16} />, label: "My Profile", href: "/main/settings" },
+    { icon: <Heart size={16} />, label: "Following", href: "/main/following" },
+    { icon: <Settings size={16} />, label: "Settings", href: "/main/settings" },
     { divider: true },
     {
       icon: <Crown size={16} />,
@@ -92,48 +79,18 @@ export default function ProfileDropdown({ user }) {
   ]
 
   return (
-    <div style={{ position: "relative" }} ref={panelRef}>
-      <button
-        onClick={() => setOpen(!open)}
-        style={{
-          background: "transparent",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-          borderRadius: "50%",
-          position: "relative",
-        }}
-      >
+    <div className="profileDropdown" ref={panelRef}>
+      <button className="profileDropdown__trigger" onClick={() => setOpen(!open)}>
         <Image
           src={user?.image || "/default-avatar.png"}
           alt={user?.name || "Profile"}
           width={36}
           height={36}
-          className="profile-picture"
-          style={{
-            borderRadius: "50%",
-            objectFit: "cover",
-            border: user?.isPremium
-              ? "2px solid #fbbf24"
-              : "2px solid transparent",
-          }}
+          className={`profileDropdown__avatar ${user?.isPremium ? "profileDropdown__avatar--premium" : ""}`}
         />
         {user?.isPremium && (
-          <span
-            style={{
-              position: "absolute",
-              bottom: -2,
-              right: -2,
-              background: "#fbbf24",
-              borderRadius: "50%",
-              width: 14,
-              height: 14,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Crown size={9} color="#0c1117" fill="#0c1117" />
+          <span className="profileDropdown__badge">
+            <Crown size={9} />
           </span>
         )}
       </button>
@@ -145,90 +102,31 @@ export default function ProfileDropdown({ user }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -8 }}
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            style={{
-              position: "absolute",
-              top: "calc(100% + 10px)",
-              right: 0,
-              width: 280,
-              background: "#0c1117",
-              border: "1px solid #222",
-              borderRadius: 16,
-              boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-              zIndex: 100,
-              overflow: "hidden",
-              display: "flex",
-              flexDirection: "column",
-            }}
+            className="profileDropdown__panel"
           >
-            <div
-              style={{
-                padding: "16px 18px",
-                borderBottom: "1px solid #1a1a1a",
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
+            <div className="profileDropdown__header">
               <Image
                 src={user?.image || "/default-avatar.png"}
                 alt={user?.name || "Profile"}
                 width={44}
                 height={44}
-                style={{ borderRadius: "50%", objectFit: "cover" }}
+                className="profileDropdown__headerAvatar"
               />
-              <div style={{ minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    color: "#fff",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {user?.name || "User"}
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#888",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                >
-                  {user?.email || ""}
-                </div>
+              <div className="profileDropdown__headerInfo">
+                <div className="profileDropdown__headerName">{user?.name || "User"}</div>
+                <div className="profileDropdown__headerEmail">{user?.email || ""}</div>
                 {user?.isPremium && (
-                  <span
-                    style={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#fbbf24",
-                      marginTop: 4,
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: 3,
-                    }}
-                  >
+                  <span className="profileDropdown__headerBadge">
                     <Crown size={10} /> PRO
                   </span>
                 )}
               </div>
             </div>
 
-            <div style={{ padding: "6px 0" }}>
+            <div className="profileDropdown__menu">
               {menuItems.map((item, i) =>
                 item.divider ? (
-                  <div
-                    key={i}
-                    style={{
-                      height: 1,
-                      background: "#1a1a1a",
-                      margin: "6px 12px",
-                    }}
-                  />
+                  <div key={i} className="profileDropdown__divider" />
                 ) : (
                   <MenuItem key={i} item={item} onClose={() => setOpen(false)} />
                 )
@@ -242,61 +140,35 @@ export default function ProfileDropdown({ user }) {
 }
 
 function MenuItem({ item, onClose }) {
-  const baseStyle = {
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    padding: "10px 18px",
-    background: "transparent",
-    border: "none",
-    color: item.danger ? "#ef4444" : item.highlight ? "#fbbf24" : "#e0e0e0",
-    fontSize: 14,
-    cursor: "pointer",
-    textAlign: "left",
-    textDecoration: "none",
-    transition: "background 0.15s",
-    borderRadius: 0,
-  }
-
   const handleClick = () => {
     if (item.onClick) item.onClick()
     onClose()
   }
 
+  const className = [
+    "profileDropdown__item",
+    item.danger ? "profileDropdown__item--danger" : "",
+    item.highlight ? "profileDropdown__item--highlight" : "",
+  ].filter(Boolean).join(" ")
+
   const content = (
     <>
-      <span style={{ display: "flex", alignItems: "center", opacity: 0.8 }}>
-        {item.icon}
-      </span>
-      <span style={{ flex: 1 }}>{item.label}</span>
-      {item.href && !item.onClick && (
-        <ChevronRight size={14} color="#555" />
-      )}
+      <span className="profileDropdown__itemIcon">{item.icon}</span>
+      <span className="profileDropdown__itemLabel">{item.label}</span>
+      {item.href && !item.onClick && <ChevronRight size={14} className="profileDropdown__itemChevron" />}
     </>
   )
 
   if (item.href && !item.onClick) {
     return (
-      <Link
-        href={item.href}
-        style={baseStyle}
-        onClick={onClose}
-        onMouseEnter={(e) => { e.currentTarget.style.background = "#161d27" }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-      >
+      <Link href={item.href} className={className} onClick={onClose}>
         {content}
       </Link>
     )
   }
 
   return (
-    <button
-      onClick={handleClick}
-      style={baseStyle}
-      onMouseEnter={(e) => { e.currentTarget.style.background = "#161d27" }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent" }}
-    >
+    <button className={className} onClick={handleClick}>
       {content}
     </button>
   )

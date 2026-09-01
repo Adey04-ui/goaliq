@@ -1,21 +1,10 @@
-// components/Skeleton.jsx
-
-const Skeleton = ({
-  width = '100%',
-  height = '20px',
-  borderRadius = '6px',
-  className = ''
-}) => {
+const Skeleton = ({ width = '100%', height = '20px', borderRadius = '6px', className = '' }) => {
   return (
     <div
       className={`skeleton ${className}`}
-      style={{
-        width: width,
-        height: height,
-        borderRadius: borderRadius,
-      }}
+      style={{ width, height, borderRadius }}
     />
   );
 };
 
-export default Skeleton
+export default Skeleton;

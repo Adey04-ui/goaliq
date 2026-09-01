@@ -16,6 +16,7 @@ import {
   LogIn,
 } from "lucide-react"
 import { useUser } from "@/context/userContext"
+import { useTheme } from "@/context/themeContext"
 import { useToast } from "@/lib/useToast"
 import EditFieldModal from "./EditFieldModal"
 import { useSignIn } from "@/context/signInContext"
@@ -58,77 +59,53 @@ const MATCH_VIEW_OPTIONS = [
 ]
 
 /* ───────── Skeleton ───────── */
-function SkeletonPulse({ width, height, radius = 6, style = {} }) {
+function SkeletonPulse({ width, height, radius = 6 }) {
   return (
     <div
-      style={{
-        width,
-        height,
-        borderRadius: radius,
-        background: "linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)",
-        backgroundSize: "200% 100%",
-        animation: "settingsSkeletonShimmer 1.4s ease-in-out infinite",
-        ...style,
-      }}
+      className="skeleton-pulse"
+      style={{ width, height, borderRadius: radius }}
     />
   )
 }
 
 function SettingsSkeleton() {
   return (
-    <div className="settingsMiddle">
-      <style>{`
-        @keyframes settingsSkeletonShimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-      `}</style>
-
+    <div className="settingsMiddle settingsMiddle--skeleton">
       <div className="settingsMiddle__header">
-        <SkeletonPulse width={140} height={28} style={{ marginBottom: 8 }} />
+        <SkeletonPulse width={140} height={28} />
         <SkeletonPulse width={260} height={16} />
       </div>
 
-      <div className="settingsMiddle__body" style={{ width: "100%" }}>
-        <div className="settingsNav">
+      <div className="settingsMiddle__body">
+        <div className="settingsNav settingsNav--skeleton">
           {NAV_ITEMS.map((_, i) => (
-            <div key={i} className="settingsNav__item" style={{ opacity: 0.4 }}>
-              <SkeletonPulse width={16} height={16} radius={4} style={{ marginRight: 8, flexShrink: 0 }} />
+            <div key={i} className="settingsNav__item settingsNav__item--skeleton">
+              <SkeletonPulse width={16} height={16} radius={4} />
               <SkeletonPulse width={80} height={14} />
             </div>
           ))}
         </div>
 
         <div className="settingsContent">
-          <div className="settingsCard">
-            <div className="settingsCard__header" style={{ marginBottom: 20 }}>
-              <SkeletonPulse width={160} height={22} style={{ marginBottom: 6 }} />
+          <div className="settingsCard settingsCard--skeleton">
+            <div className="settingsCard__header settingsCard__header--skeleton">
+              <SkeletonPulse width={160} height={22} />
               <SkeletonPulse width={240} height={14} />
             </div>
 
-            <div className="settingsCard__profileRow" style={{ marginBottom: 16 }}>
-              <SkeletonPulse width={56} height={56} radius="50%" style={{ marginRight: 16 }} />
-              <div style={{ flex: 1 }}>
-                <SkeletonPulse width={120} height={16} style={{ marginBottom: 8 }} />
+            <div className="settingsCard__profileRow settingsCard__profileRow--skeleton">
+              <SkeletonPulse width={56} height={56} radius="50%" />
+              <div className="settingsCard__profileText">
+                <SkeletonPulse width={120} height={16} />
                 <SkeletonPulse width={180} height={12} />
               </div>
               <SkeletonPulse width={80} height={32} radius={8} />
             </div>
 
             {Array.from({ length: 5 }).map((_, i) => (
-              <div
-                key={i}
-                className="settingsRow"
-                style={{
-                  borderBottom: "1px solid #1a1a1a",
-                  padding: "14px 0",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
+              <div key={i} className="settingsRow settingsRow--skeleton">
                 <SkeletonPulse width={100} height={14} />
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div className="settingsRow__right">
                   <SkeletonPulse width={60} height={14} />
                   <SkeletonPulse width={16} height={16} radius={4} />
                 </div>
@@ -145,60 +122,16 @@ function SettingsSkeleton() {
 function NotAuthenticated() {
   const { setShowSignIn } = useSignIn()
   return (
-    <div
-      className="settingsMiddle"
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "60vh",
-      }}
-    >
-      <div
-        style={{
-          textAlign: "center",
-          maxWidth: 360,
-          padding: "40px 24px",
-          background: "#0c1117",
-          borderRadius: 16,
-        }}
-      >
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: "50%",
-            background: "#1a1a1a",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            margin: "0 auto 20px",
-          }}
-        >
-          <LogIn size={28} color="#888" />
+    <div className="settingsMiddle settingsMiddle--empty">
+      <div className="settingsEmpty">
+        <div className="settingsEmpty__icon">
+          <LogIn size={28} />
         </div>
-        <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px", color: "#fff" }}>
-          Sign in required
-        </h2>
-        <p style={{ fontSize: 14, color: "#888", lineHeight: 1.5, margin: "0 0 24px" }}>
+        <h2 className="settingsEmpty__title">Sign in required</h2>
+        <p className="settingsEmpty__text">
           Please sign in to manage your account settings and preferences.
         </p>
-        <button
-          onClick={() => setShowSignIn(true)}
-          style={{
-            background: "#3b82f6",
-            color: "#fff",
-            border: "none",
-            borderRadius: 8,
-            padding: "10px 24px",
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 8,
-          }}
-        >
+        <button className="settingsEmpty__btn" onClick={() => setShowSignIn(true)}>
           <LogIn size={16} />
           Sign In
         </button>
@@ -210,11 +143,11 @@ function NotAuthenticated() {
 /* ───────── UI Components ───────── */
 function SettingsRow({ label, value, onClick }) {
   return (
-    <div className="settingsRow" onClick={onClick}>
+    <div className="settingsRow" onClick={onClick} role="button" tabIndex={0}>
       <span className="settingsRow__label">{label}</span>
       <div className="settingsRow__valueGroup">
         <span className="settingsRow__value">{value}</span>
-        <ChevronRight size={16} />
+        <ChevronRight size={16} className="settingsRow__chevron" />
       </div>
     </div>
   )
@@ -223,12 +156,12 @@ function SettingsRow({ label, value, onClick }) {
 function ToggleRow({ label, description, checked, onChange }) {
   return (
     <div className="settingsRow settingsRow--toggle">
-      <div>
+      <div className="settingsRow__text">
         <span className="settingsRow__label">{label}</span>
         {description && <div className="settingsRow__description">{description}</div>}
       </div>
       <button
-        className={`settingsToggle ${checked ? "on" : ""}`}
+        className={`settingsToggle ${checked ? "settingsToggle--on" : ""}`}
         onClick={() => onChange(!checked)}
         role="switch"
         aria-checked={checked}
@@ -242,6 +175,7 @@ function ToggleRow({ label, description, checked, onChange }) {
 /* ───────── Main Component ───────── */
 export default function Settings() {
   const { status } = useUser()
+  const { theme, setTheme } = useTheme()
   const { success, error } = useToast()
   const [activeTab, setActiveTab] = useState("account")
   const [modalConfig, setModalConfig] = useState(null)
@@ -256,9 +190,7 @@ export default function Settings() {
   async function handleAvatarChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
-
     setUploadingAvatar(true)
-
     const formData = new FormData()
     formData.append("file", file)
 
@@ -286,29 +218,28 @@ export default function Settings() {
 
   const user = profile
     ? {
-      displayName: profile.name || "",
-      email: profile.email || "",
-      avatar: profile.image || "/default-avatar.png",
-      isPremium: subscription?.plan === "pro",
-      country: profile.country || "",
-      language: profile.language || "en",
-      timezone: profile.timezone || "",
-      defaultMatchView: profile.defaultMatchView || "live",
-      dataSaver: profile.dataSaver || false,
-      autoPlayVideos: profile.autoPlayVideos ?? true,
-      showPlayerRatings: profile.showPlayerRatings ?? true,
-      theme: profile.theme || "dark",
-      matchReminders: profile.matchReminders ?? true,
-      goalAlerts: profile.goalAlerts ?? true,
-      redCardAlerts: profile.redCardAlerts ?? true,
-      halfTimeScores: profile.halfTimeScores ?? false,
-      fullTimeScores: profile.fullTimeScores ?? true,
-      newsAlerts: profile.newsAlerts ?? true,
-      transferAlerts: profile.transferAlerts ?? false,
-      pushEnabled: profile.pushEnabled ?? true,
-      emailEnabled: profile.emailEnabled ?? false,
-      quietHoursEnabled: profile.quietHoursEnabled ?? false,
-    }
+        displayName: profile.name || "",
+        email: profile.email || "",
+        avatar: profile.image || "/default-avatar.png",
+        isPremium: subscription?.plan === "pro",
+        country: profile.country || "",
+        language: profile.language || "en",
+        timezone: profile.timezone || "",
+        defaultMatchView: profile.defaultMatchView || "live",
+        dataSaver: profile.dataSaver || false,
+        autoPlayVideos: profile.autoPlayVideos ?? true,
+        showPlayerRatings: profile.showPlayerRatings ?? true,
+        matchReminders: profile.matchReminders ?? true,
+        goalAlerts: profile.goalAlerts ?? true,
+        redCardAlerts: profile.redCardAlerts ?? true,
+        halfTimeScores: profile.halfTimeScores ?? false,
+        fullTimeScores: profile.fullTimeScores ?? true,
+        newsAlerts: profile.newsAlerts ?? true,
+        transferAlerts: profile.transferAlerts ?? false,
+        pushEnabled: profile.pushEnabled ?? true,
+        emailEnabled: profile.emailEnabled ?? false,
+        quietHoursEnabled: profile.quietHoursEnabled ?? false,
+      }
     : null
 
   const loadData = useCallback(async () => {
@@ -350,7 +281,6 @@ export default function Settings() {
     if (updates.dataSaver !== undefined) payload.dataSaver = updates.dataSaver
     if (updates.autoPlayVideos !== undefined) payload.autoPlayVideos = updates.autoPlayVideos
     if (updates.showPlayerRatings !== undefined) payload.showPlayerRatings = updates.showPlayerRatings
-    if (updates.theme !== undefined) payload.theme = updates.theme
     if (updates.matchReminders !== undefined) payload.matchReminders = updates.matchReminders
     if (updates.goalAlerts !== undefined) payload.goalAlerts = updates.goalAlerts
     if (updates.redCardAlerts !== undefined) payload.redCardAlerts = updates.redCardAlerts
@@ -386,9 +316,7 @@ export default function Settings() {
 
   async function unblockUser(blockedId) {
     try {
-      const res = await fetch(`/api/user/blocked?id=${blockedId}`, {
-        method: "DELETE",
-      })
+      const res = await fetch(`/api/user/blocked?id=${blockedId}`, { method: "DELETE" })
       const data = await res.json()
       if (data.success) {
         setBlockedList((prev) => prev.filter((b) => b.blocked.id !== blockedId))
@@ -410,22 +338,15 @@ export default function Settings() {
     setModalConfig(null)
   }
 
-  /* ───────── Guards ───────── */
-  if (status === "unauthenticated") {
-    return <NotAuthenticated />
-  }
-
-  if (status === "loading" || loading) {
-    return <SettingsSkeleton />
-  }
-
+  if (status === "unauthenticated") return <NotAuthenticated />
+  if (status === "loading" || loading) return <SettingsSkeleton />
   if (!user) return null
 
   return (
     <div className="settingsMiddle">
       <div className="settingsMiddle__header">
-        <h1>Settings</h1>
-        <p>Manage your preferences and account settings.</p>
+        <h1 className="settingsMiddle__title">Settings</h1>
+        <p className="settingsMiddle__subtitle">Manage your preferences and account settings.</p>
       </div>
 
       <div className="settingsMiddle__body">
@@ -433,11 +354,11 @@ export default function Settings() {
           {NAV_ITEMS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              className={`settingsNav__item ${activeTab === key ? "active" : ""}`}
+              className={`settingsNav__item ${activeTab === key ? "settingsNav__item--active" : ""}`}
               onClick={() => setActiveTab(key)}
             >
               <Icon size={16} />
-              {label}
+              <span>{label}</span>
             </button>
           ))}
         </div>
@@ -446,8 +367,8 @@ export default function Settings() {
           {activeTab === "account" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>Account Information</h2>
-                <p>Update your account details and manage your profile.</p>
+                <h2 className="settingsCard__title">Account Information</h2>
+                <p className="settingsCard__subtitle">Update your account details and manage your profile.</p>
               </div>
 
               <div className="settingsCard__profileRow">
@@ -460,14 +381,8 @@ export default function Settings() {
                     className="settingsCard__avatar"
                   />
                   {uploadingAvatar && (
-                    <div style={{
-                      position: "absolute",
-                      inset: 0,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}>
-                      <span style={{ fontSize: 12, color: "#888" }}>Uploading...</span>
+                    <div className="settingsCard__avatarOverlay">
+                      <span>Uploading...</span>
                     </div>
                   )}
                   <label className="settingsCard__avatarEditBtn">
@@ -552,8 +467,8 @@ export default function Settings() {
           {activeTab === "preferences" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>App Preferences</h2>
-                <p>Customize your GOALIQ experience.</p>
+                <h2 className="settingsCard__title">App Preferences</h2>
+                <p className="settingsCard__subtitle">Customize your GOALIQ experience.</p>
               </div>
 
               <SettingsRow
@@ -593,26 +508,24 @@ export default function Settings() {
           {activeTab === "appearance" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>Appearance</h2>
-                <p>Choose your preferred theme.</p>
+                <h2 className="settingsCard__title">Appearance</h2>
+                <p className="settingsCard__subtitle">Choose your preferred theme.</p>
               </div>
 
-              <div style={{ display: "flex", gap: 16, marginTop: 12 }}>
+              <div className="themeSelector">
                 <button
-                  className={`settingsCard ${user.theme === "dark" ? "active" : ""}`}
-                  style={{ flex: 1, padding: 20, border: user.theme === "dark" ? "2px solid #3b82f6" : "1px solid #333" }}
-                  onClick={() => updateUser({ theme: "dark" })}
+                  className={`themeSelector__card ${theme === "dark" ? "themeSelector__card--active" : ""}`}
+                  onClick={() => setTheme("dark")}
                 >
-                  <div style={{ width: "100%", height: 60, background: "#0a0a0a", borderRadius: 8, marginBottom: 8, border: "1px solid #333" }} />
-                  <span>Dark</span>
+                  <div className="themeSelector__preview themeSelector__preview--dark" />
+                  <span className="themeSelector__label">Dark</span>
                 </button>
                 <button
-                  className={`settingsCard ${user.theme === "light" ? "active" : ""}`}
-                  style={{ flex: 1, padding: 20, border: user.theme === "light" ? "2px solid #3b82f6" : "1px solid #333" }}
-                  onClick={() => updateUser({ theme: "light" })}
+                  className={`themeSelector__card ${theme === "light" ? "themeSelector__card--active" : ""}`}
+                  onClick={() => setTheme("light")}
                 >
-                  <div style={{ width: "100%", height: 60, background: "#f5f5f5", borderRadius: 8, marginBottom: 8, border: "1px solid #ddd" }} />
-                  <span>Light</span>
+                  <div className="themeSelector__preview themeSelector__preview--light" />
+                  <span className="themeSelector__label">Light</span>
                 </button>
               </div>
             </div>
@@ -622,16 +535,16 @@ export default function Settings() {
             <>
               <div className="settingsCard">
                 <div className="settingsCard__header">
-                  <h2>Login Activity</h2>
-                  <p>Recent devices that have signed into your account.</p>
+                  <h2 className="settingsCard__title">Login Activity</h2>
+                  <p className="settingsCard__subtitle">Recent devices that have signed into your account.</p>
                 </div>
 
                 {activities.length === 0 ? (
-                  <p style={{ color: "#888", padding: "12px 0" }}>No recent login activity.</p>
+                  <p className="settingsCard__empty">No recent login activity.</p>
                 ) : (
                   activities.map((a) => (
                     <div key={a.id} className="settingsRow">
-                      <div>
+                      <div className="settingsRow__text">
                         <span className="settingsRow__label">{a.device || "Unknown device"}</span>
                         <div className="settingsRow__description">
                           {a.ipAddress || "Unknown IP"}
@@ -639,19 +552,18 @@ export default function Settings() {
                           {" · "}{new Date(a.createdAt).toLocaleString()}
                         </div>
                       </div>
-                      <span style={{ color: "#22c55e", fontSize: 12, fontWeight: 600 }}>Current</span>
+                      <span className="settingsRow__status settingsRow__status--current">Current</span>
                     </div>
                   ))
                 )}
               </div>
 
-              <div className="settingsCard" style={{ marginTop: 16, borderColor: "#ff4444" }}>
+              <div className="settingsCard settingsCard--danger">
                 <div className="settingsCard__header">
-                  <h2 style={{ color: "#ff4444" }}>Danger Zone</h2>
+                  <h2 className="settingsCard__title settingsCard__title--danger">Danger Zone</h2>
                 </div>
                 <button
-                  className="settingsCard__editProfileBtn"
-                  style={{ background: "transparent", border: "1px solid #ff4444", color: "#ff4444" }}
+                  className="settingsCard__dangerBtn"
                   onClick={() => {
                     if (confirm("Delete your account permanently? This cannot be undone.")) {
                       error("Not available", "Account deletion is not yet implemented.")
@@ -667,31 +579,27 @@ export default function Settings() {
           {activeTab === "blocked" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>Blocked Users</h2>
-                <p>Users you&apos;ve blocked from interacting with you.</p>
+                <h2 className="settingsCard__title">Blocked Users</h2>
+                <p className="settingsCard__subtitle">Users you&apos;ve blocked from interacting with you.</p>
               </div>
 
               {blockedList.length === 0 ? (
-                <p style={{ color: "#888", padding: "12px 0" }}>You haven&apos;t blocked anyone yet.</p>
+                <p className="settingsCard__empty">You haven&apos;t blocked anyone yet.</p>
               ) : (
                 blockedList.map((b) => (
-                  <div key={b.id} className="settingsRow" style={{ gap: 12 }}>
+                  <div key={b.id} className="settingsRow settingsRow--blocked">
                     <Image
                       src={b.blocked.image || "/default-avatar.png"}
                       alt={b.blocked.name}
                       width={40}
                       height={40}
-                      style={{ borderRadius: "50%" }}
+                      className="settingsRow__avatar"
                     />
-                    <div style={{ flex: 1 }}>
+                    <div className="settingsRow__text settingsRow__text--grow">
                       <span className="settingsRow__label">{b.blocked.name || "Unknown"}</span>
                       <div className="settingsRow__description">{b.blocked.email}</div>
                     </div>
-                    <button
-                      className="settingsCard__editProfileBtn"
-                      style={{ padding: "4px 12px", fontSize: 13 }}
-                      onClick={() => unblockUser(b.blocked.id)}
-                    >
+                    <button className="settingsCard__editProfileBtn settingsCard__editProfileBtn--sm" onClick={() => unblockUser(b.blocked.id)}>
                       Unblock
                     </button>
                   </div>
@@ -703,32 +611,20 @@ export default function Settings() {
           {activeTab === "subscription" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>Subscription</h2>
-                <p>Manage your plan and billing.</p>
+                <h2 className="settingsCard__title">Subscription</h2>
+                <p className="settingsCard__subtitle">Manage your plan and billing.</p>
               </div>
 
-              <div
-                className="settingsRow"
-                style={{
-                  background: "#0a0a0a",
-                  borderRadius: 12,
-                  padding: 20,
-                  marginBottom: 16,
-                  flexDirection: "column",
-                  alignItems: "flex-start",
-                  gap: 8,
-                }}
-              >
-                <span className="settingsRow__label" style={{ fontSize: 18 }}>
+              <div className="settingsCard__planCard">
+                <span className="settingsCard__planName">
                   {subscription?.plan === "pro" ? "Pro Plan" : "Free Plan"}
                 </span>
-                <span style={{ color: "#888", fontSize: 14, textTransform: "capitalize" }}>
+                <span className="settingsCard__planStatus">
                   {subscription?.status || "active"}
                 </span>
                 {subscription?.plan === "free" && (
                   <button
                     className="settingsCard__editProfileBtn"
-                    style={{ marginTop: 8 }}
                     onClick={() => error("Coming soon", "Stripe integration is not ready yet.")}
                   >
                     Upgrade to Pro
@@ -739,7 +635,7 @@ export default function Settings() {
               {subscription?.currentPeriodEnd && (
                 <div className="settingsRow">
                   <span className="settingsRow__label">Current period ends</span>
-                  <span>{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</span>
+                  <span className="settingsRow__value">{new Date(subscription.currentPeriodEnd).toLocaleDateString()}</span>
                 </div>
               )}
             </div>
@@ -748,13 +644,11 @@ export default function Settings() {
           {activeTab === "notifications" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>Notifications</h2>
-                <p>Choose what you want to be notified about.</p>
+                <h2 className="settingsCard__title">Notifications</h2>
+                <p className="settingsCard__subtitle">Choose what you want to be notified about.</p>
               </div>
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
-                Match Alerts
-              </h3>
+              <h3 className="settingsSectionTitle">Match Alerts</h3>
               <ToggleRow
                 label="Match Reminders"
                 description="30 minutes before kickoff for favorite teams"
@@ -786,9 +680,7 @@ export default function Settings() {
                 onChange={(val) => updateUser({ fullTimeScores: val })}
               />
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
-                Updates
-              </h3>
+              <h3 className="settingsSectionTitle">Updates</h3>
               <ToggleRow
                 label="News Alerts"
                 description="Breaking football news and headlines"
@@ -802,9 +694,7 @@ export default function Settings() {
                 onChange={(val) => updateUser({ transferAlerts: val })}
               />
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
-                Delivery
-              </h3>
+              <h3 className="settingsSectionTitle">Delivery</h3>
               <ToggleRow
                 label="Push Notifications"
                 description="In-app and device push (requires permission)"
@@ -829,27 +719,23 @@ export default function Settings() {
           {activeTab === "about" && (
             <div className="settingsCard">
               <div className="settingsCard__header">
-                <h2>About GOALIQ</h2>
+                <h2 className="settingsCard__title">About GOALIQ</h2>
               </div>
 
-              <div className="settingsRow" style={{ cursor: "default" }}>
+              <div className="settingsRow settingsRow--static">
                 <span className="settingsRow__label">Version</span>
-                <span style={{ color: "#888", fontSize: 14 }}>1.0.0</span>
+                <span className="settingsRow__value settingsRow__value--muted">1.0.0</span>
               </div>
-              <div className="settingsRow" style={{ cursor: "default" }}>
+              <div className="settingsRow settingsRow--static">
                 <span className="settingsRow__label">Build</span>
-                <span style={{ color: "#888", fontSize: 14 }}>2026.08.09</span>
+                <span className="settingsRow__value settingsRow__value--muted">2026.08.09</span>
               </div>
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
-                Legal
-              </h3>
+              <h3 className="settingsSectionTitle">Legal</h3>
               <SettingsRow label="Terms of Service" value="" onClick={() => error("Coming soon", "Terms page is under construction.")} />
               <SettingsRow label="Privacy Policy" value="" onClick={() => error("Coming soon", "Privacy page is under construction.")} />
 
-              <h3 style={{ fontSize: 13, fontWeight: 600, color: "#888", textTransform: "uppercase", letterSpacing: 0.5, margin: "24px 0 12px" }}>
-                Support
-              </h3>
+              <h3 className="settingsSectionTitle">Support</h3>
               <SettingsRow label="Contact Support" value="" onClick={() => window.location.href = "mailto:support@goaliq.com"} />
               <SettingsRow label="Report a Bug" value="" onClick={() => window.location.href = "mailto:bugs@goaliq.com"} />
             </div>

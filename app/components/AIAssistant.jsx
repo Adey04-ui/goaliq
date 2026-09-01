@@ -34,7 +34,6 @@ export default function AIAssistant({
       style={{
         borderRadius: 16,
         padding: 20,
-        color: "#fff",
       }}
     >
       <h3
@@ -51,7 +50,7 @@ export default function AIAssistant({
         style={{
           margin: "0 0 16px 0",
           fontSize: 14,
-          color: "#888",
+          color: "var(--text-muted)",
         }}
       >
         {subtitle}
@@ -66,11 +65,11 @@ export default function AIAssistant({
           disabled={loading}
           style={{
             width: "100%",
-            background: "#0a0a0a",
-            border: "1px solid #222",
+            background: "var(--bg-hover)",
+            border: "1px solid var(--border-light)",
             borderRadius: 10,
             padding: "12px 44px 12px 14px",
-            color: "#fff",
+            color: "var(--text-primary)",
             fontSize: 14,
             outline: "none",
           }}
@@ -83,8 +82,8 @@ export default function AIAssistant({
             right: 8,
             top: "50%",
             transform: "translateY(-50%)",
-            background: input.trim() ? "#3b82f6" : "#1a1a1a",
-            color: input.trim() ? "#fff" : "#555",
+            background: input.trim() ? "var(--accent-blue)" : "var(--bg-hover)",
+            color: input.trim() ? "#fff" : "var(--text-muted)",
             border: "none",
             borderRadius: 8,
             width: 32,

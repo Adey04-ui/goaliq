@@ -14,7 +14,7 @@ function SkeletonPulse({ width, height, radius = 8, style = {} }) {
         width,
         height,
         borderRadius: radius,
-        background: "linear-gradient(90deg, #1a2a3a 25%, #243447 50%, #1a2a3a 75%)",
+        background: "linear-gradient(90deg, var(--skeleton-start) 25%, var(--skeleton-mid) 50%, var(--skeleton-start) 75%)",
         backgroundSize: "200% 100%",
         animation: "h2hShimmer 1.4s ease-in-out infinite",
         ...style,
