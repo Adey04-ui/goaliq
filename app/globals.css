@@ -1491,13 +1491,11 @@ p {
 
 .standingsContainer > .contentViewport > .contentSlider > .panel > .standingsL > .standingsRows > .standingRow > .qualificationMarker.ucl {
   width: 4px;
-  background: #1151a0;
   border-radius: 4px;
 }
 
 .standingsContainer > .contentViewport > .contentSlider > .panel > .standingsL > .standingsRows > .standingRow > .qualificationMarker.uel {
   width: 4px;
-  background: #FF9B00;
   border-radius: 4px;
 }
 
@@ -7248,7 +7246,7 @@ p {
   stroke-width: 1;
   stroke: var(--text-muted);
   fill: none;
-  transition: stroke 0.2s, fill 0.2s, transform 0.15s;
+  transition: stroke 0.2s, fill 0.2s, transform 0.15s ease-in-out;
 }
 
 .favourite-svg.filled {
@@ -7258,7 +7256,7 @@ p {
 }
 
 .favourite-btn:hover .favourite-svg {
-  transform: scale(1.15);
+  transform: scale(1.1);
 }
 
 /* Per-team inline score - hidden in the wide layout, only used when .matchRow's
@@ -7459,16 +7457,41 @@ p {
   background: transparent;
 }
 
-.qualificationMarker.ucl {
+.qualificationMarker.ucl,
+.qualificationMarker.ucl-through {
   background: var(--accent-blue);
 }
 
-.qualificationMarker.uel {
+.qualificationMarker.ucl-playoff {
+  background: var(--accent-blue);
+  opacity: 0.5;
+}
+
+.qualificationMarker.uel,
+.qualificationMarker.uel-through {
   background: var(--accent-orange, #f59e0b);
+}
+
+.qualificationMarker.uel-playoff {
+  background: var(--accent-orange, #f59e0b);
+  opacity: 0.5;
+}
+
+.qualificationMarker.uecl {
+  background: var(--accent-green);
 }
 
 .qualificationMarker.relegation {
   background: var(--accent-red);
+}
+
+.qualificationMarker.relegation-playoff {
+  background: var(--accent-red);
+  opacity: 0.5;
+}
+
+.qualificationMarker.eliminated {
+  background: var(--text-dim);
 }
 
 .teamRank {
@@ -9460,4 +9483,299 @@ p {
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
   }
+}
+/* =========================================================
+   FOOTER — theme-aware
+   ========================================================= */
+
+.web-name {
+  height: 24px;
+}
+
+.footer-first-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header-2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-2 > span {
+  display: flex;
+  font-size: 30px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+footer {
+  padding: 24px;
+  margin-top: 50px;
+  background: var(--bg-primary);
+  border-top: 1px solid var(--border-light);
+}
+
+.built {
+  display: flex;
+  padding-bottom: 8px;
+}
+
+.everything-about-goaliq-text {
+  font-size: 11px;
+}
+
+.about-goaliq {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-tertiary);
+  padding: 15px 15px 15px 10px;
+  border-radius: 10px;
+}
+
+.users-realtime-league-matchscovered-liveupdate {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.amount {
+  font-size: 20px;
+}
+
+.content {
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.the-features-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.features-text {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.all-features {
+  display: flex;
+  width: 99%;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border: none;
+  border-radius: 10px;
+  padding: 20px 15px 30px 15px;
+  line-height: 21px;
+  gap: 5px;
+  background-color: var(--bg-tertiary);
+}
+
+.svg-contaner {
+  border: none;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 5px 5px 5px 5px;
+  /* original was a bespoke #070c14, one shade darker than --bg-primary -
+     no existing token matches it exactly, so this reuses --bg-primary
+     rather than inventing a new one-off var. Add a dedicated token if you
+     want that exact original shade back in dark mode. */
+  background-color: var(--bg-primary);
+  width: 60px;
+  height: 60px;
+}
+
+.svg-names {
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.svg-meaning {
+  font-size: 13px;
+}
+
+.features-cards {
+  display: flex;
+  justify-content: space-between;
+}
+
+.features-cards > div {
+  width: 19%;
+  display: flex;
+}
+
+.league-main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.top-league-text {
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.all-top-league-cards {
+  display: flex;
+  gap: 10px;
+}
+
+.league-cards {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-tertiary);
+  padding: 10px 10px 10px 10px;
+  border-radius: 10px;
+  width: 12%;
+}
+.league-cards:last-child {
+  width: 7%;
+}
+
+.league-cards:nth-child(4), .league-cards:nth-child(6) {
+  width: 13%;
+}
+
+.league-img {
+  height: 28px;
+  width: 28px;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.league-name {
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+.download-background-banner {
+  display: flex;
+  gap: 190px;
+  position: relative;
+  width: 100%;
+  height: 100px;
+  background-color: var(--bg-primary);
+  overflow: hidden;
+  border-radius: 10px;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.download-banner-glow {
+  position: absolute;
+  z-index: 0;
+  width: 500px;
+  height: 300px;
+  left: 45%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(40, 90, 255, 0.8) 0%,
+    rgba(40, 90, 255, 0.35) 20%,
+    rgba(40, 90, 255, 0.15) 40%,
+    transparent 70%
+  );
+  filter: blur(60px);
+  pointer-events: none;
+}
+
+.download-app-text-container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doaload-app-text {
+  font-size: 17px;
+}
+
+.doaload-app-text2 {
+  font-size: 13px;
+}
+
+.download-app {
+  display: flex;
+  gap: 15px;
+}
+
+.download-img {
+  width: 140px;
+  height: 50px;
+  border-radius: 5px;
+  image-rendering: crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+.all-social-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  place-items: center;
+  border-top: 1px solid var(--border-light);
+  gap: 8px;
+}
+
+.social-left {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.logo-name {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.webname {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.social-left-text {
+  font-size: 12px;
+}
+
+.social-center {
+  display: flex;
+  gap: 20px;
+}
+
+.social-center > div {
+  text-transform: capitalize;
+}
+
+.social-right {
+  display: flex;
+  place-items: center;
+}
+
+.social-media-links {
+  display: flex;
+  gap: 20px;
+  place-items: center;
+}
+
+.social-center-text {
+  font-size: 12px;
+}
+
+.social-img {
+  height: 15px;
 }

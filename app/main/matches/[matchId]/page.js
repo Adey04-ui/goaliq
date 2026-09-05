@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import useSWR from "swr"
 import Image from "next/image"
+import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import MatchOverview from "@/app/components/MatchOverview"
 import MatchLineups from "@/app/components/MatchLineups"
@@ -31,6 +32,25 @@ function MatchPageSkeleton() {
       <div className="matchPage__bodySkeleton" />
     </div>
   )
+}
+
+// Builds the /main/leagues/[id] link, passing along whatever the match's
+// league object already has so that page can paint instantly instead of
+// waiting on its own fetch. Only sets params that actually exist here -
+// match.league's exact shape (does it include country/flag/type?) isn't
+// confirmed, so this skips anything undefined rather than passing the
+// literal string "undefined" in the URL.
+function buildLeagueHref(league) {
+  if (!league?.id) return null
+  const params = new URLSearchParams()
+  if (league.season) params.set("season", String(league.season))
+  if (league.name) params.set("name", league.name)
+  if (league.logo) params.set("logo", league.logo)
+  if (league.country) params.set("countryName", league.country)
+  if (league.flag) params.set("countryFlag", league.flag)
+  if (league.type) params.set("type", league.type)
+  const qs = params.toString()
+  return `/main/leagues/${league.id}${qs ? `?${qs}` : ""}`
 }
 
 export default function MatchPage() {
@@ -61,6 +81,7 @@ export default function MatchPage() {
   const isLive = match.status === "LIVE"
   const isFinished = match.status === "FINISHED"
   const matchDate = match.fixture?.date ?? match.date
+  const leagueHref = buildLeagueHref(match.league)
 
   return (
     <div className="parent-container">
@@ -72,12 +93,21 @@ export default function MatchPage() {
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="matchPage__header"
         >
-          <div className="matchPage__league">
-            {!dataSaver && (
-              <Image src={match.league.logo} alt={match.league.name} width={20} height={20} />
-            )}
-            <span>{match.league.name} · {match.league.round || "Matchday"}</span>
-          </div>
+          {leagueHref ? (
+            <Link href={leagueHref} className="matchPage__league" style={{ textDecoration: "none", width: "fit-content" }}>
+              {!dataSaver && (
+                <Image src={match.league.logo} alt={match.league.name} width={20} height={20} />
+              )}
+              <span>{match.league.name} · {match.league.round || "Matchday"}</span>
+            </Link>
+          ) : (
+            <div className="matchPage__league">
+              {!dataSaver && (
+                <Image src={match.league.logo} alt={match.league.name} width={20} height={20} />
+              )}
+              <span>{match.league.name} · {match.league.round || "Matchday"}</span>
+            </div>
+          )}
 
           <div className="matchPage__scoreboard">
             <div className="matchPage__team" onClick={() => router.push(`/main/team/${match.teams.home.id}`)}>

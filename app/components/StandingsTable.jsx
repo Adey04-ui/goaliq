@@ -3,9 +3,12 @@ import Image from "next/image"
 import StandingsSkeleton from "./StandingsSkeleton"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { getZone } from "@/lib/zoneRules"
 
 function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelectedGroup, displayedStandings, isLoading, league }) {
   const router = useRouter()
+  const totalTeams = displayedStandings?.length ?? 0
+
   return (
     <div className="standingsL">
       {
@@ -50,50 +53,44 @@ function StandingsTable({ hasGroups, standingsGroups, selectedGroup, setSelected
       </div>
 
       <div className="standingsRows">
-        {!isLoading ? displayedStandings?.map((team) => (
-          <div
-            className="standingRow"
-            key={team.team.id}
-          >
-
+        {!isLoading ? displayedStandings?.map((team) => {
+          const zone = getZone(league?.league?.id, team.rank, totalTeams)
+          return (
             <div
-              className={`qualificationMarker ${team.rank <= 4
-                ? "ucl"
-                : team.rank === 5
-                  ? "uel"
-                  : team.rank >= 18
-                    ? "relegation"
-                    : ""
-                }`}
-            />
+              className="standingRow"
+              key={team.team.id}
+            >
 
-            <span className="teamRank">
-              {team.rank}
-            </span>
+              <div className={`qualificationMarker ${zone || ""}`} />
 
-            <div className="teamColumn" onClick={() => router.push(`/main/team/${team?.team?.id}?leagueId=${league?.league?.id}`)}>
-              <Image
-                src={team.team.logo}
-                alt={team.team.name}
-                width={24}
-                height={24}
-              />
+              <span className="teamRank">
+                {team.rank}
+              </span>
 
-              <span>
-                {team.team.name}
+              <div className="teamColumn" onClick={() => router.push(`/main/team/${team?.team?.id}?leagueId=${league?.league?.id}`)}>
+                <Image
+                  src={team.team.logo}
+                  alt={team.team.name}
+                  width={24}
+                  height={24}
+                />
+
+                <span>
+                  {team.team.name}
+                </span>
+              </div>
+
+              <span>{team.all.played}</span>
+              <span>{team.all.win}</span>
+              <span>{team.all.draw}</span>
+              <span>{team.all.lose}</span>
+              <span>{team.goalsDiff}</span>
+              <span className="points">
+                {team.points}
               </span>
             </div>
-
-            <span>{team.all.played}</span>
-            <span>{team.all.win}</span>
-            <span>{team.all.draw}</span>
-            <span>{team.all.lose}</span>
-            <span>{team.goalsDiff}</span>
-            <span className="points">
-              {team.points}
-            </span>
-          </div>
-        )) : (
+          )
+        }) : (
           Array.from({ length: 7 }).map((_, i) => (
             <StandingsSkeleton key={i} />
           ))

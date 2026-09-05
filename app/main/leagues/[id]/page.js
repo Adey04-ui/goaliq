@@ -1,7 +1,7 @@
 "use client"
 
 import useSWR from "swr"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 // TODO: adjust this import to wherever Standings.jsx actually lives in your
 // project (LeaguesComponent imports it as "./Standings", so it's a sibling
 // of LeaguesComponent.jsx - point this at that same folder).
@@ -14,28 +14,34 @@ const fetcher = async (url) => {
   return result
 }
 
-export default function LeaguePage({ params, searchParams }) {
+export default function LeaguePage() {
   const router = useRouter()
-  const leagueId = params.id
 
-  // A season is required to fetch standings. Pass it in the link from
-  // wherever you navigate here from, e.g.
-  //   /main/leagues/${match.league.id}?season=${match.league.season}
-  // Falling back to the current year only covers direct navigation without
-  // a season (bookmarks, manual URL entry) - it won't always be right for
-  // competitions whose season doesn't match the calendar year.
-  const season = searchParams?.season || String(new Date().getFullYear())
+  // useParams()/useSearchParams() instead of the params/searchParams PROPS:
+  // MatchPage.js already does this for its route param (useParams -> matchId),
+  // and NewsPage.js does the same for query params (searchParams.get("q")).
+  // The prop-based versions weren't behaving reliably here, which is why
+  // leagueId was coming through undefined -> the SWR key was null -> no
+  // fetch ever fired -> immediate "League not found".
+  const params = useParams()
+  const searchParams = useSearchParams()
+
+  // If this is still undefined, the dynamic route folder likely isn't
+  // literally named [id] - useParams() keys are named after the folder's
+  // bracket segment, so a folder named [leagueId] would need params.leagueId
+  // instead.
+  const leagueId = params?.id
+
+  const season = searchParams.get("season") || String(new Date().getFullYear())
 
   // Optional query params a linking page can pass if it already has this
   // data on hand (e.g. from a fixture's `league` object), so the header can
   // paint immediately instead of waiting on the fetch below.
-  const {
-    name: qName,
-    logo: qLogo,
-    countryName: qCountryName,
-    countryFlag: qCountryFlag,
-    type: qType,
-  } = searchParams || {}
+  const qName = searchParams.get("name")
+  const qLogo = searchParams.get("logo")
+  const qCountryName = searchParams.get("countryName")
+  const qCountryFlag = searchParams.get("countryFlag")
+  const qType = searchParams.get("type")
 
   const optimisticLeague = qName
     ? {
@@ -47,11 +53,19 @@ export default function LeaguePage({ params, searchParams }) {
   // Same URL/key that Standings itself fetches internally for the actual
   // standings table - SWR dedupes this into a single request, we're just
   // also reading the nested `league` metadata off the same response.
-  const { data, isLoading } = useSWR(
+  const { data, error, isLoading } = useSWR(
     leagueId ? `/api/standings?league=${leagueId}&season=${season}` : null,
     fetcher,
     { dedupingInterval: 60000, revalidateOnFocus: false }
   )
+
+  if (error) {
+    // Surfaced to the console rather than swallowed - if the endpoint itself
+    // is erroring (bad league id, season with no data, server error, etc.)
+    // this tells you that instead of leaving you guessing between "no id"
+    // and "fetch failed".
+    console.error("Failed to load league standings:", error)
+  }
 
   const leagueInfo = data?.data?.[0]?.league
 
@@ -81,6 +95,16 @@ export default function LeaguePage({ params, searchParams }) {
   const league = fetchedLeague || optimisticLeague
 
   if (!league) {
+    if (!leagueId) {
+      // Dev-time signal, not meant to be a friendly user-facing state -
+      // if you're seeing this, check the dynamic folder name (see comment
+      // on leagueId above).
+      return (
+        <div className="parent-container">
+          <div className="matchEmpty">No league id in the URL - check the dynamic route folder name.</div>
+        </div>
+      )
+    }
     if (isLoading) {
       return (
         <div className="parent-container">
@@ -96,7 +120,9 @@ export default function LeaguePage({ params, searchParams }) {
     }
     return (
       <div className="parent-container">
-        <div className="matchEmpty">League not found</div>
+        <div className="matchEmpty">
+          {error ? "Couldn't load this league right now." : "League not found"}
+        </div>
       </div>
     )
   }

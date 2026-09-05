@@ -196,7 +196,7 @@ function LeaguesList({
                     }}
                   >
                     <svg
-                      style={{ strokeWidth: 1, height: 22, width: 22, stroke: '#fff' }}
+                      style={{ strokeWidth: 1, height: 22, width: 22, }}
                       viewBox="0 0 24 24"
                       className={`favourite-svg ${isFavourite ? 'filled' : ''}`}
                     >
