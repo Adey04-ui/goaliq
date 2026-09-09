@@ -55,7 +55,7 @@ function LoginComponent() {
                 </button>
               </div>
               <div className="agreement">
-                By continuing, you agree to our <span style={{ color: "#0070f3", cursor: "pointer" }}>Terms of Service</span> and <span style={{ color: "#0070f3", cursor: "pointer" }}>Privacy Policy</span>.
+                By continuing, you agree to our <span style={{ color: "var(--accent-blue)", cursor: "pointer" }}>Terms of Service</span> and <span style={{ color: "#0070f3", cursor: "pointer" }}>Privacy Policy</span>.
               </div>
             </div>
 

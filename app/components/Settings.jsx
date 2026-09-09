@@ -218,28 +218,28 @@ export default function Settings() {
 
   const user = profile
     ? {
-        displayName: profile.name || "",
-        email: profile.email || "",
-        avatar: profile.image || "/default-avatar.png",
-        isPremium: subscription?.plan === "pro",
-        country: profile.country || "",
-        language: profile.language || "en",
-        timezone: profile.timezone || "",
-        defaultMatchView: profile.defaultMatchView || "live",
-        dataSaver: profile.dataSaver || false,
-        autoPlayVideos: profile.autoPlayVideos ?? true,
-        showPlayerRatings: profile.showPlayerRatings ?? true,
-        matchReminders: profile.matchReminders ?? true,
-        goalAlerts: profile.goalAlerts ?? true,
-        redCardAlerts: profile.redCardAlerts ?? true,
-        halfTimeScores: profile.halfTimeScores ?? false,
-        fullTimeScores: profile.fullTimeScores ?? true,
-        newsAlerts: profile.newsAlerts ?? true,
-        transferAlerts: profile.transferAlerts ?? false,
-        pushEnabled: profile.pushEnabled ?? true,
-        emailEnabled: profile.emailEnabled ?? false,
-        quietHoursEnabled: profile.quietHoursEnabled ?? false,
-      }
+      displayName: profile.name || "",
+      email: profile.email || "",
+      avatar: profile.image || "/default-avatar.png",
+      isPremium: subscription?.plan === "pro",
+      country: profile.country || "",
+      language: profile.language || "en",
+      timezone: profile.timezone || "",
+      defaultMatchView: profile.defaultMatchView || "live",
+      dataSaver: profile.dataSaver || false,
+      autoPlayVideos: profile.autoPlayVideos ?? true,
+      showPlayerRatings: profile.showPlayerRatings ?? true,
+      matchReminders: profile.matchReminders ?? true,
+      goalAlerts: profile.goalAlerts ?? true,
+      redCardAlerts: profile.redCardAlerts ?? true,
+      halfTimeScores: profile.halfTimeScores ?? false,
+      fullTimeScores: profile.fullTimeScores ?? true,
+      newsAlerts: profile.newsAlerts ?? true,
+      transferAlerts: profile.transferAlerts ?? false,
+      pushEnabled: profile.pushEnabled ?? true,
+      emailEnabled: profile.emailEnabled ?? false,
+      quietHoursEnabled: profile.quietHoursEnabled ?? false,
+    }
     : null
 
   const loadData = useCallback(async () => {
@@ -542,7 +542,7 @@ export default function Settings() {
                 {activities.length === 0 ? (
                   <p className="settingsCard__empty">No recent login activity.</p>
                 ) : (
-                  activities.map((a) => (
+                  activities.map((a, index) => (
                     <div key={a.id} className="settingsRow">
                       <div className="settingsRow__text">
                         <span className="settingsRow__label">{a.device || "Unknown device"}</span>
@@ -552,7 +552,9 @@ export default function Settings() {
                           {" · "}{new Date(a.createdAt).toLocaleString()}
                         </div>
                       </div>
-                      <span className="settingsRow__status settingsRow__status--current">Current</span>
+                      {index === 0 && (
+                        <span className="settingsRow__status settingsRow__status--current">Current</span>
+                      )}
                     </div>
                   ))
                 )}
