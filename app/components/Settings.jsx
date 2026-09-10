@@ -330,6 +330,22 @@ export default function Settings() {
     }
   }
 
+  async function signOutDevice(activityId) {
+    try {
+      const res = await fetch(`/api/user/activity?id=${activityId}`, { method: "DELETE" })
+      const data = await res.json()
+      if (data.success) {
+        setActivities((prev) => prev.filter((a) => a.id !== activityId))
+        success("Signed out", "That device has been signed out.")
+      } else {
+        error("Failed", data.message || "Could not sign out that device.")
+      }
+    } catch (e) {
+      console.error(e)
+      error("Failed", "Something went wrong.")
+    }
+  }
+
   function openModal(config) {
     setModalConfig(config)
   }
@@ -542,7 +558,7 @@ export default function Settings() {
                 {activities.length === 0 ? (
                   <p className="settingsCard__empty">No recent login activity.</p>
                 ) : (
-                  activities.map((a, index) => (
+                  activities.map((a) => (
                     <div key={a.id} className="settingsRow">
                       <div className="settingsRow__text">
                         <span className="settingsRow__label">{a.device || "Unknown device"}</span>
@@ -552,8 +568,15 @@ export default function Settings() {
                           {" · "}{new Date(a.createdAt).toLocaleString()}
                         </div>
                       </div>
-                      {index === 0 && (
+                      {a.isCurrent ? (
                         <span className="settingsRow__status settingsRow__status--current">Current</span>
+                      ) : (
+                        <button
+                          className="settingsCard__editProfileBtn settingsCard__editProfileBtn--sm"
+                          onClick={() => signOutDevice(a.id)}
+                        >
+                          Sign out
+                        </button>
                       )}
                     </div>
                   ))

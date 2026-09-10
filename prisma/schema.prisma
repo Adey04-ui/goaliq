@@ -141,9 +141,16 @@ model LoginActivity {
   device    String?
   location  String?
   createdAt DateTime @default(now())
+
+  sessionToken String?
+
+  deleted   Boolean  @default(false)
+
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+  @@index([sessionToken])
+  @@index([userId, deleted])
 }
 
 model Subscription {

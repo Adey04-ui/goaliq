@@ -5,9 +5,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import { headers } from "next/headers"
 
-// Deliberately simple, dependency-free device labelling. Good enough to
-// distinguish "Mobile" vs "Desktop" in the activity list; swap in a proper
-// parser (e.g. ua-parser-js) if you want browser/OS-level detail later.
 function getDeviceLabel(userAgent = "") {
   if (/mobile/i.test(userAgent)) return "Mobile"
   if (/tablet|ipad/i.test(userAgent)) return "Tablet"
@@ -15,16 +12,88 @@ function getDeviceLabel(userAgent = "") {
 }
 
 function getClientIp(headersList) {
-  // Behind a proxy/load balancer (Vercel, etc.) the real client IP shows up
-  // in x-forwarded-for as the first entry in a comma-separated chain, not
-  // as a plain remote address you can read off the request directly.
   const forwardedFor = headersList.get("x-forwarded-for")
   if (forwardedFor) return forwardedFor.split(",")[0].trim()
   return headersList.get("x-real-ip") || null
 }
 
+const PRIVATE_IP_PATTERN = /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.|::1$)/
+
+async function getLocationFromIp(ip) {
+  if (!ip || PRIVATE_IP_PATTERN.test(ip)) {
+    return null
+  }
+  try {
+    const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}`)
+    const data = await res.json()
+    if (!data.success) return null
+    return [data.city, data.region, data.country].filter(Boolean).join(", ")
+  } catch (e) {
+    console.error("IP geolocation lookup failed:", e)
+    return null
+  }
+}
+
+function LoggingPrismaAdapter(prismaClient) {
+  const base = PrismaAdapter(prismaClient)
+
+  return {
+    ...base,
+
+    async createSession(session) {
+      const created = await base.createSession(session)
+
+      try {
+        // headers() is async in Next.js 15+ - must be awaited, or
+        // headersList is a Promise and .get(...) throws, which was
+        // silently swallowed by the catch below and looked exactly like
+        // "nothing happened."
+        const headersList = await headers()
+        const userAgent = headersList.get("user-agent") || ""
+        const ipAddress = getClientIp(headersList)
+        const device = getDeviceLabel(userAgent)
+        const location = await getLocationFromIp(ipAddress)
+
+        await prismaClient.$transaction([
+          prismaClient.user.update({
+            where: { id: session.userId },
+            data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
+          }),
+          prismaClient.loginActivity.create({
+            data: {
+              userId: session.userId,
+              ipAddress,
+              userAgent,
+              device,
+              location,
+              sessionToken: session.sessionToken,
+            },
+          }),
+        ])
+      } catch (e) {
+        console.error("Login activity log failed:", e)
+      }
+
+      return created
+    },
+
+    async deleteSession(sessionToken) {
+      try {
+        await prismaClient.loginActivity.updateMany({
+          where: { sessionToken },
+          data: { deleted: true },
+        })
+      } catch (e) {
+        console.error("Login activity cleanup failed:", e)
+      }
+
+      return base.deleteSession(sessionToken)
+    },
+  }
+}
+
 export const authOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: LoggingPrismaAdapter(prisma),
 
   providers: [
     Google({
@@ -41,8 +110,8 @@ export const authOptions = {
 
   session: {
     strategy: "database",
-    maxAge: 30 * 24 * 60 * 60,      // 30 days
-    updateAge: 24 * 60 * 60,         // extend session if older than 24h
+    maxAge: 30 * 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
   },
 
   callbacks: {
@@ -51,42 +120,6 @@ export const authOptions = {
         session.user.id = user.id
       }
       return session
-    },
-
-    async signIn({ user }) {
-      try {
-        const headersList = headers()
-        const userAgent = headersList.get("user-agent") || ""
-        const ipAddress = getClientIp(headersList)
-        const device = getDeviceLabel(userAgent)
-
-        // Both writes together: lastLoginAt/lastLoginIp on the user record
-        // for quick lookups, and a new LoginActivity row per sign-in so the
-        // Settings page can show a real history instead of one entry that
-        // silently gets nothing new appended to it.
-        await prisma.$transaction([
-          prisma.user.update({
-            where: { id: user.id },
-            data: { lastLoginAt: new Date(), lastLoginIp: ipAddress },
-          }),
-          prisma.loginActivity.create({
-            data: {
-              userId: user.id,
-              ipAddress,
-              userAgent,
-              device,
-              // `location` is left null here - populating it needs an
-              // IP-to-geo lookup (e.g. ipapi.co) which isn't wired up.
-              // Add that separately if you want it filled in.
-            },
-          }),
-        ])
-      } catch (e) {
-        // Don't block sign-in if logging fails
-        console.error("Login activity log failed:", e)
-      }
-
-      return true
     },
   },
 
