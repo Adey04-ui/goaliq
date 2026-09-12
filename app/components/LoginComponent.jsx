@@ -44,14 +44,14 @@ function LoginComponent() {
                   onClick={() => signIn("google")}
                   className="auth-option"
                 >
-                  <BsGoogle size={23} />
+                  <BsGoogle size={23} color style={{color: 'var(--text-primary)'}} />
                 </button>
 
                 <button
                   onClick={() => signIn("github")}
                   className="auth-option"
                 >
-                  <BsGithub size={23} />
+                  <BsGithub size={23} color style={{color: 'var(--text-primary)'}} />
                 </button>
               </div>
               <div className="agreement">

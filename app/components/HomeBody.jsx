@@ -176,6 +176,47 @@ export function MatchListSkeleton() {
   )
 }
 
+export function LiveMatchesSkeleton() {
+  return (
+    <div className="matchSkeleton liveMatchesSkeleton">
+      {Array.from({ length: 3 }).map((_, gi) => (
+        <div key={gi} className="matchSkeleton__group">
+          <div className="matchSkeleton__leagueHeader">
+            <div className="matchSkeleton__leagueLogo" />
+            <div className="matchSkeleton__leagueInfo">
+              <div className="matchSkeleton__leagueName" />
+              <div className="matchSkeleton__leagueMeta" />
+            </div>
+          </div>
+
+          {Array.from({ length: 2 }).map((_, mi) => (
+            <div
+              key={mi}
+              className="matchSkeleton__liveRow"
+              style={{ animationDelay: `${(gi * 2 + mi) * 0.1}s` }}
+            >
+              <div className="matchSkeleton__teamBlock">
+                <div className="matchSkeleton__teamName" />
+                <div className="matchSkeleton__teamLogo" />
+              </div>
+
+              <div className="matchSkeleton__scoreBlock">
+                <div className="matchSkeleton__score" />
+                <div className="matchSkeleton__status" />
+              </div>
+
+              <div className="matchSkeleton__teamBlock matchSkeleton__teamBlock--away">
+                <div className="matchSkeleton__teamLogo" />
+                <div className="matchSkeleton__teamName" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function EmptyState({ tab, offsetDays }) {
   const msg = tab === "live" ? "No live matches right now" : offsetDays === 0 ? "No matches scheduled today" : "No matches found"
   return (
@@ -213,10 +254,19 @@ function HomeBody() {
   const statusParam = tab === "live" ? "live" : tab === "finished" ? "finished" : "all"
   const leagueFilterParam = tab === "trending" ? "trending" : "all"
 
-  const { data: liveData } = useSWR(
-    offsetDays === 0 ? `/api/matches?date=${date}&status=live&tz=${encodeURIComponent(tz)}` : null,
+  const {
+    data: liveData,
+    isLoading: isLiveLoading,
+    isValidating: isLiveValidating,
+  } = useSWR(
+    offsetDays === 0
+      ? `/api/matches?date=${date}&status=live&tz=${encodeURIComponent(tz)}`
+      : null,
     fetcher,
-    { refreshInterval: 30000, revalidateOnFocus: false }
+    {
+      refreshInterval: 30000,
+      revalidateOnFocus: false,
+    }
   )
 
   const { data: mainData, isLoading } = useSWR(
@@ -305,7 +355,7 @@ function HomeBody() {
 
         {/* ─── Live Matches ─── */}
         <AnimatePresence mode="wait">
-          {(tab === "live" || tab === "all") && (hasLiveMatches || (tab === "live" && mainLeagues.length > 0)) && (
+          {(tab === "live" || tab === "all") && (
             <motion.div
               key="live-section"
               variants={sectionVariants}
@@ -315,15 +365,34 @@ function HomeBody() {
               className="livematches-section homeSectionCard"
             >
               <SectionHeader title="Live Matches" live onSeeAll={() => goToAllMatches("live")} />
-              <motion.div variants={containerVariants} initial="hidden" animate="show" className="livematches-container">
-                <AnimatePresence mode="popLayout">
-                  {(hasLiveMatches ? liveLeagueGroups : mainLeagues).map((group) => (
-                    <motion.div key={group.league.id} variants={itemVariants} layout>
-                      <LeagueGroup group={group} favouriteIds={favouriteIds} onToggleFavourite={handleToggleFavourite} />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
+              {isLiveLoading ? (
+                <MatchListSkeleton />
+              ) : hasLiveMatches ? (
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="show"
+                  className="livematches-container"
+                >
+                  <AnimatePresence mode="popLayout">
+                    {liveLeagueGroups.map((group) => (
+                      <motion.div
+                        key={group.league.id}
+                        variants={itemVariants}
+                        layout
+                      >
+                        <LeagueGroup
+                          group={group}
+                          favouriteIds={favouriteIds}
+                          onToggleFavourite={handleToggleFavourite}
+                        />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              ) : (
+                <EmptyState tab="live" offsetDays={offsetDays} />
+              )}
             </motion.div>
           )}
         </AnimatePresence>

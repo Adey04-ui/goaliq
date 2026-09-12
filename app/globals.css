@@ -181,6 +181,7 @@ body {
 body {
   background: var(--bg-secondary);
   color: var(--text-primary);
+  -webkit-highlight-color: transparent;
 }
 
 p {
@@ -5953,31 +5954,285 @@ p {
 .matchSkeleton {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--gap-lg);
   padding: 8px 0;
 }
 
 .matchSkeleton__group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--gap-sm);
 }
 
 .matchSkeleton__label {
   height: 18px;
   width: 140px;
-  border-radius: 6px;
-  background: linear-gradient(90deg, var(--bg-hover) 25%, var(--border-light) 50%, var(--bg-hover) 75%);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
 
 .matchSkeleton__row {
   height: 56px;
-  border-radius: 10px;
-  background: linear-gradient(90deg, var(--bg-hover) 25%, var(--border-light) 50%, var(--bg-hover) 75%);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
+}
+
+/* ============================================
+   LIVE MATCHES SKELETON
+   Theme-responsive and matches the live layout
+   ============================================ */
+
+.liveMatchesSkeleton {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-lg);
+}
+
+.liveMatchesSkeleton .matchSkeleton__group {
+  gap: var(--gap-sm);
+}
+
+.matchSkeleton__leagueHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: 4px 2px 8px;
+}
+
+.matchSkeleton__leagueLogo {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__leagueInfo {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.matchSkeleton__leagueName {
+  width: 135px;
+  max-width: 55%;
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__leagueMeta {
+  width: 80px;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__liveRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--gap-md);
+  min-height: 64px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-glass-subtle);
+  border-radius: var(--radius-xl);
+  box-sizing: border-box;
+}
+
+.matchSkeleton__teamBlock {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.matchSkeleton__teamBlock--away {
+  justify-content: flex-start;
+}
+
+.matchSkeleton__teamLogo {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__teamName {
+  width: 70px;
+  max-width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__scoreBlock {
+  min-width: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.matchSkeleton__score {
+  width: 30px;
+  height: 18px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.matchSkeleton__status {
+  width: 34px;
+  height: 7px;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--border-light) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@media (max-width: 700px) {
+  .liveMatchesSkeleton {
+    gap: var(--gap-md);
+  }
+
+  .matchSkeleton__liveRow {
+    gap: 8px;
+    padding: 9px 10px;
+    min-height: 60px;
+  }
+
+  .matchSkeleton__teamName {
+    width: 55px;
+  }
+
+  .matchSkeleton__teamLogo {
+    width: 25px;
+    height: 25px;
+    flex-basis: 25px;
+  }
+
+  .matchSkeleton__leagueLogo {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .matchSkeleton__liveRow {
+    gap: 6px;
+    padding: 8px;
+    min-height: 56px;
+  }
+
+  .matchSkeleton__teamName {
+    width: 42px;
+  }
+
+  .matchSkeleton__teamBlock {
+    gap: 6px;
+  }
+
+  .matchSkeleton__teamLogo {
+    width: 23px;
+    height: 23px;
+    flex-basis: 23px;
+  }
+
+  .matchSkeleton__scoreBlock {
+    min-width: 36px;
+  }
+
+  .matchSkeleton__score {
+    width: 26px;
+    height: 16px;
+  }
+
+  .matchSkeleton__status {
+    width: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .matchSkeleton__label,
+  .matchSkeleton__row,
+  .matchSkeleton__leagueLogo,
+  .matchSkeleton__leagueName,
+  .matchSkeleton__leagueMeta,
+  .matchSkeleton__teamLogo,
+  .matchSkeleton__teamName,
+  .matchSkeleton__score,
+  .matchSkeleton__status {
+    animation: none;
+  }
 }
 
 /* ============================================
@@ -9489,7 +9744,7 @@ p {
    ========================================================= */
 
 .web-name {
-  height: 24px;
+  height: 34px;
 }
 
 .footer-first-container {
