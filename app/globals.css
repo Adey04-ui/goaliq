@@ -6158,6 +6158,560 @@ p {
   animation: shimmer 1.4s infinite;
 }
 
+/* =========================================================
+   TV SCHEDULE PAGE — theme-aware
+   Color mapping from the original file:
+     #0c1117  -> var(--bg-primary)
+     #1a2026  -> var(--bg-tertiary)
+     #14181e  -> var(--bg-hover)
+     #1a1a1a  -> var(--bg-hover)
+     #465261  -> var(--border-light)
+     #0222d8  -> var(--accent-blue)
+     #146BFF  -> var(--accent-blue)
+     #086fff  -> var(--accent-blue)
+     (hardcoded whites/blacks) -> var(--text-primary) / theme vars
+   ========================================================= */
+
+.tv-schedule-page {
+  display: flex;
+  gap: var(--gap-lg);
+  width: 100%;
+}
+
+.tv-schedule-page svg {
+  height: 18px;
+  width: 18px;
+  stroke-width: 1.5;
+  stroke: currentColor;
+  fill: none;
+}
+
+.tv-left-container {
+  width: 755px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ── Top bar: title + country/date picker ── */
+
+.tv-country-calendar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  border-bottom: 1px solid var(--border-light);
+  padding-bottom: var(--gap-lg);
+}
+
+.tv-watch-text {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tv-text {
+  font-weight: 600;
+  font-size: 25px;
+  color: var(--text-primary);
+}
+
+.never-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.country-calendar-container {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+.country-arrow-container {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  padding: 10px;
+  border-radius: var(--radius-md);
+}
+
+.country-change-container {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.country-change-container > span {
+  font-size: 13px;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+
+.country-img {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+}
+
+.calendar-button {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.calendar-button:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+/* ── Date tabs ── */
+
+.date-changer-container {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xl);
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.date-changer-each-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.date-changer {
+  font-size: 13px;
+  text-transform: capitalize;
+  color: var(--text-muted);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.date-changer.active > span {
+  color: var(--accent-blue);
+  font-weight: 600;
+}
+
+.date-changer.active::before {
+  content: "";
+  background-color: var(--accent-blue);
+  bottom: -11px;
+  position: absolute;
+  width: 90px;
+  left: -13px;
+  height: 2px;
+  border-radius: 50px;
+}
+
+/* ── Channel filter pills ── */
+
+.all-channel-container {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  gap: 12px;
+}
+
+.channels {
+  padding: 12px 22px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  gap: 5px;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.channels:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-hover);
+}
+
+.channels.active {
+  background-color: var(--accent-blue);
+  border-color: transparent;
+  color: var(--text-primary);
+}
+
+.channels > img {
+  height: 22px;
+  width: 27px;
+  object-fit: contain;
+}
+
+.channel-text {
+  font-size: 13px;
+  text-transform: capitalize;
+}
+
+/* ── Match list ── */
+
+.match-time-competition-channel-main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.match-time-competition-channel-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.competition-svg-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-tertiary);
+  padding: 10px;
+  border: 1px solid var(--border-glass-subtle);
+  border-bottom: none;
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  cursor: pointer;
+}
+
+.competition-text-name {
+  font-size: 14px;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+
+.club-time-channel-conatiner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: 7px 10px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+
+.club-time-channel-conatiner-two {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-md);
+  padding: 7px 10px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  border-top: none;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.club-time-channel-show-all-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  padding: 7px 10px 10px;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  border-top: none;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+}
+
+.club-time-channel-conatiner-three {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.time-club {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.time > span {
+  font-size: 13px;
+  color: var(--accent-blue);
+  text-transform: capitalize;
+  font-variant-numeric: tabular-nums;
+}
+
+.club-logo-name-container {
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--border-light);
+  padding-left: 15px;
+  gap: 10px;
+}
+
+.club-logo-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.club-logo-name > img {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+}
+
+.club-logo-name > span {
+  font-size: 13px;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+
+.channel-svg-conatiner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 85px;
+  color: var(--text-muted);
+}
+
+.channel-logo-name {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+  background-color: var(--bg-hover);
+  padding: 8px;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.channel-logo-name:hover {
+  color: var(--text-primary);
+}
+
+.channel-logo-name > img {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+}
+
+.channel-logo-name > span {
+  text-transform: capitalize;
+  font-size: 13px;
+}
+
+.load-matches-box {
+  width: 100%;
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+
+.load-matches-box:hover {
+  color: var(--text-primary);
+  background-color: var(--border-light);
+}
+
+.load-matches-text {
+  text-transform: capitalize;
+  font-size: 14px;
+}
+
+/* ── Right column ── */
+
+.tv-right-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.about-tv-schedule-container {
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  padding: 20px 20px 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-radius: var(--radius-lg);
+}
+
+.about-tv-schedule-svg-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tv-button {
+  padding: 5px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.about-tv-text {
+  text-transform: capitalize;
+  font-weight: bold;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.where-to-watch-text {
+  font-size: 12px;
+  line-height: 22px;
+  color: var(--text-secondary);
+}
+
+.learn-svg-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-top: 10px;
+}
+
+.learn-more-link-container > a {
+  color: var(--accent-link);
+  font-size: 12px;
+}
+
+.channels-favorite-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  gap: 20px;
+}
+
+.channels-favorite {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--gap-sm);
+}
+
+.your-channel-text {
+  font-size: 13px;
+  font-weight: bold;
+  text-transform: capitalize;
+  color: var(--text-primary);
+}
+
+.Edit-text {
+  color: var(--accent-blue);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.channel-logo-favorite {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.channel-logo-favorite > img {
+  height: 20px;
+  width: 20px;
+  object-fit: contain;
+}
+
+.channel-name-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* ── Premium card ── */
+
+.premium-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-primary);
+  border: 1px solid var(--border-glass-subtle);
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  gap: 13px;
+}
+
+.premium-img-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.premium-img-name > img {
+  height: 23px;
+  width: 23px;
+}
+
+.web-name-text {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
+.unlock-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.about-pro {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.about-pro svg {
+  flex-shrink: 0;
+}
+
+.all-pro-text-container > span {
+  font-size: 11px;
+  text-transform: capitalize;
+  color: var(--text-secondary);
+}
+
+.premium-container .upgrade-button {
+  padding: 10px 30px;
+  background-color: var(--accent-blue);
+  color: var(--text-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.premium-container .upgrade-button:hover {
+  opacity: 0.9;
+}
+
 @media (max-width: 700px) {
   .liveMatchesSkeleton {
     gap: var(--gap-md);
@@ -9148,6 +9702,14 @@ p {
   .calendar-page__main-grid {
     grid-template-columns: 1fr 300px;
   }
+
+  .tv-schedule-page {
+    flex-direction: column;
+  }
+
+  .tv-left-container {
+    width: 100%;
+  }
 }
 
 @media (max-width: 900px) {
@@ -9723,6 +10285,39 @@ p {
   .newsPreview__article__image {
     width: 64px;
       height: 48px;
+  }
+
+  .tv-country-calendar-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-changer-container,
+  .all-channel-container {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .date-changer-container::-webkit-scrollbar,
+  .all-channel-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .club-time-channel-conatiner,
+  .club-time-channel-conatiner-two,
+  .club-time-channel-conatiner-three {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .channel-svg-conatiner {
+    gap: 12px;
+  }
+
+  .time-club {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 
