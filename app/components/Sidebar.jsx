@@ -5,30 +5,20 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useSidebar } from '@/context/sidebarContext'
 import { useUser } from '@/context/userContext'
 import { useSignIn } from '@/context/signInContext'
-import { useTheme } from '@/context/themeContext'
 import { ChevronDown, X } from 'lucide-react'
 
 function Sidebar() {
-  const { theme } = useTheme()
   const pathname = usePathname()
   const router = useRouter()
   const { isOpen, isMobile, close } = useSidebar()
   const { session, status } = useUser()
   const { setShowSignIn } = useSignIn()
 
-  const matchesIconSrc =
-    pathname === '/main/matches'
-      ? '/ball3.png' // Selected
-      : theme === 'dark'
-        ? '/ball.png' // Dark mode
-        : '/ball2.png' // Light mode
-
   const navItems = [
     {
       href: '/main/matches',
       label: 'Matches',
       type: 'image',
-      src: matchesIconSrc,
     },
     {
       href: '/main/leagues',
@@ -91,13 +81,22 @@ function Sidebar() {
           </button>
         )}
 
+        {/* Both logos are rendered; CSS shows the one matching html[data-theme] */}
         <div className="logo-container">
           <Image
             width={120}
             height={28}
             alt="GoalIQ"
-            className="goalIQ-name"
-            src={`/${theme === "dark" ? "logo1.png" : "logo2.png"}`}
+            className="goalIQ-name img-dark"
+            src="/logo1.png"
+            priority
+          />
+          <Image
+            width={120}
+            height={28}
+            alt="GoalIQ"
+            className="goalIQ-name img-light"
+            src="/logo2.png"
             priority
           />
         </div>
@@ -112,13 +111,34 @@ function Sidebar() {
               onClick={() => navigate(item.href)}
             >
               {item.type === 'image' ? (
-                <Image
-                  width={26}
-                  height={26}
-                  src={item.src}
-                  alt={item.label}
-                  className="sidebar-link__img"
-                />
+                pathname === '/main/matches' ? (
+                  <Image
+                    width={26}
+                    height={26}
+                    src="/ball3.png"
+                    alt={item.label}
+                    className="sidebar-link__img"
+                  />
+                ) : (
+                  <>
+                    <Image
+                      width={26}
+                      height={26}
+                      src="/ball.png"
+                      alt={item.label}
+                      className="sidebar-link__img img-dark"
+                      loading="eager"
+                    />
+                    <Image
+                      width={26}
+                      height={26}
+                      src="/ball2.png"
+                      alt={item.label}
+                      className="sidebar-link__img img-light"
+                      loading="eager"
+                    />
+                  </>
+                )
               ) : (
                 <NavIcon name={item.id} />
               )}

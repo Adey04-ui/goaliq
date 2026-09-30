@@ -25,6 +25,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="dark">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('goaliq-theme');if(t!=='light'&&t!=='dark')t='dark';var r=document.documentElement;r.classList.add(t);r.setAttribute('data-theme',t)}catch(e){}`,
+          }}
+        />
+      </head>
       <body className={`${inter.variable} font-sans`}>
         <SignInProvider>
           {/* SessionProvider MUST wrap UserProvider */}

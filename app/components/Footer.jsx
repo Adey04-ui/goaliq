@@ -5,16 +5,16 @@ import Image from "next/image"
 import { Facebook, Instagram, X, Youtube } from "lucide-react"
 import { BiLogoApple, BiLogoFacebook, BiLogoInstagram, BiLogoPlayStore, BiLogoTiktok, BiLogoYoutube } from "react-icons/bi"
 import { BsTiktok } from "react-icons/bs"
-import { useTheme } from "@/context/themeContext"
 
 export default function Footer() {
-  const { theme, setTheme } = useTheme()
   return (
     <footer className="about-page">
       <div className="footer-first-container">
         <div className="header-2">
           <span>about</span>
-          <img className="web-name" src={`/${theme === "dark" ? "logo1.png" : "logo2.png"}`} alt="web name" />
+          {/* Both logos rendered; CSS shows the one matching html[data-theme] */}
+          <img className="web-name img-dark" src="/logo1.png" alt="web name" />
+          <img className="web-name img-light" src="/logo2.png" alt="web name" />
         </div>
         <div>
           <span>Your all-in-one football companion.</span>
@@ -22,7 +22,8 @@ export default function Footer() {
         <div>
           <div className="about-goaliq">
             <div className="logo-img">
-              <Image src={theme === "dark" ? "/ball.png" : "/ball3.png"} height={125} width={125} alt="logo" />
+              <Image className="img-dark" src="/ball.png" height={125} width={125} alt="logo" />
+              <Image className="img-light" src="/ball3.png" height={125} width={125} alt="logo" />
             </div>
             <div className="logo-img">
               <span className="built">Built for football fans, powered by technology.</span>
@@ -385,8 +386,9 @@ export default function Footer() {
         <div className="social-main-container">
           <div className="all-social-content">
             <div className="social-left">
-              <div className="logo-name"> 
-                {theme === "dark" ? <img style={{ height: 30 }} src="/ball.png" alt="logo" /> : <img style={{ height: 30 }} src="/ball2.png" alt="logo" />}
+              <div className="logo-name">
+                <img className="img-dark" style={{ height: 30 }} src="/ball.png" alt="logo" />
+                <img className="img-light" style={{ height: 30 }} src="/ball2.png" alt="logo" />
                 <div>
                   <span className="webname">GOALIQ</span>
                 </div>
