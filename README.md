@@ -120,13 +120,12 @@ node scripts/index-players.mjs
 ## Roadmap
 
 - GitHub sign-in
-- <!-- TODO: add your next planned features -->
+- 
 
 ## Contributors
 
 - [Odukoya Kehinde](https://github.com/Adey04-ui) – lead developer
-- <!-- TODO: add the second developer -->
+- [Evans Ali]
 
 ## License
 
-<!-- TODO: choose a license -->
