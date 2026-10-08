@@ -5,12 +5,12 @@ import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
 const TOPICS = [
-  { label: "All News", query: "football" },
-  { label: "Latest News", query: "football latest" },
-  { label: "Champions League", query: "Champions League" },
-  { label: "Premier League", query: "Premier League" },
-  { label: "Transfers", query: "football transfer" },
-  { label: "La Liga", query: "La Liga" },
+  { label: "All News", query: "all" },
+  { label: "Latest News", query: "latest" },
+  { label: "Champions League", query: "champions-league" },
+  { label: "Premier League", query: "premier-league" },
+  { label: "Transfers", query: "transfers" },
+  { label: "La Liga", query: "la-liga" },
 ]
 
 function timeAgo(dateStr) {
