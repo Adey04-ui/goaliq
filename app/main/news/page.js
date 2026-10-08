@@ -64,8 +64,14 @@ function NewsSkeleton() {
 
 function NewsPageContent() {
   const searchParams = useSearchParams()
-  const initialQuery = searchParams.get("q") || "football"
-  const [query, setQuery] = useState(initialQuery)
+
+  const initialQuery = searchParams.get("q") || "all"
+
+  const [query, setQuery] = useState(
+    TOPICS.some((topic) => topic.query === initialQuery)
+      ? initialQuery
+      : "all"
+  )
 
   const { data, isLoading } = useSWR(
     `/api/news?q=${encodeURIComponent(query)}&max=10`,
@@ -83,6 +89,19 @@ function NewsPageContent() {
   const medium = articles.slice(4, 6)
   const small = articles.slice(6, 10)
 
+  function handleTopicChange(topicQuery) {
+    setQuery(topicQuery)
+
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("q", topicQuery)
+
+    window.history.pushState(
+      null,
+      "",
+      `/main/news?${params.toString()}`
+    )
+  }
+
   return (
     <>
       <h1 className="newsPage__heading">News</h1>
@@ -91,15 +110,19 @@ function NewsPageContent() {
         {TOPICS.map((topic) => (
           <button
             key={topic.query}
-            className={`newsPage__topic ${query === topic.query ? "active" : ""}`}
-            onClick={() => setQuery(topic.query)}
+            className={`newsPage__topic ${
+              query === topic.query ? "active" : ""
+            }`}
+            onClick={() => handleTopicChange(topic.query)}
           >
             {topic.label}
           </button>
         ))}
       </div>
 
-      {isLoading ? <NewsSkeleton /> : (
+      {isLoading ? (
+        <NewsSkeleton />
+      ) : (
         <>
           <div className="newsPage__topGrid">
             {hero && (
@@ -108,16 +131,23 @@ function NewsPageContent() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="newsPage__hero"
-                style={{ backgroundImage: `url(${hero.image})` }}
+                style={{
+                  backgroundImage: `url(${hero.image})`,
+                }}
               >
                 <div className="newsPage__hero__overlay">
                   <span className="newsPage__tag">
-                    <span>
-                      {hero.source.name}
-                    </span>
+                    <span>{hero.source.name}</span>
                   </span>
-                  <h2 className="newsPage__hero__title">{hero.title}</h2>
-                  <p className="newsPage__hero__desc">{hero.description}</p>
+
+                  <h2 className="newsPage__hero__title">
+                    {hero.title}
+                  </h2>
+
+                  <p className="newsPage__hero__desc">
+                    {hero.description}
+                  </p>
+
                   <div className="newsPage__meta">
                     <span>{timeAgo(hero.publishedAt)}</span>
                   </div>
@@ -133,14 +163,27 @@ function NewsPageContent() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="newsPage__featured"
-                  style={{ backgroundImage: `url(${article.image})` }}
+                  style={{
+                    backgroundImage: `url(${article.image})`,
+                  }}
                 >
                   <div className="newsPage__featured__overlay">
-                    <span className="newsPage__tag">{article.source.name}</span>
-                    <h3 className="newsPage__featured__title">{article.title}</h3>
-                    <p className="newsPage__featured__desc">{article.description}</p>
+                    <span className="newsPage__tag">
+                      {article.source.name}
+                    </span>
+
+                    <h3 className="newsPage__featured__title">
+                      {article.title}
+                    </h3>
+
+                    <p className="newsPage__featured__desc">
+                      {article.description}
+                    </p>
+
                     <div className="newsPage__meta">
-                      <span>{timeAgo(article.publishedAt)}</span>
+                      <span>
+                        {timeAgo(article.publishedAt)}
+                      </span>
                     </div>
                   </div>
                 </a>
@@ -158,14 +201,28 @@ function NewsPageContent() {
                 >
                   {article.image && (
                     <div className="newsPage__sideCard__image">
-                      <img src={article.image} alt={article.title} />
+                      <img
+                        src={article.image}
+                        alt={article.title}
+                      />
                     </div>
                   )}
+
                   <div className="newsPage__sideCard__content">
-                    <span className="newsPage__tag">{article.source.name}</span>
-                    <p className="newsPage__sideCard__title">{article.title.slice(0, 70) + "..."}</p>
+                    <span className="newsPage__tag">
+                      {article.source.name}
+                    </span>
+
+                    <p className="newsPage__sideCard__title">
+                      {article.title.length > 70
+                        ? article.title.slice(0, 70) + "..."
+                        : article.title}
+                    </p>
+
                     <div className="newsPage__meta">
-                      <span>{timeAgo(article.publishedAt)}</span>
+                      <span>
+                        {timeAgo(article.publishedAt)}
+                      </span>
                     </div>
                   </div>
                 </a>
@@ -183,15 +240,30 @@ function NewsPageContent() {
               >
                 {articles[5].image && (
                   <div className="newsPage__landscape__image">
-                    <img src={articles[5].image} alt={articles[5].title} />
+                    <img
+                      src={articles[5].image}
+                      alt={articles[5].title}
+                    />
                   </div>
                 )}
+
                 <div className="newsPage__landscape__content">
-                  <span className="newsPage__tag">{articles[5].source.name}</span>
-                  <h3 className="newsPage__landscape__title">{articles[5].title}</h3>
-                  <p className="newsPage__landscape__desc">{articles[5].description}</p>
+                  <span className="newsPage__tag">
+                    {articles[5].source.name}
+                  </span>
+
+                  <h3 className="newsPage__landscape__title">
+                    {articles[5].title}
+                  </h3>
+
+                  <p className="newsPage__landscape__desc">
+                    {articles[5].description}
+                  </p>
+
                   <div className="newsPage__meta">
-                    <span>{timeAgo(articles[5].publishedAt)}</span>
+                    <span>
+                      {timeAgo(articles[5].publishedAt)}
+                    </span>
                   </div>
                 </div>
               </a>
@@ -204,13 +276,23 @@ function NewsPageContent() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="newsPage__medCard"
-                style={{ backgroundImage: `url(${article.image})` }}
+                style={{
+                  backgroundImage: `url(${article.image})`,
+                }}
               >
                 <div className="newsPage__medCard__overlay">
-                  <span className="newsPage__tag">{article.source.name}</span>
-                  <p className="newsPage__medCard__title">{article.title}</p>
+                  <span className="newsPage__tag">
+                    {article.source.name}
+                  </span>
+
+                  <p className="newsPage__medCard__title">
+                    {article.title}
+                  </p>
+
                   <div className="newsPage__meta">
-                    <span>{timeAgo(article.publishedAt)}</span>
+                    <span>
+                      {timeAgo(article.publishedAt)}
+                    </span>
                   </div>
                 </div>
               </a>
@@ -225,13 +307,23 @@ function NewsPageContent() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="newsPage__smallCard"
-                style={{ backgroundImage: `url(${article.image})` }}
+                style={{
+                  backgroundImage: `url(${article.image})`,
+                }}
               >
                 <div className="newsPage__smallCard__overlay">
-                  <span className="newsPage__tag">{article.source.name}</span>
-                  <p className="newsPage__smallCard__title">{article.title}</p>
+                  <span className="newsPage__tag">
+                    {article.source.name}
+                  </span>
+
+                  <p className="newsPage__smallCard__title">
+                    {article.title}
+                  </p>
+
                   <div className="newsPage__meta">
-                    <span>{timeAgo(article.publishedAt)}</span>
+                    <span>
+                      {timeAgo(article.publishedAt)}
+                    </span>
                   </div>
                 </div>
               </a>
