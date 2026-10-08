@@ -5,8 +5,6 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { useUser } from "@/context/userContext"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 function SkeletonPulse({ width, height, radius = 8, style = {} }) {
   return (
     <div
@@ -54,7 +52,6 @@ export default function MatchStandings({ match, matchId, active }) {
 
   const { data, isLoading } = useSWR(
     active === "Standings" ? `/api/matches/${matchId}/standings?league=${match.league.id}&season=${match.league.season}` : null,
-    fetcher
   )
 
   const groups = data?.data

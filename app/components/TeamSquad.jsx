@@ -2,19 +2,11 @@
 import useSWR from "swr"
 import Image from "next/image"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const POSITION_ORDER = ["Goalkeeper", "Defender", "Midfielder", "Attacker"]
 
 export default function TeamSquad({ teamId, active }) {
   const { data, isLoading } = useSWR(
     active === "Squad" ? `/api/teams/${teamId}/squad` : null,
-    fetcher,
     { dedupingInterval: 60000, revalidateOnFocus: false }
   )
 

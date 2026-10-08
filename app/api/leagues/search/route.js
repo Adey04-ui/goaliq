@@ -1,6 +1,7 @@
 import { getSearchIndex } from "@/services/leaguesCache"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const q = searchParams.get("q")?.toLowerCase() ?? ""
@@ -25,3 +26,5 @@ export async function GET(request) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

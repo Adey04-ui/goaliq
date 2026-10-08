@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET(req) {
+async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -31,7 +32,9 @@ export async function GET(req) {
   }
 }
 
-export async function POST(req) {
+export const GET = withRateLimit(getHandler, { limiter: "read" })
+
+async function postHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -72,11 +75,16 @@ export async function POST(req) {
         { status: 409 }
       )
     }
+    if (error.code === "P2003") {
+      return Response.json({ message: "User not found" }, { status: 404 })
+    }
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
 
-export async function DELETE(req) {
+export const POST = withRateLimit(postHandler, { limiter: "write" })
+
+async function deleteHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -106,3 +114,5 @@ export async function DELETE(req) {
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
+
+export const DELETE = withRateLimit(deleteHandler, { limiter: "write" })

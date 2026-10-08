@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 async function getGeoFromIp(ip) {
   if (!ip || ip === "::1" || ip === "127.0.0.1") {
@@ -31,7 +32,7 @@ function parseDevice(ua) {
   return "Desktop"
 }
 
-export async function GET(req) {
+async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -140,7 +141,9 @@ export async function GET(req) {
   }
 }
 
-export async function PATCH(req) {
+export const GET = withRateLimit(getHandler, { limiter: "read" })
+
+async function patchHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -205,3 +208,5 @@ export async function PATCH(req) {
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
+
+export const PATCH = withRateLimit(patchHandler, { limiter: "write" })

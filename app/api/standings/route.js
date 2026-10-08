@@ -1,10 +1,12 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 const CURRENT_SEASON = new Date().getFullYear().toString()
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30  // 30 days
 const CURRENT_CACHE_SECONDS = 60 * 60 * 3      // 3 hours
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const league = searchParams.get("league")
@@ -27,23 +29,16 @@ export async function GET(request) {
 
     console.log(`[standings] Redis miss — fetching ${cacheKey}`)
 
-    const res = await fetch(
-      `https://v3.football.api-sports.io/standings?league=${league}&season=${season}`,
-      {
-        headers: {
-          "x-apisports-key": process.env.API_FOOTBALL_KEY,
-        },
+    const res = await fetchApiFootball(`/standings?league=${league}&season=${season}`, {
+      headers: {
+        "x-apisports-key": process.env.API_FOOTBALL_KEY,
+      },
       }
     )
 
-    if (!res.ok) {
-      return Response.json(
-        { success: false, message: "Failed to fetch standings" },
-        { status: 502 }
-      )
-    }
+    if (!res.ok) return apiFootballErrorResponse(res, "Failed to fetch standings")
 
-    const data = await res.json()
+    const data = await res.data
     const standings = data.response
 
     const ttl = season === CURRENT_SEASON
@@ -61,3 +56,5 @@ export async function GET(request) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

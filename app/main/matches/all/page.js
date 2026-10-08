@@ -10,8 +10,6 @@ import { getUserTimeZone } from "@/lib/matchTime"
 import { toggleFavourite } from "@/services/favourites"
 import { useFavorites } from "@/context/favoriteContext"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 const FILTERS = [
   { key: "live", label: "Live" },
   { key: "finished", label: "Finished" },
@@ -80,7 +78,6 @@ function AllMatchesContent() {
 
   const { data, isLoading } = useSWR(
     `/api/matches?date=${date}&status=${filter}&tz=${encodeURIComponent(tz)}&page=${page}`,
-    fetcher,
     {
       revalidateOnFocus: false,
       refreshInterval: filter === "live" ? 30000 : 0,

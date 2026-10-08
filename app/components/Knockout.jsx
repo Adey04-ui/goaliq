@@ -1,19 +1,11 @@
 import useSWR from "swr"
 import Image from "next/image"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 export default function Knockout({ league, season, active }) {
   const { data, isLoading } = useSWR(
     active === "Knockout" && league
       ? `/api/knockout?league=${league.league.id}&season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

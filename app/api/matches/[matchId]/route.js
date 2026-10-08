@@ -1,7 +1,9 @@
 import { redis } from "@/lib/redis"
 import { mapStatus } from "@/lib/matchStatus"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { matchId } = await params
 
@@ -9,15 +11,15 @@ export async function GET(request, { params }) {
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
-    const res = await fetch(`https://v3.football.api-sports.io/fixtures?id=${matchId}`, {
+    const result = await fetchApiFootball(`/fixtures?id=${matchId}`, {
       headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
     })
 
-    if (!res.ok) {
-      return Response.json({ success: false, message: "Failed to fetch match" }, { status: 502 })
+    if (!result.ok) {
+      return apiFootballErrorResponse(result, "Failed to fetch match")
     }
 
-    const data = await res.json()
+    const data = await result.data
     const m = data.response[0]
 
     if (!m) {
@@ -61,3 +63,5 @@ export async function GET(request, { params }) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

@@ -2,22 +2,13 @@
 import useSWR from "swr"
 import Image from "next/image"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 export default function TeamOverview({ team, active, teamId }) {
   const { data: newsData, isLoading: newsLoading } = useSWR(
     active === "Overview" ? `/api/news?q=${encodeURIComponent(team.team.name)}&max=3` : null,
-    fetcher
   )
 
   const { data: fixturesData, isLoading: fixturesLoading } = useSWR(
     active === "Overview" ? `/api/teams/${teamId}/fixtures` : null,
-    fetcher
   )
 
   const news = newsData?.data ?? []

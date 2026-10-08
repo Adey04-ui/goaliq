@@ -1,8 +1,9 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 const NEWS_CACHE_SECONDS = 60 * 60 * 2 // 2 hours — news goes stale fast
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const query = searchParams.get("q") || "football"
@@ -43,3 +44,5 @@ export async function GET(request) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

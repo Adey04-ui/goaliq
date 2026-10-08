@@ -1,4 +1,6 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 const CURRENT_SEASON = new Date().getFullYear().toString()
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
@@ -13,7 +15,7 @@ const KNOCKOUT_KEYWORDS = [
   "final",
 ]
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const league = searchParams.get("league")
@@ -36,8 +38,8 @@ export async function GET(request) {
 
     console.log(`[knockout] Redis miss — fetching ${cacheKey}`)
 
-    const res = await fetch(
-      `https://v3.football.api-sports.io/fixtures?league=${league}&season=${season}`,
+    const result = await fetchApiFootball(
+      `/fixtures?league=${league}&season=${season}`,
       {
         headers: {
           "x-apisports-key": process.env.API_FOOTBALL_KEY,
@@ -45,14 +47,9 @@ export async function GET(request) {
       }
     )
 
-    if (!res.ok) {
-      return Response.json(
-        { success: false, message: "Failed to fetch knockout fixtures" },
-        { status: 502 }
-      )
-    }
+    if (!result.ok) return apiFootballErrorResponse(result, "Failed to fetch Knockout matches")
 
-    const data = await res.json()
+    const data = result.data
 
     const roundMap = {}
     for (const match of data.response) {
@@ -84,3 +81,5 @@ export async function GET(request) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

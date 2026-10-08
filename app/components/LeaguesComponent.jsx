@@ -9,13 +9,6 @@ import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
 import { useUser } from "@/context/userContext"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 export default function LeaguesComponent() {
   const { preferences } = useUser()
   const dataSaver = preferences?.dataSaver ?? false
@@ -54,7 +47,6 @@ export default function LeaguesComponent() {
     filter === "all_leagues"
       ? `/api/leagues?filter=all_leagues&page=${allLeaguesPage}`
       : `/api/leagues?filter=${filter}`,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,
@@ -66,7 +58,6 @@ export default function LeaguesComponent() {
     filter === "all_leagues" && deferredSearch.length >= 2
       ? `/api/leagues/search?q=${encodeURIComponent(deferredSearch)}`
       : null,
-    fetcher,
     {
       dedupingInterval: 5000,
       revalidateOnFocus: false,

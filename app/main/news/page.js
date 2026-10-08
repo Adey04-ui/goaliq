@@ -4,13 +4,6 @@ import useSWR from "swr"
 import { Suspense, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const TOPICS = [
   { label: "All News", query: "football" },
   { label: "Latest News", query: "football latest" },
@@ -76,7 +69,6 @@ function NewsPageContent() {
 
   const { data, isLoading } = useSWR(
     `/api/news?q=${encodeURIComponent(query)}&max=10`,
-    fetcher,
     {
       dedupingInterval: 1000 * 60 * 60 * 2,
       revalidateOnFocus: false,

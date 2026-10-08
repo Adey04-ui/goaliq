@@ -7,13 +7,6 @@ import { Search, X, ChevronDown, Check, Loader } from "lucide-react"
 import { PitchSVG2 } from "@/app/components/BuildYourXI"
 import { useXI } from "@/context/xiContext"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const season = "2024"
 
 // All formations
@@ -103,7 +96,6 @@ function PlayerPicker({ position, onSelect, onClose }) {
     tab === "search" && debouncedSearch.length >= 2
       ? `/api/players/search?q=${encodeURIComponent(debouncedSearch)}&season=${season}`
       : null,
-    fetcher
   )
 
   // Search teams
@@ -111,7 +103,6 @@ function PlayerPicker({ position, onSelect, onClose }) {
     tab === "team" && !selectedTeamId && debouncedTeam.length >= 2
       ? `/api/teams/search?q=${encodeURIComponent(debouncedTeam)}&season=${season}`
       : null,
-    fetcher
   )
 
   // Browse players by team
@@ -119,7 +110,6 @@ function PlayerPicker({ position, onSelect, onClose }) {
     tab === "team" && selectedTeamId
       ? `/api/players/search?team=${selectedTeamId}&season=${season}`
       : null,
-    fetcher
   )
 
   const players = tab === "search"

@@ -1,10 +1,12 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 const CURRENT_SEASON = "2024"
 const PAST_CACHE_SECONDS = 60 * 60 * 24 * 30
 const CURRENT_CACHE_SECONDS = 60 * 60 * 3
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { teamId } = await params
     const { searchParams } = new URL(request.url)
@@ -14,19 +16,15 @@ export async function GET(request, { params }) {
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
-    const res = await fetch(
-      `https://v3.football.api-sports.io/fixtures?team=${teamId}&season=${season}`,
-      { headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY } }
-    )
+    const res = await fetchApiFootball(`/fixtures?team=${teamId}&season=${season}`, {
+      headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY }
+    })
 
     if (!res.ok) {
-      return Response.json(
-        { success: false, message: "Failed to fetch fixtures" },
-        { status: 502 }
-      )
+      return apiFootballErrorResponse(res, "Failed to fetch fixtures")
     }
 
-    const data = await res.json()
+    const data = await res.data
 
     const fixtures = data.response.filter(m => m.fixture.status.short === "NS")
 
@@ -54,3 +52,5 @@ export async function GET(request, { params }) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

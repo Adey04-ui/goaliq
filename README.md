@@ -119,8 +119,13 @@ node scripts/index-players.mjs
 
 ## Roadmap
 
+<<<<<<< Updated upstream
 - GitHub sign-in
 - <!-- TODO: add your next planned features -->
+=======
+- Rate limiting
+- nginX
+>>>>>>> Stashed changes
 
 ## Contributors
 

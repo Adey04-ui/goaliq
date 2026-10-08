@@ -6,13 +6,6 @@ import { useRouter } from "next/navigation"
 import { useUser } from "@/context/userContext"
 import { useLocale, useUserTimezone } from "@/lib/preferences"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 function NewsPreview({ query = "football" }) {
   const router = useRouter()
   const { preferences } = useUser()
@@ -22,7 +15,6 @@ function NewsPreview({ query = "football" }) {
 
   const { data, isLoading } = useSWR(
     `/api/news?q=${encodeURIComponent(query)}&max=3`,
-    fetcher,
     {
       dedupingInterval: 1000 * 60 * 60 * 2,
       revalidateOnFocus: false,

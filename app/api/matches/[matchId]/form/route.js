@@ -1,17 +1,19 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getTeamForm(teamId) {
   const cacheKey = `team:form:${teamId}`
   const cached = await redis.get(cacheKey)
   if (cached) return cached
 
-  const res = await fetch(`https://v3.football.api-sports.io/fixtures?team=${teamId}&last=5`, {
+  const result = await fetchApiFootball(`/fixtures?team=${teamId}&last=5`, {
     headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
   })
 
-  if (!res.ok) return []
+  if (!result.ok) return []
 
-  const data = await res.json()
+  const data = result.data
 
   const form = data.response
     .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
@@ -32,7 +34,7 @@ async function getTeamForm(teamId) {
   return form
 }
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { searchParams } = new URL(request.url)
     const homeTeamId = searchParams.get("home")
@@ -49,3 +51,5 @@ export async function GET(request, { params }) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

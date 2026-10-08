@@ -3,6 +3,7 @@ import { redis } from "@/lib/redis"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
 import { NextResponse } from "next/server"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 const SEARCH_CACHE_TTL = 60 * 60 * 24 // team/league names essentially never change — cache a full day
 
@@ -38,7 +39,7 @@ async function cachedFetch(cacheKey, endpoint) {
   return result
 }
 
-export async function GET(request) {
+async function getHandler(request) {
   const { searchParams } = new URL(request.url)
   const q = searchParams.get("q")?.trim()
 
@@ -111,3 +112,5 @@ export async function GET(request) {
 
   return NextResponse.json({ players, teams, leagues })
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

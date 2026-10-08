@@ -9,13 +9,6 @@ import { useFormatMatchTime, useLocale, useUserTimezone } from "@/lib/preference
 
 const DATES_PER_PAGE = 3
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 let flushTimer = null
 const favQueue = new Map()
 
@@ -106,7 +99,6 @@ function Results({ season, league, active }) {
     active === "Results" && league
       ? `/api/fixtures?league=${league.league.id}&season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

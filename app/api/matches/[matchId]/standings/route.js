@@ -1,6 +1,8 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { matchId } = await params
     const { searchParams } = new URL(request.url)
@@ -15,15 +17,15 @@ export async function GET(request, { params }) {
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
-    const res = await fetch(`https://v3.football.api-sports.io/standings?league=${league}&season=${season}`, {
+    const result = await fetchApiFootball(`/standings?league=${league}&season=${season}`, {
       headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
     })
 
-    if (!res.ok) {
-      return Response.json({ success: false, message: "Failed to fetch standings" }, { status: 502 })
+    if (!result.ok) {
+      return apiFootballErrorResponse(result, "Failed to fetch standings")
     }
 
-    const data = await res.json()
+    const data = await result.data
 
     // API-Football nests standings as response[0].league.standings[groupIndex][]
     // some leagues (e.g. cup groups) have multiple groups — flatten for simplicity, frontend can split by group if needed
@@ -50,3 +52,5 @@ export async function GET(request, { params }) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })
