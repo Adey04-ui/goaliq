@@ -11,7 +11,7 @@ const TOAST_COOLDOWN_MS = 10_000
 const MAX_AUTO_RETRY_WAIT_S = 60
 
 export default function SWRProvider({ children }) {
-  const { error: showError } = useToast()
+  const { error: showError, warn: showWarn } = useToast()
   const lastToastAt = useRef(0)
 
   const config = useMemo(
@@ -28,7 +28,7 @@ export default function SWRProvider({ children }) {
         lastToastAt.current = now
 
         if (err.status === 429) {
-          showError("Too many requests", "Slowing down for a moment.")
+          showWarn("Too many requests", "Slowing down for a moment.")
         } else {
           showError("Data temporarily unavailable", "We'll try again shortly.")
         }
