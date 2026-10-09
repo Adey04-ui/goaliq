@@ -11,7 +11,8 @@ import { XIProvider } from "@/context/xiContext"
 import ThemeWrapper from "./components/ThemeWrapper"
 import { SidebarProvider } from "@/context/sidebarContext"
 import { ThemeProvider } from "@/context/themeContext"
-import PageViewTracker from "@/app/components/PageViewTracker";
+import PageViewTracker from "@/app/components/PageViewTracker"
+import FrontendMonitor from "@/app/components/analytics/FrontendMonitor"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`${inter.variable} font-sans`}>
         <PageViewTracker />
+        <FrontendMonitor />
         <ToastProvider>
           <SWRProvider>
             <SignInProvider>
