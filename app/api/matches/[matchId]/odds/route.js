@@ -1,24 +1,45 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { matchId } = await params
+
+    // Numbers only: keeps junk out of the cache key and the API-Football query.
+    if (!/^\d+$/.test(matchId)) {
+      return Response.json(
+        { success: false, message: "Invalid match id" },
+        { status: 400 }
+      )
+    }
 
     const cacheKey = `match:odds:${matchId}`
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
+    // Paths only: the helper adds the base URL and the API key.
     const [oddsRes, predictionsRes] = await Promise.all([
-      fetch(`https://v3.football.api-sports.io/odds?fixture=${matchId}`, {
-        headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
-      }),
-      fetch(`https://v3.football.api-sports.io/predictions?fixture=${matchId}`, {
-        headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
-      }),
+      fetchApiFootball(`/odds?fixture=${matchId}`),
+      fetchApiFootball(`/predictions?fixture=${matchId}`),
     ])
 
-    const oddsData = oddsRes.ok ? await oddsRes.json() : { response: [] }
-    const predictionsData = predictionsRes.ok ? await predictionsRes.json() : { response: [] }
+    const failed = [oddsRes, predictionsRes].filter((r) => !r.ok)
+
+    // Both failed: there is nothing to show. Prefer the failure that carries
+    // a retryAfter (budget used up) so the client gets a proper Retry-After.
+    if (failed.length === 2) {
+      return apiFootballErrorResponse(
+        failed.find((r) => r.retryAfter) ?? failed[0],
+        "Failed to fetch odds and predictions"
+      )
+    }
+
+    // One failed: still return the half we have. This is different from
+    // "the API has no odds for this match", which is ok:true with an empty
+    // response and is cached normally.
+    const oddsData = oddsRes.ok ? oddsRes.data : { response: [] }
+    const predictionsData = predictionsRes.ok ? predictionsRes.data : { response: [] }
 
     // odds: pick the first bookmaker's match-winner market as a simple default
     const bookmaker = oddsData.response[0]?.bookmakers?.[0]
@@ -44,11 +65,19 @@ export async function GET(request, { params }) {
         : null,
     }
 
-    // odds shift as kickoff approaches, but not worth refreshing more than hourly
-    await redis.set(cacheKey, payload, { ex: 60 * 60 })
+    // Full result: cache for an hour. Partial result: cache briefly, so the
+    // missing half is retried soon without every request re-spending budget.
+    const ttl = failed.length === 0 ? 60 * 60 : 60
+    await redis.set(cacheKey, payload, { ex: ttl })
 
     return Response.json({ success: true, data: payload })
   } catch (error) {
-    return Response.json({ success: false, message: error.message }, { status: 500 })
+    console.error("[match odds] error:", error)
+    return Response.json(
+      { success: false, message: "Something went wrong" },
+      { status: 500 }
+    )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

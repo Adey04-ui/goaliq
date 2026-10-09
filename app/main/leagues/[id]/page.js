@@ -7,13 +7,6 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 // of LeaguesComponent.jsx - point this at that same folder).
 import Standings from "@/app/components/Standings"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 export default function LeaguePage() {
   const router = useRouter()
 
@@ -55,7 +48,6 @@ export default function LeaguePage() {
   // also reading the nested `league` metadata off the same response.
   const { data, error, isLoading } = useSWR(
     leagueId ? `/api/standings?league=${leagueId}&season=${season}` : null,
-    fetcher,
     { dedupingInterval: 60000, revalidateOnFocus: false }
   )
 

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { fetchLocalDayFixtures, todayString } from "@/lib/fixtures"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 const TRENDING_CACHE_SECONDS = 60 * 60
 const LEAGUES_PER_PAGE = 8
@@ -61,7 +62,7 @@ function filterByFavourites(leagues, favourites) {
   return filtered
 }
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const date = searchParams.get("date") || todayString()
@@ -125,3 +126,5 @@ export async function GET(request) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

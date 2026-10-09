@@ -7,13 +7,6 @@ import { div } from "three/src/nodes/math/OperatorNode.js"
 
 const DATES_PER_PAGE = 3 // how many date groups to show at a time
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const season = "2024"
 
 let flushTimer = null
@@ -100,7 +93,6 @@ function TeamFixtures({ league, active, teamId }) {
     active === "Fixtures"
       ? `/api/teams/${teamId}/fixtures?season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

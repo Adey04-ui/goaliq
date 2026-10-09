@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { cookies } from "next/headers"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 async function getCurrentSessionToken() {
   // cookies() is async in Next.js 15+ - same issue as headers() in route.js
@@ -13,7 +14,7 @@ async function getCurrentSessionToken() {
   )
 }
 
-export async function GET(req) {
+async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -42,7 +43,9 @@ export async function GET(req) {
   }
 }
 
-export async function DELETE(req) {
+export const GET = withRateLimit(getHandler, { limiter: "read" })
+
+async function deleteHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -78,3 +81,5 @@ export async function DELETE(req) {
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
+
+export const DELETE = withRateLimit(deleteHandler, { limiter: "write" })

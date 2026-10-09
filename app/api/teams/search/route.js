@@ -1,6 +1,7 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const query = searchParams.get("q")
@@ -35,3 +36,5 @@ export async function GET(request) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

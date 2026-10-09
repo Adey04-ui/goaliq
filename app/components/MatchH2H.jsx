@@ -5,8 +5,6 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { useUser } from "@/context/userContext"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 function SkeletonPulse({ width, height, radius = 8, style = {} }) {
   return (
     <div
@@ -49,7 +47,6 @@ export default function MatchH2H({ match, matchId, active }) {
 
   const { data, isLoading } = useSWR(
     active === "H2H" ? `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
-    fetcher
   )
 
   const h2h = data?.data

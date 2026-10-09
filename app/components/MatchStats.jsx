@@ -4,8 +4,6 @@ import useSWR from "swr"
 import { motion } from "framer-motion"
 import { shadeColor } from "@/lib/color"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 const STAT_ORDER = [
   "Ball Possession",
   "Total Shots",
@@ -91,11 +89,11 @@ function StatBar({ label, homeValue, awayValue, homeColor, awayColor, index }) {
 }
 
 export default function MatchStats({ match, matchId, active }) {
-  const { data, isLoading } = useSWR(active === "Stats" ? `/api/matches/${matchId}/stats?status=${match.status}` : null, fetcher, {
+  const { data, isLoading } = useSWR(active === "Stats" ? `/api/matches/${matchId}/stats?status=${match.status}` : null, {
     refreshInterval: match.status === "LIVE" ? 30000 : 0,
   })
-  const { data: homeColorData } = useSWR(`/api/teams/${match.teams.home.id}/color`, fetcher)
-  const { data: awayColorData } = useSWR(`/api/teams/${match.teams.away.id}/color`, fetcher)
+  const { data: homeColorData } = useSWR(`/api/teams/${match.teams.home.id}/color`,)
+  const { data: awayColorData } = useSWR(`/api/teams/${match.teams.away.id}/color`,)
 
   const stats = data?.data
   const homeColor = homeColorData?.data?.color || "#d41b27"

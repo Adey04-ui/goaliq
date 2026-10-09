@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET(req) {
+async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -29,7 +30,9 @@ export async function GET(req) {
   }
 }
 
-export async function PATCH(req) {
+export const GET = withRateLimit(getHandler, { limiter: "read" })
+
+async function patchHandler(req) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -59,7 +62,9 @@ export async function PATCH(req) {
   }
 }
 
-export async function DELETE(req) {
+export const PATCH = withRateLimit(patchHandler, { limiter: "write" })
+
+async function deleteHandler(req) {
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user?.id) {
@@ -82,3 +87,5 @@ export async function DELETE(req) {
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
+
+export const DELETE = withRateLimit(deleteHandler, { limiter: "write" })

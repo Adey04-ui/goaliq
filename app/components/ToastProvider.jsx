@@ -8,7 +8,7 @@ const ToastContext = createContext(null)
 export function useToast() {
   const ctx = useContext(ToastContext)
   if (!ctx) {
-    return { success: () => {}, error: () => {} }
+    return { success: () => { }, error: () => { }, warn: () => { } }
   }
   return ctx
 }
@@ -125,6 +125,120 @@ function ToastIcon({ type }) {
   )
 }
 
+function WarningToastIcon() {
+  const color = "#f59e0b"
+
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      style={{ flexShrink: 0 }}
+    >
+      {/* Expanding splash ring */}
+      <motion.circle
+        cx="16"
+        cy="16"
+        r="11"
+        fill="none"
+        stroke={color}
+        strokeWidth="3"
+        initial={{ scale: 0.6, opacity: 0.5 }}
+        animate={{ scale: 2.2, opacity: 0 }}
+        transition={{
+          delay: 0.65,
+          duration: 0.5,
+          ease: "easeOut",
+        }}
+        style={{ transformOrigin: "16px 16px" }}
+      />
+
+      {/* Flying particles */}
+      {[0, 90, 180, 270].map((deg, i) => (
+        <motion.circle
+          key={i}
+          cx="16"
+          cy="16"
+          r="1.8"
+          fill={color}
+          initial={{ opacity: 1, scale: 1 }}
+          animate={{
+            opacity: 0,
+            scale: 0,
+            x: Math.cos((deg * Math.PI) / 180) * 18,
+            y: Math.sin((deg * Math.PI) / 180) * 18,
+          }}
+          transition={{
+            delay: 0.6 + i * 0.03,
+            duration: 0.5,
+            ease: "easeOut",
+          }}
+        />
+      ))}
+
+      {/* Warning triangle */}
+      <motion.path
+        d="M16 5L28 26H4L16 5Z"
+        fill={color}
+        initial={{ opacity: 0, scale: 0.4 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          delay: 0.35,
+          duration: 0.35,
+          type: "spring",
+          stiffness: 400,
+          damping: 15,
+        }}
+        style={{ transformOrigin: "16px 16px" }}
+      />
+
+      {/* Triangle outline */}
+      <motion.path
+        d="M16 5L28 26H4L16 5Z"
+        fill="none"
+        stroke={color}
+        strokeWidth="0.7"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0, opacity: 1 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{
+          duration: 0.45,
+          ease: "easeInOut",
+        }}
+      />
+
+      {/* Warning ! */}
+      <motion.path
+        d="M16 11V18"
+        stroke="#fff"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{
+          duration: 0.3,
+          delay: 0.5,
+          ease: "easeOut",
+        }}
+      />
+
+      <motion.circle
+        cx="16"
+        cy="22"
+        r="1.2"
+        fill="#fff"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{
+          delay: 0.75,
+          duration: 0.2,
+          type: "spring",
+        }}
+      />
+    </svg>
+  )
+}
+
 /* ─── Single Toast ─── */
 function ToastItem({ toast, onRemove }) {
   return (
@@ -154,7 +268,11 @@ function ToastItem({ toast, onRemove }) {
         cursor: "pointer",
       }}
     >
-      <ToastIcon type={toast.type} />
+      {toast.type === "warn" ? (
+        <WarningToastIcon />
+      ) : (
+        <ToastIcon type={toast.type} />
+      )}
 
       <div style={{ display: "flex", flexDirection: "column", gap: 3, flex: 1, minWidth: 0 }}>
         <span style={{ fontWeight: 700, fontSize: 13, color: "#fff" }}>
@@ -178,7 +296,12 @@ function ToastItem({ toast, onRemove }) {
           left: 0,
           right: 0,
           height: 2,
-          background: toast.type === "success" ? "#22c55e" : "#ef4444",
+          background:
+            toast.type === "success"
+              ? "#22c55e"
+              : toast.type === "warn"
+                ? "#f59e0b"
+                : "#ef4444",
           transformOrigin: "left",
         }}
         onAnimationComplete={onRemove}
@@ -227,9 +350,13 @@ export function ToastProvider({ children }) {
 
   const success = useCallback((title, message) => addToast("success", title, message), [addToast])
   const error = useCallback((title, message) => addToast("error", title, message), [addToast])
+  const warn = useCallback(
+    (title, message) => addToast("warn", title, message),
+    [addToast]
+  )
 
   return (
-    <ToastContext.Provider value={{ success, error }}>
+    <ToastContext.Provider value={{ success, error, warn }}>
       {children}
 
       <div

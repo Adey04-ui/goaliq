@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET() {
+async function getHandler() {
   try {
     const session = await getServerSession(authOptions)
 
@@ -35,7 +36,11 @@ export async function GET() {
   }
 }
 
-export async function POST(request) {
+
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })
+
+async function postHandler(request) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -74,3 +79,5 @@ export async function POST(request) {
     )
   }
 }
+
+export const POST = withRateLimit(postHandler, { limiter: "write" })

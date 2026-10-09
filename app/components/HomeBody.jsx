@@ -15,8 +15,6 @@ import { useUser } from "@/context/userContext"
 import { useToast } from "@/lib/useToast"
 import { useFavorites } from "@/context/favoriteContext"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 function formatDate(offsetDays) {
   const d = new Date()
   d.setDate(d.getDate() + offsetDays)
@@ -262,7 +260,6 @@ function HomeBody() {
     offsetDays === 0
       ? `/api/matches?date=${date}&status=live&tz=${encodeURIComponent(tz)}`
       : null,
-    fetcher,
     {
       refreshInterval: 30000,
       revalidateOnFocus: false,
@@ -271,7 +268,6 @@ function HomeBody() {
 
   const { data: mainData, isLoading } = useSWR(
     `/api/matches?date=${date}&status=${statusParam}&filter=${leagueFilterParam}&tz=${encodeURIComponent(tz)}&page=${page}`,
-    fetcher,
     { revalidateOnFocus: false, refreshInterval: offsetDays === 0 && page === 1 ? 60000 : 0 }
   )
 

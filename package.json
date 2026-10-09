@@ -19,6 +19,7 @@
     "@radix-ui/react-dropdown-menu": "^2.1.17",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
+    "@upstash/ratelimit": "^2.2.0",
     "@upstash/redis": "^1.38.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",

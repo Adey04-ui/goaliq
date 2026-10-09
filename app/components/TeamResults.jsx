@@ -6,13 +6,6 @@ import { useState } from "react"
 
 const DATES_PER_PAGE = 3 // how many date groups to show at a time
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const season = "2024"
 
 let flushTimer = null
@@ -102,7 +95,6 @@ function TeamResults({ league, active, teamId }) {
     active === "Results"
       ? `/api/teams/${teamId}/fixtures?season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

@@ -2,6 +2,7 @@ import { v2 as cloudinary } from "cloudinary"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,7 +10,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-export async function POST(req) {
+async function postHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -29,9 +30,9 @@ export async function POST(req) {
       return Response.json({ message: "File must be an image" }, { status: 400 })
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      return Response.json({ message: "Image must be under 5MB" }, { status: 400 })
+    // Validate file size (max 4MB)
+    if (file.size > 4 * 1024 * 1024) {
+      return Response.json({ message: "Image must be under 4MB" }, { status: 400 })
     }
 
     // Convert to buffer for Cloudinary
@@ -93,8 +94,10 @@ export async function POST(req) {
   } catch (error) {
     console.error("Upload error:", error)
     return Response.json(
-      { message: error.message || "Upload failed" },
+      { message: "Upload failed" },
       { status: 500 }
     )
   }
 }
+
+export const POST = withRateLimit(postHandler, { limiter: "upload" }) 

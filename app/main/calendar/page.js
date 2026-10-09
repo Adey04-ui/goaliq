@@ -8,8 +8,6 @@ import Image from "next/image"
 import { useUser } from "@/context/userContext"
 import { getUserTimeZone } from "@/lib/matchTime"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
@@ -154,14 +152,12 @@ export default function CalendarPage() {
 
   const { data: calendarData, isLoading: calendarLoading } = useSWR(
     `/api/matches/calendar?month=${monthKey}&tz=${encodeURIComponent(tz)}`,
-    fetcher
   )
 
   const { data: dayData, isLoading: dayLoading } = useSWR(
     selectedDate
       ? `/api/matches?date=${selectedDate}&status=all&filter=favourites&tz=${encodeURIComponent(tz)}&page=1`
       : null,
-    fetcher
   )
 
   const dayMap = useMemo(() => {

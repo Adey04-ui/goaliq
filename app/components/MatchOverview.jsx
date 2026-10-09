@@ -6,8 +6,6 @@ import { motion } from "framer-motion"
 import { useUser } from "@/context/userContext"
 import { GoalIcon, OwnGoalIcon, MissedPenaltyIcon, SubstitutionIcon, YellowCardIcon, RedCardIcon } from "./EventIcons"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 const containerVariants = {
   hidden: { opacity: 0 },
   show: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
@@ -85,12 +83,10 @@ function LiveOrFinishedOverview({ match, matchId, isActive }) {
 
   const { data: eventsData, isLoading: eventsLoading } = useSWR(
     isActive ? `/api/matches/${matchId}/events?status=${match.status}` : null,
-    fetcher,
     { refreshInterval: match.status === "LIVE" ? 30000 : 0 }
   )
   const { data: statsData, isLoading: statsLoading } = useSWR(
     isActive ? `/api/matches/${matchId}/stats?status=${match.status}` : null,
-    fetcher
   )
 
   const events = eventsData?.data || []
@@ -189,13 +185,11 @@ function UpcomingOverview({ match, matchId, isActive }) {
 
   const { data: h2hData, isLoading: h2hLoading } = useSWR(
     isActive ? `/api/matches/${matchId}/h2h?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
-    fetcher
   )
   const { data: formData, isLoading: formLoading } = useSWR(
     isActive ? `/api/matches/${matchId}/form?home=${match.teams.home.id}&away=${match.teams.away.id}` : null,
-    fetcher
   )
-  const { data: oddsData, isLoading: oddsLoading } = useSWR(isActive ? `/api/matches/${matchId}/odds` : null, fetcher)
+  const { data: oddsData, isLoading: oddsLoading } = useSWR(isActive ? `/api/matches/${matchId}/odds` : null, )
 
   const h2h = h2hData?.data
   const form = formData?.data

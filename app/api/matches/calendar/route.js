@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { fetchDayFixtures, todayString } from "@/lib/fixtures"
 import { getServerSession } from "next-auth"
 import { authOptions } from "../../auth/[...nextauth]/route"
+import { withRateLimit } from "@/lib/withRateLimit"
 
 
 async function getCurrentUserId() {
@@ -44,7 +45,7 @@ function isFavouriteMatch(match, favs) {
   )
 }
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const month = searchParams.get("month") || todayString().slice(0, 7)
@@ -90,3 +91,5 @@ export async function GET(request) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

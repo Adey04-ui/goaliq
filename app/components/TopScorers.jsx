@@ -2,19 +2,11 @@ import useSWR from "swr"
 import Image from "next/image"
 import Link from "next/link"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 function TopScorers({ league, season, active }) {
   const { data, isLoading } = useSWR(
     active === "Top Scorers" && league
       ? `/api/topScorers?league=${league.league.id}&season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

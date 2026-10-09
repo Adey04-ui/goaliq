@@ -5,8 +5,9 @@ import {
   getFavoritesCache,
   setFavoritesCache,
 } from "@/services/favoritesCache"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function POST(req) {
+async function postHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -93,7 +94,7 @@ export async function POST(req) {
   }
 }
 
-export async function GET(req) {
+async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -148,3 +149,6 @@ export async function GET(req) {
     return Response.json({ message: error.message }, { status: 500 })
   }
 }
+
+export const POST = withRateLimit(postHandler, { limiter: "write" })
+export const GET = withRateLimit(getHandler, { limiter: "read" })

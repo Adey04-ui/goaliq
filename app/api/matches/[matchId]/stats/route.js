@@ -1,6 +1,8 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { matchId } = await params
     const { searchParams } = new URL(request.url)
@@ -14,15 +16,15 @@ export async function GET(request, { params }) {
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
-    const res = await fetch(`https://v3.football.api-sports.io/fixtures/statistics?fixture=${matchId}`, {
+    const result = await fetchApiFootball(`/fixtures/statistics?fixture=${matchId}`, {
       headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY },
     })
 
-    if (!res.ok) {
-      return Response.json({ success: false, message: "Failed to fetch stats" }, { status: 502 })
+    if (!result.ok) {
+      return apiFootballErrorResponse(result, "Failed to fetch stats")
     }
 
-    const data = await res.json()
+    const data = await result.data
 
     // data.response is an array of 2 team stat blocks — reshape to { home: {...}, away: {...} }
     const [homeBlock, awayBlock] = data.response
@@ -50,3 +52,5 @@ export async function GET(request, { params }) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

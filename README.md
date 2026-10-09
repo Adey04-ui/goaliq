@@ -121,6 +121,8 @@ node scripts/index-players.mjs
 
 - GitHub sign-in
 - 
+- Rate limiting
+- nginX
 
 ## Contributors
 

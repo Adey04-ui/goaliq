@@ -15,13 +15,6 @@ import { useFormatMatchTime, useFormatDate } from "@/lib/preferences"
 import { useUser } from "@/context/userContext"
 import { MapPin, UserCheck } from "lucide-react"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const TABS = ["Overview", "Lineups", "Stats", "H2H", "Standings"]
 
 function MatchPageSkeleton() {
@@ -60,7 +53,7 @@ export default function MatchPage() {
   const dataSaver = preferences?.dataSaver ?? false
   const router = useRouter()
 
-  const { data: matchData, isLoading: matchLoading } = useSWR(`/api/matches/${matchId}`, fetcher, {
+  const { data: matchData, isLoading: matchLoading } = useSWR(`/api/matches/${matchId}`, {
     refreshInterval: 30000,
   })
 

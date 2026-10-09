@@ -7,8 +7,6 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { useUser } from "@/context/userContext"
 import {useRouter} from "next/navigation"
 
-const fetcher = (url) => fetch(url).then((res) => res.json())
-
 function SkeletonPulse({ width, height, radius = 8, style = {} }) {
   return (
     <div
@@ -194,10 +192,9 @@ function TeamSubsList({ side, showRating, dataSaver }) {
 export default function MatchLineups({ match, matchId, active }) {
   const { preferences } = useUser()
   const isActive = active === "Lineups"
-  const { data, isLoading } = useSWR(isActive ? `/api/matches/${matchId}/lineups?status=${match.status}` : null, fetcher)
+  const { data, isLoading } = useSWR(isActive ? `/api/matches/${matchId}/lineups?status=${match.status}` : null)
   const { data: eventsData } = useSWR(
     isActive && match.status !== "UPCOMING" ? `/api/matches/${matchId}/events?status=${match.status}` : null,
-    fetcher,
     { refreshInterval: match.status === "LIVE" ? 30000 : 0 }
   )
 

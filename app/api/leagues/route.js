@@ -5,8 +5,9 @@ import {
   getFilteredLeagues,
   getPaginatedLeagues,
 } from "@/services/leaguesCache"
+import { withRateLimit } from "@/lib/withRateLimit"
 
-export async function GET(request) {
+async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
     const filter = searchParams.get("filter") ?? "top_leagues"
@@ -71,3 +72,5 @@ export async function GET(request) {
     )
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

@@ -5,13 +5,6 @@ import useSWR from "swr"
 import Image from "next/image"
 import { Plus, Newspaper, Calendar } from "lucide-react"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime()
   const mins = Math.floor(diff / 60000)
@@ -29,12 +22,10 @@ export default function FollowingPage() {
 
   const { data: followingData, isLoading: followingLoading } = useSWR(
     "/api/following",
-    fetcher
   )
 
   const { data: feedData, isLoading: feedLoading } = useSWR(
     "/api/following/feed",
-    fetcher
   )
 
   const teams = followingData?.data?.teams ?? []

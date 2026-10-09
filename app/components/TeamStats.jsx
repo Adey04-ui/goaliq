@@ -1,13 +1,6 @@
 // app/main/team/[teamId]/TeamStats.jsx
 import useSWR from "swr"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const season = "2024"
 
 export default function TeamStats({ teamId, team, active, leagueId }) {
@@ -16,7 +9,6 @@ export default function TeamStats({ teamId, team, active, leagueId }) {
     active === "Stats" && leagueId
       ? `/api/teams/${teamId}/stats?league=${leagueId}&season=${season}`
       : null,
-    fetcher,
     { dedupingInterval: 60000, revalidateOnFocus: false }
   )
 

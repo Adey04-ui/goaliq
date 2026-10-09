@@ -9,13 +9,6 @@ import Results from "./Results"
 import TopScorers from "./TopScorers"
 import Knockout from "./Knockout"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 export default function Standings({ league, onBack, season }) {
   const [active, setActive] = useState(null)
   const [selectedGroup, setSelectedGroup] = useState(0)
@@ -24,7 +17,6 @@ export default function Standings({ league, onBack, season }) {
     league
       ? `/api/standings?league=${league.league.id}&season=${season}`
       : null,
-    fetcher,
     {
       dedupingInterval: 60000,
       revalidateOnFocus: false,

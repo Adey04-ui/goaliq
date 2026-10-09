@@ -1,6 +1,8 @@
 import { redis } from "@/lib/redis"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
-export async function GET(request, { params }) {
+async function getHandler(request, { params }) {
   try {
     const { matchId } = await params
     const { searchParams } = new URL(request.url)
@@ -15,16 +17,16 @@ export async function GET(request, { params }) {
     const cached = await redis.get(cacheKey)
     if (cached) return Response.json({ success: true, data: cached })
 
-    const res = await fetch(
-      `https://v3.football.api-sports.io/fixtures/headtohead?h2h=${homeTeamId}-${awayTeamId}&last=10`,
+    const result = await fetchApiFootball(
+      `/fixtures/headtohead?h2h=${homeTeamId}-${awayTeamId}&last=10`,
       { headers: { "x-apisports-key": process.env.API_FOOTBALL_KEY } }
     )
 
-    if (!res.ok) {
-      return Response.json({ success: false, message: "Failed to fetch head-to-head" }, { status: 502 })
+    if (!result.ok) {
+      return apiFootballErrorResponse(result, "Failed to fetch head-to-head")
     }
 
-    const data = await res.json()
+    const data = result.data
 
     const meetings = data.response
       .filter((m) => m.fixture.status.short === "FT" || m.fixture.status.short === "AET" || m.fixture.status.short === "PEN")
@@ -64,3 +66,5 @@ export async function GET(request, { params }) {
     return Response.json({ success: false, message: error.message }, { status: 500 })
   }
 }
+
+export const GET = withRateLimit(getHandler, { limiter: "read" })

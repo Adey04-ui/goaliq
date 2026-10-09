@@ -15,13 +15,6 @@ import TeamFixtures from "@/app/components/TeamFixtures"
 import TeamResults from "@/app/components/TeamResults"
 import TeamStats from "@/app/components/TeamStats"
 
-const fetcher = async (url) => {
-  const res = await fetch(url)
-  const result = await res.json()
-  if (!res.ok) throw new Error(result.message)
-  return result
-}
-
 const TABS = ["Overview", "Squad", "Fixtures", "Results", "Stats"]
 
 export default function TeamPage() {
@@ -33,8 +26,7 @@ export default function TeamPage() {
 
   // Only fetch team info on mount — lightweight, cached 30 days
   const { data: teamData, isLoading: teamLoading } = useSWR(
-    `/api/teams/${teamId}`,
-    fetcher
+    `/api/teams/${teamId}`
   )
 
   const team = teamData?.data
