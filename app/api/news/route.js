@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis"
 import { withRateLimit } from "@/lib/withRateLimit"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 
 const NEWS_CACHE_SECONDS = 60 * 60 * 2 // 2 hours
 
@@ -191,6 +192,8 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, {
-  limiter: "read",
-})
+export const GET = withApiMonitoring(
+  withRateLimit(getHandler, {
+    limiter: "read",
+  })
+)

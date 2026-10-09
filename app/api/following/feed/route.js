@@ -1,7 +1,7 @@
 import { redis } from "@/lib/redis"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { withRateLimit } from "@/lib/withRateLimit"
 
 const FEED_CACHE_SECONDS = 60 * 60 // 1 hour

@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import { redis } from "@/lib/redis"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { NextResponse } from "next/server"
 import { withRateLimit } from "@/lib/withRateLimit"
 

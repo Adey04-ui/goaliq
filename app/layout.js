@@ -11,6 +11,7 @@ import { XIProvider } from "@/context/xiContext"
 import ThemeWrapper from "./components/ThemeWrapper"
 import { SidebarProvider } from "@/context/sidebarContext"
 import { ThemeProvider } from "@/context/themeContext"
+import PageViewTracker from "@/app/components/PageViewTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -36,13 +37,10 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${inter.variable} font-sans`}>
-        {/* ToastProvider is outermost so SWRProvider (and everything below)
-            can call useToast(). SWRProvider is next so ALL useSWR hooks in the
-            app get the shared fetcher and retry rules. */}
+        <PageViewTracker />
         <ToastProvider>
           <SWRProvider>
             <SignInProvider>
-              {/* SessionProvider MUST wrap UserProvider */}
               <SidebarProvider>
                 <Providers>
                   <UserProvider>

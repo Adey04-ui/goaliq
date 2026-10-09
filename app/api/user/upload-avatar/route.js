@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { withRateLimit } from "@/lib/withRateLimit"
 
 cloudinary.config({

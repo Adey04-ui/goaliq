@@ -2,7 +2,7 @@ import { redis } from "@/lib/redis"
 import { prisma } from "@/lib/prisma"
 import { fetchDayFixtures, todayString } from "@/lib/fixtures"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { withRateLimit } from "@/lib/withRateLimit"
 import { routeErrorResponse } from "@/lib/apiFootball"
 
