@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { useUser } from "@/context/userContext"
 import { useLocale, useUserTimezone } from "@/lib/preferences"
 
-function NewsPreview({ query = "football" }) {
+function NewsPreview({ query = "all" }) {
   const router = useRouter()
   const { preferences } = useUser()
   const locale = useLocale()

@@ -9,6 +9,13 @@ import LeaguesList from "./LeaguesList"
 import Standings from "./Standings"
 import { useUser } from "@/context/userContext"
 
+// ─── Leagues come in two shapes ───
+// Nested (API-Football style, most filters): { league: { name }, country: { name } }
+// Flat (search index, used by the favorites tab): { name, country: "Nigeria" }
+const getLeagueName = (l) => l.league?.name ?? l.name ?? ""
+const getCountryName = (l) =>
+  (typeof l.country === "string" ? l.country : l.country?.name) ?? ""
+
 export default function LeaguesComponent() {
   const { preferences } = useUser()
   const dataSaver = preferences?.dataSaver ?? false
@@ -94,11 +101,13 @@ export default function LeaguesComponent() {
       return accumulatedLeagues
     }
 
-    // Small filters — search locally, already have full data
+    // Small filters — search locally, already have full data.
+    // Works for both item shapes (the favorites tab returns flat items).
     if (deferredSearch.length >= 2) {
+      const q = deferredSearch.toLowerCase()
       return rawLeagues.filter(l =>
-        l.league.name.toLowerCase().includes(deferredSearch.toLowerCase()) ||
-        l.country.name.toLowerCase().includes(deferredSearch.toLowerCase())
+        getLeagueName(l).toLowerCase().includes(q) ||
+        getCountryName(l).toLowerCase().includes(q)
       )
     }
 

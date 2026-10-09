@@ -1,5 +1,6 @@
 import { getSearchIndex } from "@/services/leaguesCache"
 import { withRateLimit } from "@/lib/withRateLimit"
+import { routeErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request) {
   try {
@@ -20,10 +21,7 @@ async function getHandler(request) {
     return Response.json({ success: true, data: results })
 
   } catch (error) {
-    return Response.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    )
+    return routeErrorResponse(error, "leagues")
   }
 }
 

@@ -6,6 +6,8 @@ import {
   getPaginatedLeagues,
 } from "@/services/leaguesCache"
 import { withRateLimit } from "@/lib/withRateLimit"
+import { getSearchIndex } from "@/services/leaguesCache"
+import { routeErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request) {
   try {
@@ -43,7 +45,6 @@ async function getHandler(request) {
 
       // Pull from Redis cached top_leagues + all continents to find matches
       // Use search index since it covers everything
-      const { getSearchIndex } = await import("@/services/leaguesCache")
       const index = await getSearchIndex()
       const favLeagues = index.filter(l => favIds.has(l.id))
 
@@ -66,10 +67,7 @@ async function getHandler(request) {
     return Response.json({ success: true, data: leagues })
 
   } catch (error) {
-    return Response.json(
-      { success: false, message: error.message },
-      { status: 500 }
-    )
+    return routeErrorResponse(error, "leagues")
   }
 }
 
