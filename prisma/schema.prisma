@@ -305,19 +305,19 @@ model AnalyticsEvent {
   @@index([path, createdAt])
   @@map("analytics_events")
 }
-
 model ApiRequestLog {
-  id          String   @id @default(cuid())
-  visitorId   String?
-  userId      String?
-  ipAddress   String?
-  method      String
-  path        String
-  statusCode  Int
-  durationMs  Int
-  userAgent   String?
-  errorType   String?
-  createdAt   DateTime @default(now())
+  id           String   @id @default(cuid())
+  visitorId    String?
+  userId       String?
+  ipAddress    String?
+  method       String
+  path         String
+  statusCode   Int
+  durationMs   Int
+  userAgent    String?
+  errorType    String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
 
   @@index([createdAt])
   @@index([path, createdAt])
@@ -325,5 +325,6 @@ model ApiRequestLog {
   @@index([ipAddress, createdAt])
   @@index([visitorId, createdAt])
   @@index([userId, createdAt])
+
   @@map("api_request_logs")
 }

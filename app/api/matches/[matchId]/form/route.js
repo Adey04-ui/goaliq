@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getTeamForm(teamId) {
@@ -52,4 +53,4 @@ async function getHandler(request, { params }) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

@@ -5,8 +5,8 @@ import {
   getFavoritesCache,
   setFavoritesCache,
 } from "@/services/favoritesCache"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function postHandler(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -150,5 +150,5 @@ async function getHandler(req) {
   }
 }
 
-export const POST = withRateLimit(postHandler, { limiter: "write" })
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const POST = withApiMonitoring(withRateLimit(postHandler, { limiter: "write" }));
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

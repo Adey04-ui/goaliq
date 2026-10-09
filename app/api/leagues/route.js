@@ -5,7 +5,8 @@ import {
   getFilteredLeagues,
   getPaginatedLeagues,
 } from "@/services/leaguesCache"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { getSearchIndex } from "@/services/leaguesCache"
 import { routeErrorResponse } from "@/lib/apiFootball"
 
@@ -71,4 +72,4 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request, { params }) {
@@ -58,7 +59,7 @@ async function getHandler(request, { params }) {
 
     const payload = { meetings, record: { homeWins, awayWins, draws } }
 
-    // H2H history rarely changes day-to-day — long cache is fine
+    // H2H history rarely changes day-to-day â€” long cache is fine
     await redis.set(cacheKey, payload, { ex: 60 * 60 * 24 * 7 })
 
     return Response.json({ success: true, data: payload })
@@ -67,4 +68,4 @@ async function getHandler(request, { params }) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

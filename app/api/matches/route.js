@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { fetchLocalDayFixtures, todayString } from "@/lib/fixtures"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 const TRENDING_CACHE_SECONDS = 60 * 60
 const LEAGUES_PER_PAGE = 8
 
@@ -127,4 +127,4 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

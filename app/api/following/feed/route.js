@@ -2,8 +2,8 @@ import { redis } from "@/lib/redis"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 const FEED_CACHE_SECONDS = 60 * 60 // 1 hour
 const PARTIAL_CACHE_SECONDS = 60 * 5 // some GNews calls failed: retry soon
 // Every followed item = one GNews request on a cache miss. Cap it so one user
@@ -88,4 +88,4 @@ async function getHandler() {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

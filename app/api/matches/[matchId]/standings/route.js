@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request, { params }) {
@@ -28,7 +29,7 @@ async function getHandler(request, { params }) {
     const data = await result.data
 
     // API-Football nests standings as response[0].league.standings[groupIndex][]
-    // some leagues (e.g. cup groups) have multiple groups — flatten for simplicity, frontend can split by group if needed
+    // some leagues (e.g. cup groups) have multiple groups â€” flatten for simplicity, frontend can split by group if needed
     const groups = data.response[0]?.league?.standings || []
 
     const payload = groups.map((group) =>
@@ -53,4 +54,4 @@ async function getHandler(request, { params }) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

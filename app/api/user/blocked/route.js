@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -32,7 +32,7 @@ async function getHandler(req) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));
 
 async function postHandler(req) {
   try {
@@ -82,7 +82,7 @@ async function postHandler(req) {
   }
 }
 
-export const POST = withRateLimit(postHandler, { limiter: "write" })
+export const POST = withApiMonitoring(withRateLimit(postHandler, { limiter: "write" }));
 
 async function deleteHandler(req) {
   try {
@@ -115,4 +115,4 @@ async function deleteHandler(req) {
   }
 }
 
-export const DELETE = withRateLimit(deleteHandler, { limiter: "write" })
+export const DELETE = withApiMonitoring(withRateLimit(deleteHandler, { limiter: "write" }));

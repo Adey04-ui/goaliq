@@ -1,6 +1,6 @@
 import { redis } from "@/lib/redis"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function getHandler(request) {
   try {
     const { searchParams } = new URL(request.url)
@@ -37,4 +37,4 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

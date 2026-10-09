@@ -1,5 +1,6 @@
 import { redis } from "@/lib/redis"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request, { params }) {
@@ -26,7 +27,7 @@ async function getHandler(request, { params }) {
 
     const data = await result.data
 
-    // data.response is an array of 2 team stat blocks — reshape to { home: {...}, away: {...} }
+    // data.response is an array of 2 team stat blocks â€” reshape to { home: {...}, away: {...} }
     const [homeBlock, awayBlock] = data.response
 
     function toStatMap(block) {
@@ -53,4 +54,4 @@ async function getHandler(request, { params }) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

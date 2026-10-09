@@ -2,8 +2,8 @@ import { v2 as cloudinary } from "cloudinary"
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/authOptions"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -100,4 +100,4 @@ async function postHandler(req) {
   }
 }
 
-export const POST = withRateLimit(postHandler, { limiter: "upload" }) 
+export const POST = withApiMonitoring(withRateLimit(postHandler, { limiter: "upload" }));
