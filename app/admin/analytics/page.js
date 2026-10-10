@@ -22,6 +22,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import * as Select from "@radix-ui/react-select";
+import { useRouter } from "next/navigation";
 
 const DATE_RANGES = [
   { label: "Last 7 days", value: "7" },
@@ -427,6 +428,7 @@ function RequestTable({ requests, loading }) {
 }
 
 export default function AnalyticsPage() {
+  const router = useRouter()
   const [range, setRange] = useState("7");
   const [overview, setOverview] = useState(null);
   const [pages, setPages] = useState([]);
@@ -803,7 +805,9 @@ export default function AnalyticsPage() {
           title="Recent API requests"
           subtitle="Latest requests captured by the backend monitor"
           action={
-            <span className="analytics-panel__link">
+            <span className="analytics-panel__link" onClick={() => {
+              router.push("/admin/analytics/backend-logs")
+            }}>
               Latest activity <ChevronRight size={15} />
             </span>
           }
