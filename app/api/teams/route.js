@@ -1,4 +1,5 @@
-import { withRateLimit } from "@/lib/withRateLimit"
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { fetchApiFootball, apiFootballErrorResponse } from "@/lib/apiFootball"
 
 async function getHandler(request) {
@@ -19,4 +20,4 @@ async function getHandler(request) {
   return Response.json(data);
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" });
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

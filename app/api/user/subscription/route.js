@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { authOptions } from "@/lib/authOptions"
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function getHandler(req) {
   try {
     const session = await getServerSession(authOptions)
@@ -32,4 +32,4 @@ async function getHandler(req) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

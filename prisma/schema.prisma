@@ -287,3 +287,69 @@ model PlayerLink {
 
   @@map("player_links")
 }
+
+model AnalyticsEvent {
+  id             String   @id @default(cuid())
+  visitorId      String
+  userId         String?
+  eventType      String   @default("page_view")
+  path           String
+  country        String?
+  device         String?
+
+  // Frontend error details
+  message        String?  @db.Text
+  stack          String?  @db.Text
+  source         String?
+  lineNumber     Int?
+  columnNumber   Int?
+
+  // Performance metrics: LCP, INP, CLS
+  metricName     String?
+  metricValue    Float?
+  metricRating   String?
+
+  // Frontend API failure details
+  resourceName   String?
+  statusCode     Int?
+
+  // Browser context
+  userAgent      String?
+
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([visitorId, createdAt])
+  @@index([userId, createdAt])
+  @@index([country, createdAt])
+  @@index([path, createdAt])
+  @@index([eventType, createdAt])
+  @@index([metricName, createdAt])
+
+  @@map("analytics_events")
+}
+
+
+model ApiRequestLog {
+  id           String   @id @default(cuid())
+  visitorId    String?
+  userId       String?
+  ipAddress    String?
+  method       String
+  path         String
+  statusCode   Int
+  durationMs   Int
+  userAgent    String?
+  errorType    String?
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([path, createdAt])
+  @@index([statusCode, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([visitorId, createdAt])
+  @@index([userId, createdAt])
+
+  @@map("api_request_logs")
+}

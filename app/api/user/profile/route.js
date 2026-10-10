@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { authOptions } from "@/lib/authOptions"
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function getGeoFromIp(ip) {
   if (!ip || ip === "::1" || ip === "127.0.0.1") {
     return { country: "NG", timezone: "Africa/Lagos", location: "Localhost" }
@@ -141,7 +141,7 @@ async function getHandler(req) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));
 
 async function patchHandler(req) {
   try {
@@ -209,4 +209,4 @@ async function patchHandler(req) {
   }
 }
 
-export const PATCH = withRateLimit(patchHandler, { limiter: "write" })
+export const PATCH = withApiMonitoring(withRateLimit(patchHandler, { limiter: "write" }));

@@ -2,8 +2,9 @@ import { redis } from "@/lib/redis"
 import { prisma } from "@/lib/prisma"
 import { fetchDayFixtures, todayString } from "@/lib/fixtures"
 import { getServerSession } from "next-auth"
-import { authOptions } from "../../auth/[...nextauth]/route"
-import { withRateLimit } from "@/lib/withRateLimit"
+import { authOptions } from "@/lib/authOptions"
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 import { routeErrorResponse } from "@/lib/apiFootball"
 
 // A month is ~30 days = ~30 API-Football calls on a cold cache, but the free
@@ -151,4 +152,4 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));

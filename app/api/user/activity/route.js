@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/lib/authOptions"
 import { cookies } from "next/headers"
-import { withRateLimit } from "@/lib/withRateLimit"
-
+import { withRateLimit } from "@/lib/withRateLimit";
+import { withApiMonitoring } from "@/lib/apiMonitor";
 async function getCurrentSessionToken() {
   // cookies() is async in Next.js 15+ - same issue as headers() in route.js
   const cookieStore = await cookies()
@@ -43,7 +43,7 @@ async function getHandler(req) {
   }
 }
 
-export const GET = withRateLimit(getHandler, { limiter: "read" })
+export const GET = withApiMonitoring(withRateLimit(getHandler, { limiter: "read" }));
 
 async function deleteHandler(req) {
   try {
@@ -82,4 +82,4 @@ async function deleteHandler(req) {
   }
 }
 
-export const DELETE = withRateLimit(deleteHandler, { limiter: "write" })
+export const DELETE = withApiMonitoring(withRateLimit(deleteHandler, { limiter: "write" }));

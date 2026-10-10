@@ -5,6 +5,7 @@ import {
   apiFootballErrorResponse,
   routeErrorResponse,
 } from "@/lib/apiFootball"
+import { withApiMonitoring } from "@/lib/apiMonitor";
 
 const CURRENT_SEASON = new Date().getFullYear().toString()
 
@@ -112,6 +113,8 @@ async function getHandler(request) {
   }
 }
 
-export const GET = withRateLimit(getHandler, {
-  limiter: "read",
-})
+export const GET = withApiMonitoring(
+  withRateLimit(getHandler, {
+    limiter: "read",
+  })
+)
