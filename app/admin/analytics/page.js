@@ -805,7 +805,7 @@ export default function AnalyticsPage() {
           title="Recent API requests"
           subtitle="Latest requests captured by the backend monitor"
           action={
-            <span className="analytics-panel__link" onClick={() => {
+            <span className="analytics-panel__link" style={{ cursor: "pointer" }} onClick={() => {
               router.push("/admin/analytics/backend-logs")
             }}>
               Latest activity <ChevronRight size={15} />
