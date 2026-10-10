@@ -13,6 +13,7 @@ import { SidebarProvider } from "@/context/sidebarContext"
 import { ThemeProvider } from "@/context/themeContext"
 import PageViewTracker from "@/app/components/PageViewTracker"
 import FrontendMonitor from "@/app/components/analytics/FrontendMonitor"
+import { Suspense } from "react"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,7 +39,9 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className={`${inter.variable} font-sans`}>
-        <PageViewTracker />
+        <Suspense fallback={null}>
+          <PageViewTracker />
+        </Suspense>
         <FrontendMonitor />
         <ToastProvider>
           <SWRProvider>

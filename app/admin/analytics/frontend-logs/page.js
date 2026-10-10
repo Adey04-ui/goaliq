@@ -1,4 +1,4 @@
-
+import { Suspense } from "react";
 import LogsExplorer from "@/app/components/analytics/LogsExplorer";
 
 export const metadata = {
@@ -6,5 +6,9 @@ export const metadata = {
 };
 
 export default function FrontendLogsPage() {
-  return <LogsExplorer type="frontend" />;
+  return (
+    <Suspense fallback={<div>Loading frontend logs...</div>}>
+      <LogsExplorer type="frontend" />
+    </Suspense>
+  );
 }
